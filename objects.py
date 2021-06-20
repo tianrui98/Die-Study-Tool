@@ -1,4 +1,5 @@
 import os
+from typing import DefaultDict
 
 class ImgObj:
     """Class object for an image
@@ -45,7 +46,8 @@ class Stage:
         self.stages = ["Validate Clusters", "Inspect Verified", "Verified vs Singles", "Singles vs Singles"]
         self.stage_number = stage_number
         self.name = self.stages[self.stage_number]
-        self.images_checked = set()
+        self.images_checked = set() #image names
+        self.matches = DefaultDict(set) #key: left image obj # value: list of right image obj
 
     def next_stage(self):
         """When move into the next stage, clear images checked

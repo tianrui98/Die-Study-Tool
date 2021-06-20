@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter.constants import RAISED, RIDGE
 from PIL import Image, ImageTk
 import math
 import actions
@@ -26,11 +27,15 @@ class MainUI:
         self.root.rowconfigure(2, weight=1)
         self.root.rowconfigure(3, weight=1)
 
+#%% Shortcuts
+
     def _get_image_object(self, image_index):
         return self.cluster.images [image_index]
 
     def _get_image_name (self, image_index):
         return self._get_image_object(image_index).name
+
+#%% Visuals and Aesthetics
 
     def add_image(self,  path, column, row, columspan, rowspan, parent, sticky="nsew"):
 
@@ -77,13 +82,15 @@ class MainUI:
                            textvariable=button_text,
                            height=height,
                            width=width,
-                           command=func)
+                           command=func,
+                           font = ("Arial", "14"))
         button_text.set(content)
         button.grid(column=column,
                     row=row,
                     columnspan=columspan,
                     rowspan=rowspan,
                     sticky=sticky)
+
         return button
 
     def add_frame(self, column, row, columspan, rowspan, parent, sticky="nsew"):
@@ -123,12 +130,64 @@ class MainUI:
         right_path = self.cluster.images[right_image_number].address
         right_image = self.add_image(right_path, 2, 1, 1, 1, self.root, sticky = "we")
 
+        #initialize tick and button style
         if self._get_image_name(right_image_number) in self.current_stage.images_checked:
             self.change_tick_color("right", True)
         else:
             self.change_tick_color("right", False)
 
+        if self._get_image_object(right_image_number) in self.current_stage.matches[(self._get_image_object(left_image_number))]:
+            #the pair has been previously matched
+            self.activate_button(self.match_btn)
+
         return left_image, right_image
+
+    def change_tick_color (self, side, checked):
+        """turn the "check" icon green or grey
+
+        Args:
+            tick_widget ([type]): [description]
+            checked ([type]): [description]
+        """
+        if side == "left":
+            tick_widget = self.left_tick
+            frame_widget = self.left_info_bar
+
+        else:
+            tick_widget = self.right_tick
+            frame_widget = self.right_info_bar
+
+        tick_widget.grid_forget()
+        if checked:
+            tick_widget = self.add_icon("images/green_tick.png", 15, 15, 1, 0, 1, 1, frame_widget, sticky = "e")
+
+        else:
+            tick_widget = self.add_icon("images/grey_tick.png", 15, 15, 1, 0, 1, 1, frame_widget, sticky = "e")
+
+    def update_icon_button_color (self):
+        """When browsing through images, update icon and button styles based on what action has been done to the right image
+        """
+        #update tick color
+        if self._get_image_name(self.right_image_index) in self.current_stage.images_checked:
+            self.change_tick_color("right", True)
+        else:
+            self.change_tick_color("right", False)
+        #the pair has been previously matched
+        if self._get_image_object(self.right_image_index) in self.current_stage.matches[(self._get_image_object(self.left_image_index))]:
+            self.activate_button(self.match_btn)
+        else:
+            self.deactivate_button(self.match_btn)
+
+    def change_button_color (self, button_widget, new_fg = "white", new_font = ("Arial", "14")):
+        button_widget.config (fg = new_fg, font = new_font)
+
+    def activate_button (self, button_widget):
+        self.change_button_color (button_widget, new_fg = "#dda15e", new_font = ("Arial", "14", "bold"))
+
+    def deactivate_button (self, button_widget):
+        self.change_button_color (button_widget, new_fg = "white", new_font = ("Arial", "14"))
+
+#%% Actions
 
     def browse_files(self):
         """Let user choose which project/folder to work on
@@ -166,111 +225,60 @@ class MainUI:
         self.right_cluster_label.config(text = "Cluster : " + self.cluster.images[self.right_image_index].cluster)
         return None
 
-    def load_next_image (self, image_widget, side):
-        """Erase old image, Add the next in line image. function for "next" button
+    def load_next_image (self):
+        """Change right image. Erase old image, Add the next in line image. function for "next" button
 
-        Args:
-            image_widget (TK Widget): either self.left or self.right
-            side (str): "left" or "right"
         """
-        if side == "left":
-            column = 0
-            self.left_image_index = min(len(self.cluster.images), self.left_image_index + 1)
-            index = self.left_image_index
-            image_label = self.left_image_name_label
-
-        else:
-            column = 2
-            self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
-            index = self.right_image_index
-            image_label = self.right_image_name_label
-
-        image_widget.grid_forget()
-        if index <= len(self.cluster.images) - 1:
-            new_image_path = self.cluster.images[index].address
-            image_widget = self.add_image(new_image_path, column, 1, 1, 1, self.root, sticky = "we")
-            new_image_label =  self.cluster.images[index].name
-
-            #update tick color
-            if self._get_image_name(index) in self.current_stage.images_checked:
-                self.change_tick_color("right", True)
-            else:
-                self.change_tick_color("right", False)
+        self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
+        self.right_image.grid_forget()
+        if self.right_image_index <= len(self.cluster.images) - 1:
+            new_image_path = self.cluster.images[self.right_image_index].address
+            self.right_image = self.add_image(new_image_path, 2, 1, 1, 1, self.root, sticky = "we")
+            new_image_label =  self.cluster.images[self.right_image_index].name
+            self.update_icon_button_color ()
 
         else:
             self.add_filler(30,30, 2, 1, 1, 1, self.root, content = "End of Cluster")
             new_image_label =  ""
             self.change_tick_color("right", False)
+            self.update_icon_button_color ()
 
         #update image labels
-        image_label.config(text = "Name : " +new_image_label)
+        self.right_image_name_label.config(text = "Name : " +new_image_label)
 
         return None
 
-    def load_prev_image (self, image_widget, side):
-        """Erase old image, Add the prev in line image. function for "prev" button
-        When user reach the index 1 image (for right) or 0 (for left), can't move forward anymore
+    def load_prev_image (self):
+        """ change right image
+        When user reach the index 1 image, can't move forward anymore
 
         Args:
             image_widget (TK Widget): either self.left or self.right
             side (str): "left" or "right"
         """
 
-        if side == "left":
-            column = 0
-            self.left_image_index = max(0, self.left_image_index - 1)
-            index = self.left_image_index
-            image_label = self.left_image_name_label
-        else:
-            column = 2
-            self.right_image_index = max(1, self.right_image_index - 1)
-            index = self.right_image_index
-            image_label = self.right_image_name_label
+        self.right_image_index = max(1, self.right_image_index - 1)
+        self.right_image.grid_forget()
+        if self.right_image_index >= 0:
+            new_image_path = self.cluster.images[self.right_image_index].address
+            self.right_image = self.add_image(new_image_path, 2, 1, 1, 1, self.root, sticky = "we")
+            self.right_image_name_label.config(text = "Name : " + self.cluster.images[self.right_image_index].name)
+            self.update_icon_button_color ()
 
-        image_widget.grid_forget()
-        if index >= 0:
-            new_image_path = self.cluster.images[index].address
-            image_widget = self.add_image(new_image_path, column, 1, 1, 1, self.root, sticky = "we")
-            image_label.config(text = "Name : " + self.cluster.images[index].name)
-
-            if self._get_image_name(index) in self.current_stage.images_checked:
-                self.change_tick_color("right", True)
-            else:
-                self.change_tick_color("right", False)
         return None
 
-    def change_tick_color (self, side, checked):
-        """turn the "check" icon green or grey & update status in Cluster_object
-
-        Args:
-            tick_widget ([type]): [description]
-            checked ([type]): [description]
-        """
-        if side == "left":
-            tick_widget = self.left_tick
-            frame_widget = self.left_info_bar
-
-        else:
-            tick_widget = self.right_tick
-            frame_widget = self.right_info_bar
-
-        tick_widget.grid_forget()
-        if checked:
-            tick_widget = self.add_icon("images/green_tick.png", 15, 15, 1, 0, 1, 1, frame_widget, sticky = "e")
-
-        else:
-            tick_widget = self.add_icon("images/grey_tick.png", 15, 15, 1, 0, 1, 1, frame_widget, sticky = "e")
 
     def cluster_validation_match (self):
         """During cluster validation stage, match left and right image
-        the right tick turn green
+        - the right tick turn green (means checked)
+        - the match button's fg turn orange
+        - the pair (objects) added to current stage
 
-        Args:
-            left_image_obj ([type]): [description]
-            right_image_obj ([type]): [description]
         """
         self.change_tick_color ("right", checked = True)
+        self.activate_button(self.match_btn)
         self.current_stage.images_checked.add(self._get_image_name(self.right_image_index))
+        self.current_stage.matches[self._get_image_object(self.left_image_index)].add(self._get_image_object(self.right_image_index))
 
     def create_validation_UI (self):
 
@@ -310,8 +318,8 @@ class MainUI:
         _ = self.add_filler(4, 80-15, 2, 0, 3, 2, self.right_info_bar, sticky= "e")
 
         #navigation bar
-        self.prev_btn = self.add_button("Prev", lambda: self.load_prev_image(self.right_image, "right"), 4, 4, 5, 0, 1, 2, self.right_info_bar, sticky="e")
-        self.next_btn = self.add_button("Next", lambda: self.load_next_image(self.right_image, "right"), 4, 4, 6, 0, 1, 2, self.right_info_bar, sticky="e")
+        self.prev_btn = self.add_button("Prev", self.load_prev_image, 4, 4, 5, 0, 1, 2, self.right_info_bar, sticky="e")
+        self.next_btn = self.add_button("Next", self.load_next_image, 4, 4, 6, 0, 1, 2, self.right_info_bar, sticky="e")
 
         # action buttons
         action_bar = self.add_frame(2, 3, 1, 1, self.root)
