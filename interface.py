@@ -5,9 +5,8 @@ import actions
 from tkinter import filedialog
 from tkinter.filedialog import askopenfile
 import os
-
-left_path = "/Users/rui/Desktop/Coin/Clean_Reverse_Cluster_Folder/Reverse_Clusters_1302/53/53_Clusters/53;007_53;072_53;144/53;007.jpg"
-right_path = "/Users/rui/Desktop/Coin/Clean_Reverse_Cluster_Folder/Reverse_Clusters_1302/53/53_Clusters/53;007_53;072_53;144/53;072.jpg"
+from objects import *
+import actions
 
 
 class MainUI:
@@ -27,12 +26,32 @@ class MainUI:
         self.root.rowconfigure(2, weight=1)
         self.root.rowconfigure(3, weight=1)
 
+    def _get_image_object(self, image_index):
+        return self.cluster.images [image_index]
+
+    def _get_image_name (self, image_index):
+        return self._get_image_object(image_index).name
+
     def add_image(self,  path, column, row, columspan, rowspan, parent, sticky="nsew"):
 
         image = Image.open(path)
         iw, ih = int(image.width), int(image.height)
         h = 600
         image = image.resize((math.ceil(h/ih * iw), h), Image. ANTIALIAS)
+        img = ImageTk.PhotoImage(image)
+        img_label = tk.Label(parent, image=img)
+        img_label.image = img
+        img_label.grid(column=column,
+                       row=row,
+                       columnspan=columspan,
+                       rowspan=rowspan,
+                       sticky=sticky)
+        return img_label
+
+    def add_icon(self, path, height, width,  column, row, columspan, rowspan, parent, sticky="nsew"):
+
+        image = Image.open(path)
+        image = image.resize((width, height), Image. ANTIALIAS)
         img = ImageTk.PhotoImage(image)
         img_label = tk.Label(parent, image=img)
         img_label.image = img
@@ -87,27 +106,27 @@ class MainUI:
 
         return filler
 
-    def open_cluster(self):
-        #TODO read log then open undone cluster
-        self.cluster_name =  os.listdir(self.project_address) [0]
-        self.cluster_address = os.path.join(self.project_address, self.cluster_name )
-        self.cluster_images = sorted([f for f in os.listdir(self.cluster_address) if not f.startswith('.')])
 
     def add_images (self, left_image_number, right_image_number):
         """Add left and right images at once
 
         Args:
-            left_image_number ([type]): index of image in self.cluster_images
-            right_image_number ([type]): index of image in self.cluster_images
+            left_image_number ([type]): index of image in self.cluster.images
+            right_image_number ([type]): index of image in self.cluster.images
 
         Returns:
             TK Widget: left and right image widgets
         """
-        left_path = os.path.join(self.cluster_address, self.cluster_images[left_image_number])
+        left_path = self.cluster.images[left_image_number].address
         left_image = self.add_image(left_path, 0, 1, 1, 1, self.root, sticky = "we")
         self.add_filler(1, 1, 1, 0, 1, 4, self.root) #divider
-        right_path = os.path.join(self.cluster_address, self.cluster_images[right_image_number])
+        right_path = self.cluster.images[right_image_number].address
         right_image = self.add_image(right_path, 2, 1, 1, 1, self.root, sticky = "we")
+
+        if self._get_image_name(right_image_number) in self.current_stage.images_checked:
+            self.change_tick_color("right", True)
+        else:
+            self.change_tick_color("right", False)
 
         return left_image, right_image
 
@@ -121,19 +140,30 @@ class MainUI:
         self.project_name = dirname.split("/")[-1]
         #update project name in menu bar
         self.project_title_label.config(text = "Project Title: " + self.project_name)
+
+        #TODO: read progress
         #update project status
-        self.current_stage_label.config (text = "Current Stage: Cluster Validation")
+
+        self.current_stage = Stage(0)
+        self.current_stage_label.config (text = "Current Stage: " + self.current_stage.name)
 
         self.project_address = dirname
-        self.open_cluster()
+        self.cluster = actions.open_cluster(project_address = self.project_address)
         self.left_image.grid_forget()
         self.right_image.grid_forget()
 
-        #TODO: change index accordint to progress?
+        #TODO: change staring index according to progress?
 
         self.left_image_index = 0
         self.right_image_index = 1
         self.left_image, self.right_image = self.add_images(self.left_image_index, self.right_image_index)
+
+        #update image info display
+        self.left_image_name_label.config(text = "Name : " + self.cluster.images[self.left_image_index].name)
+        self.left_cluster_label.config(text = "Cluster : " + self.cluster.images[self.left_image_index].cluster)
+
+        self.right_image_name_label.config(text = "Name : " + self.cluster.images[self.right_image_index].name)
+        self.right_cluster_label.config(text = "Cluster : " + self.cluster.images[self.right_image_index].cluster)
         return None
 
     def load_next_image (self, image_widget, side):
@@ -145,19 +175,36 @@ class MainUI:
         """
         if side == "left":
             column = 0
-            self.left_image_index = min(len(self.cluster_images), self.left_image_index + 1)
+            self.left_image_index = min(len(self.cluster.images), self.left_image_index + 1)
             index = self.left_image_index
+            image_label = self.left_image_name_label
+
         else:
             column = 2
-            self.right_image_index = min(len(self.cluster_images), self.right_image_index + 1)
+            self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
             index = self.right_image_index
+            image_label = self.right_image_name_label
 
         image_widget.grid_forget()
-        if index <= len(self.cluster_images) - 1:
-            new_image_path = os.path.join(self.cluster_address, self.cluster_images[index])
+        if index <= len(self.cluster.images) - 1:
+            new_image_path = self.cluster.images[index].address
             image_widget = self.add_image(new_image_path, column, 1, 1, 1, self.root, sticky = "we")
+            new_image_label =  self.cluster.images[index].name
+
+            #update tick color
+            if self._get_image_name(index) in self.current_stage.images_checked:
+                self.change_tick_color("right", True)
+            else:
+                self.change_tick_color("right", False)
+
         else:
             self.add_filler(30,30, 2, 1, 1, 1, self.root, content = "End of Cluster")
+            new_image_label =  ""
+            self.change_tick_color("right", False)
+
+        #update image labels
+        image_label.config(text = "Name : " +new_image_label)
+
         return None
 
     def load_prev_image (self, image_widget, side):
@@ -173,17 +220,57 @@ class MainUI:
             column = 0
             self.left_image_index = max(0, self.left_image_index - 1)
             index = self.left_image_index
+            image_label = self.left_image_name_label
         else:
             column = 2
             self.right_image_index = max(1, self.right_image_index - 1)
             index = self.right_image_index
+            image_label = self.right_image_name_label
 
         image_widget.grid_forget()
         if index >= 0:
-            new_image_path = os.path.join(self.cluster_address, self.cluster_images[index])
+            new_image_path = self.cluster.images[index].address
             image_widget = self.add_image(new_image_path, column, 1, 1, 1, self.root, sticky = "we")
+            image_label.config(text = "Name : " + self.cluster.images[index].name)
 
+            if self._get_image_name(index) in self.current_stage.images_checked:
+                self.change_tick_color("right", True)
+            else:
+                self.change_tick_color("right", False)
         return None
+
+    def change_tick_color (self, side, checked):
+        """turn the "check" icon green or grey & update status in Cluster_object
+
+        Args:
+            tick_widget ([type]): [description]
+            checked ([type]): [description]
+        """
+        if side == "left":
+            tick_widget = self.left_tick
+            frame_widget = self.left_info_bar
+
+        else:
+            tick_widget = self.right_tick
+            frame_widget = self.right_info_bar
+
+        tick_widget.grid_forget()
+        if checked:
+            tick_widget = self.add_icon("images/green_tick.png", 15, 15, 1, 0, 1, 1, frame_widget, sticky = "e")
+
+        else:
+            tick_widget = self.add_icon("images/grey_tick.png", 15, 15, 1, 0, 1, 1, frame_widget, sticky = "e")
+
+    def cluster_validation_match (self):
+        """During cluster validation stage, match left and right image
+        the right tick turn green
+
+        Args:
+            left_image_obj ([type]): [description]
+            right_image_obj ([type]): [description]
+        """
+        self.change_tick_color ("right", checked = True)
+        self.current_stage.images_checked.add(self._get_image_name(self.right_image_index))
 
     def create_validation_UI (self):
 
@@ -209,29 +296,29 @@ class MainUI:
         _ = self.add_filler(4,70, 1, 0, 3, 2, left_menu_bar, sticky= "e")
 
         # image info
-        left_info_bar = self.add_frame(0, 2, 1, 1, self.root)
-        left_info_bar.columnconfigure(1, weight=1)
-        self.left_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, left_info_bar)
-        self.left_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, left_info_bar)
-        _ = self.add_filler(4,80, 1, 0, 3, 2, left_info_bar, sticky= "e")
+        self.left_info_bar = self.add_frame(0, 2, 1, 1, self.root)
+        self.left_info_bar.columnconfigure(1, weight=1)
+        self.left_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.left_info_bar, sticky= "w")
+        self.left_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.left_info_bar, sticky= "w")
+        _ = self.add_filler(4,80, 1, 0, 3, 2, self.left_info_bar, sticky= "e")
 
-        right_info_bar = self.add_frame(2, 2, 1, 1, self.root)
-        right_info_bar.columnconfigure(1, weight=1)
-        right_info_bar.columnconfigure(2, weight=1)
-        self.right_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, right_info_bar, sticky="w")
-        self.right_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, right_info_bar, sticky="w")
-        _ = self.add_filler(4,80, 1, 0, 3, 2, right_info_bar, sticky= "e")
+        self.right_info_bar = self.add_frame(2, 2, 1, 1, self.root)
+        self.right_info_bar.columnconfigure(2, weight=1)
+        self.right_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.right_info_bar, sticky="w")
+        self.right_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.right_info_bar, sticky="w")
+        self.right_tick = self.add_filler(1, 1, 1, 0, 1, 1, self.right_info_bar, sticky = "e")
+        _ = self.add_filler(4, 80-15, 2, 0, 3, 2, self.right_info_bar, sticky= "e")
 
         #navigation bar
-        self.prev_btn = self.add_button("Prev", lambda: self.load_prev_image(self.right_image, "right"), 4, 4, 4, 0, 1, 2, right_info_bar, sticky="e")
-        self.next_btn = self.add_button("Next", lambda: self.load_next_image(self.right_image, "right"), 4, 4, 5, 0, 1, 2, right_info_bar, sticky="e")
+        self.prev_btn = self.add_button("Prev", lambda: self.load_prev_image(self.right_image, "right"), 4, 4, 5, 0, 1, 2, self.right_info_bar, sticky="e")
+        self.next_btn = self.add_button("Next", lambda: self.load_next_image(self.right_image, "right"), 4, 4, 6, 0, 1, 2, self.right_info_bar, sticky="e")
 
         # action buttons
         action_bar = self.add_frame(2, 3, 1, 1, self.root)
         action_bar.rowconfigure(0, weight=1)
         for i in range(4):
             action_bar.columnconfigure(i, weight=1)
-        self.match_btn = self.add_button("Match", None, 2, 4, 0, 0, 1, 1, action_bar)
+        self.match_btn = self.add_button("Match", self.cluster_validation_match, 2, 4, 0, 0, 1, 1, action_bar)
         self.no_match_btn = self.add_button("No Match", None, 2, 4, 1, 0, 1, 1, action_bar)
         self.identical_btn = self.add_button("Identical", None, 2, 4, 2, 0, 1, 1, action_bar)
         self.best_image_btn = self.add_button("Best Image", None, 2, 4, 3, 0, 1, 1, action_bar)
