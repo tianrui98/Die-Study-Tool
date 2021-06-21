@@ -10,7 +10,6 @@ class ImgObj:
         self.address = address
         self.cluster = category_name #either cluster name or "Singles"
         self.prev_cluster = category_name #The last category it was placed in
-        self.identicals = [] # List of ImgObj
 
 
 class Cluster:
@@ -23,9 +22,11 @@ class Cluster:
         self.name = folder_address.split("/")[-1]
         image_files = sorted([f for f in os.listdir(self.address) if not f.startswith('.')])
         self.images = [ImgObj(os.path.join(self.address, f), self.name) for f in image_files]
-        self.identicals = {} #key: name value: list of image names
+        self.identicals = [] #list of sets
         self.number = len(self.images) #number of coins
         self.best_image = self.images[0] #default first image
+        self.matches = set() #for adding right image obj that belong to the cluster
+        self.nomatches = set()
 
 # class Singles:
 #     """Class object for singles folder
@@ -47,7 +48,7 @@ class Stage:
         self.stage_number = stage_number
         self.name = self.stages[self.stage_number]
         self.images_checked = set() #image names
-        self.matches = DefaultDict(set) #key: left image obj # value: list of right image obj
+
 
     def next_stage(self):
         """When move into the next stage, clear images checked

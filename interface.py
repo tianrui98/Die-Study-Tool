@@ -30,11 +30,33 @@ class MainUI:
 #%% Shortcuts
 
     def _get_image_object(self, image_index):
-        return self.cluster.images [image_index]
+        if image_index < len(self.cluster.images):
+            return self.cluster.images [image_index]
 
     def _get_image_name (self, image_index):
-        return self._get_image_object(image_index).name
+        if image_index < len(self.cluster.images):
+            return self._get_image_object(image_index).name
 
+    def _add_to_identicals (self, left_image_obj, right_image_obj):
+        found = False
+        for s in self.cluster.identicals:
+            if left_image_obj in s:
+                s.add(right_image_obj)
+                found = True
+
+        if not found:
+            self.cluster.identicals.append(set([left_image_obj, right_image_obj]))
+
+    def _remove_from_identicals (self, left_image_obj, right_image_obj):
+        for s in self.cluster.identicals:
+            if left_image_obj in s:
+                s.remove(right_image_obj)
+
+    def _is_identical(self, left_image_obj, right_image_obj):
+        for s in self.cluster.identicals:
+            if left_image_obj in s and right_image_obj in s:
+                return True
+        return False
 #%% Visuals and Aesthetics
 
     def add_image(self,  path, column, row, columspan, rowspan, parent, sticky="nsew"):
@@ -136,7 +158,7 @@ class MainUI:
         else:
             self.change_tick_color("right", False)
 
-        if self._get_image_object(right_image_number) in self.current_stage.matches[(self._get_image_object(left_image_number))]:
+        if self._get_image_object(right_image_number) in self.cluster.matches:
             #the pair has been previously matched
             self.activate_button(self.match_btn)
 
@@ -164,6 +186,8 @@ class MainUI:
         else:
             tick_widget = self.add_icon("images/grey_tick.png", 15, 15, 1, 0, 1, 1, frame_widget, sticky = "e")
 
+
+
     def update_icon_button_color (self):
         """When browsing through images, update icon and button styles based on what action has been done to the right image
         """
@@ -173,10 +197,20 @@ class MainUI:
         else:
             self.change_tick_color("right", False)
         #the pair has been previously matched
-        if self._get_image_object(self.right_image_index) in self.current_stage.matches[(self._get_image_object(self.left_image_index))]:
+        if self._get_image_object(self.right_image_index) in self.cluster.matches:
             self.activate_button(self.match_btn)
         else:
             self.deactivate_button(self.match_btn)
+        #if the pair has been unmatched:
+        if self._get_image_object(self.right_image_index) in self.cluster.nomatches:
+            self.activate_button(self.no_match_btn)
+        else:
+            self.deactivate_button(self.no_match_btn)
+        #if the pair are identicals:
+        if self._is_identical(self._get_image_object(self.left_image_index), self._get_image_object(self.right_image_index)):
+            self.activate_button(self.identical_btn)
+        else:
+            self.deactivate_button(self.identical_btn)
 
     def change_button_color (self, button_widget, new_fg = "white", new_font = ("Arial", "14")):
         button_widget.config (fg = new_fg, font = new_font)
@@ -231,7 +265,8 @@ class MainUI:
         """
         self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
         self.right_image.grid_forget()
-        if self.right_image_index <= len(self.cluster.images) - 1:
+
+        if self.right_image_index < len(self.cluster.images):
             new_image_path = self.cluster.images[self.right_image_index].address
             self.right_image = self.add_image(new_image_path, 2, 1, 1, 1, self.root, sticky = "we")
             new_image_label =  self.cluster.images[self.right_image_index].name
@@ -241,20 +276,21 @@ class MainUI:
             self.add_filler(30,30, 2, 1, 1, 1, self.root, content = "End of Cluster")
             new_image_label =  ""
             self.change_tick_color("right", False)
-            self.update_icon_button_color ()
+            self.deactivate_button(self.match_btn)
+            self.deactivate_button(self.no_match_btn)
+            self.deactivate_button(self.identical_btn)
 
         #update image labels
         self.right_image_name_label.config(text = "Name : " +new_image_label)
-
+        # print("matches", str(self.cluster.matches))
+        # print("nomatches", str(self.cluster.nomatches))
+        # print("identicals", str(self.cluster.identicals))
         return None
 
     def load_prev_image (self):
         """ change right image
         When user reach the index 1 image, can't move forward anymore
 
-        Args:
-            image_widget (TK Widget): either self.left or self.right
-            side (str): "left" or "right"
         """
 
         self.right_image_index = max(1, self.right_image_index - 1)
@@ -272,13 +308,71 @@ class MainUI:
         """During cluster validation stage, match left and right image
         - the right tick turn green (means checked)
         - the match button's fg turn orange
-        - the pair (objects) added to current stage
+        - the right image object added to cluster.matchs
+        - take object out from cluster.nomatches if init
 
         """
-        self.change_tick_color ("right", checked = True)
-        self.activate_button(self.match_btn)
-        self.current_stage.images_checked.add(self._get_image_name(self.right_image_index))
-        self.current_stage.matches[self._get_image_object(self.left_image_index)].add(self._get_image_object(self.right_image_index))
+        if self.right_image_index < len(self.cluster.images):
+            self.change_tick_color ("right", checked = True)
+            self.activate_button(self.match_btn)
+            self.current_stage.images_checked.add(self._get_image_name(self.right_image_index))
+            self.cluster.matches.add(self._get_image_object(self.right_image_index))
+            if self._get_image_object(self.right_image_index) in self.cluster.nomatches:
+                self.cluster.nomatches.remove(self._get_image_object(self.right_image_index))
+                self.deactivate_button(self.no_match_btn)
+
+    def cluster_validation_no_match (self):
+        """During cluster validation stage, unmatch left and right image
+        - the right tick turn green (means checked)
+        - the unmatch button's fg turn orange
+        - the right image object added to cluster.unmatchs
+        - remove from cluster.matches
+
+        """
+        if self.right_image_index < len(self.cluster.images):
+            self.change_tick_color ("right", checked = True)
+            self.activate_button(self.no_match_btn)
+            self.current_stage.images_checked.add(self._get_image_name(self.right_image_index))
+            self.cluster.nomatches.add(self._get_image_object(self.right_image_index))
+            #delist from matches
+            if self._get_image_object(self.right_image_index) in self.cluster.matches:
+                self.cluster.matches.remove(self._get_image_object(self.right_image_index))
+                self.deactivate_button(self.match_btn)
+            #delist from identicals
+            self._remove_from_identicals (self._get_image_object(self.left_image_index), self._get_image_object(self.right_image_index))
+            self.deactivate_button(self.identical_btn)
+
+    def cluster_validation_identical (self):
+        """During cluster validation stage, mark left and right images identical
+        - the right tick turn green (means checked)
+        - add right image to the hashmap cluster.identical
+        - add current image to cluster.matches + activate match button
+        - if previously in cluster.nomatches, remove it & deactivate nomatch button
+
+        - if the two images are already marked identical, click this button will delist them from identicals
+        """
+        if self.right_image_index < len(self.cluster.images):
+            #add to checked
+            self.current_stage.images_checked.add(self._get_image_name(self.right_image_index))
+            self.change_tick_color ("right", checked = True)
+            left, right = self._get_image_object(self.left_image_index), self._get_image_object(self.right_image_index)
+
+            if self._is_identical(left,right):
+                #delist form identicals
+                self._remove_from_identicals(left,right)
+                self.deactivate_button(self.identical_btn)
+
+            else:
+                #add to identicals
+                self._add_to_identicals (left,right)
+                self.activate_button(self.identical_btn)
+                #add to matches
+                self.cluster.matches.add(self._get_image_object(self.right_image_index))
+                self.activate_button(self.match_btn)
+                #delist from no matches
+                if self._get_image_object(self.right_image_index) in self.cluster.nomatches:
+                    self.cluster.nomatches.remove(self._get_image_object(self.right_image_index))
+                    self.deactivate_button(self.no_match_btn)
 
     def create_validation_UI (self):
 
@@ -327,8 +421,8 @@ class MainUI:
         for i in range(4):
             action_bar.columnconfigure(i, weight=1)
         self.match_btn = self.add_button("Match", self.cluster_validation_match, 2, 4, 0, 0, 1, 1, action_bar)
-        self.no_match_btn = self.add_button("No Match", None, 2, 4, 1, 0, 1, 1, action_bar)
-        self.identical_btn = self.add_button("Identical", None, 2, 4, 2, 0, 1, 1, action_bar)
+        self.no_match_btn = self.add_button("No Match", self.cluster_validation_no_match, 2, 4, 1, 0, 1, 1, action_bar)
+        self.identical_btn = self.add_button("Identical", self.cluster_validation_identical, 2, 4, 2, 0, 1, 1, action_bar)
         self.best_image_btn = self.add_button("Best Image", None, 2, 4, 3, 0, 1, 1, action_bar)
 
 
@@ -348,3 +442,4 @@ class MainUI:
 I = MainUI()
 I.create_validation_UI()
 I.root.mainloop()
+# %%
