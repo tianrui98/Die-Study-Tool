@@ -116,7 +116,7 @@ class MainUI:
         return button
 
     def add_frame(self, column, row, columspan, rowspan, parent, sticky="nsew"):
-        frame = tk.Frame(parent, padx=6, pady=6, bd=0, width = 640, height = 80, bg = "white")
+        frame = tk.Frame(parent, padx=6, pady=6, bd=0, width = 640, height = 80)
         frame.grid(column=column,
                    row=row,
                    columnspan=columspan,
@@ -126,7 +126,7 @@ class MainUI:
         return frame
 
     def add_filler(self, height, width, column, row, columspan, rowspan, parent, sticky="nsew", content = ""):
-        filler = tk.Label(parent, width=width, height=height, text = content, bg = "red")
+        filler = tk.Label(parent, width=width, height=height, text = content)
         filler.grid(column=column,
                     row=row,
                     columnspan=columspan,
@@ -198,8 +198,10 @@ class MainUI:
         #the pair has been previously matched
         if self._get_image_object(self.right_image_index) in self.cluster.matches:
             self.activate_button(self.match_btn)
+
         else:
             self.deactivate_button(self.match_btn)
+
         #if the pair has been unmatched:
         if self._get_image_object(self.right_image_index) in self.cluster.nomatches:
             self.activate_button(self.no_match_btn)
@@ -263,6 +265,8 @@ class MainUI:
         self.right_image_name_label.config(text = "Name : " + self.cluster.images[self.right_image_index].name)
         self.right_cluster_label.config(text = "Cluster : " + self.cluster.images[self.right_image_index].cluster)
 
+        #add left image to checked
+        self.current_stage.images_checked.add(self._get_image_name(self.left_image_index))
         return None
 
     def load_next_image (self):
@@ -306,10 +310,10 @@ class MainUI:
         #skip the index of left image
         self.right_image_index = max(0, self.right_image_index - 1)
         if self.right_image_index == self.left_image_index:
-            self.right_image_index = max(0, self.right_image_index - 1)
-
-        if self.right_image_index == self.left_image_index and self.left_image_index == 0:
-            self.right_image_index = 1
+            if self.left_image_index == 0:
+                self.right_image_index = 1
+            else:
+                self.right_image_index = max(0, self.right_image_index - 1)
 
         self.right_image.grid_forget()
         if self.right_image_index >= 0:
@@ -379,7 +383,7 @@ class MainUI:
             if self._get_image_object(self.right_image_index) not in self.singles.images:
                 self.singles.images.append(self._get_image_object(self.right_image_index))
             self.right_cluster_label.config(text = "Cluster : Singles")
- 
+
 
     def cluster_validation_identical (self):
         """During cluster validation stage, mark left and right images identical
@@ -410,20 +414,14 @@ class MainUI:
 
     def cluster_validation_best_image (self):
         """During cluster validation, mark right image the best image of the cluster
-        - The right image has to be a match to the left image
+        - If the two images were marked unmatched, no effect
         - Make the right image cluster.best_image
         - Swap the left and right images
         """
-
-        #if left and right are already matched
-        if self._get_image_object(self.right_image_index) in self.cluster.matches:
-            self.cluster.matches.remove(self._get_image_object(self.right_image_index)) #remove right
-            self.cluster.matches.add(self._get_image_object(self.left_image_index)) #add left
-
-        # if left and right are already unmatched
+        # if right image is already classified as single, no effect
         if self._get_image_object(self.right_image_index) in self.cluster.nomatches:
-            self.cluster.nomatches.remove(self._get_image_object(self.right_image_index)) #remove right
-            self.cluster.nomatches.add(self._get_image_object(self.left_image_index)) #add left
+            return None
+
 
         #swap attributes
         best_image = self.right_image
@@ -448,6 +446,21 @@ class MainUI:
         self.right_image.grid_forget()
         self.left_image.grid_forget()
         self.add_images(self.left_image_index, self.right_image_index)
+
+        #add new left image to checked
+        self.current_stage.images_checked.add(self._get_image_name(self.left_image_index))
+
+        #if new right image has been matched to anything in the cluster before -> mark checked & match
+        if len(self.cluster.matches) > 0:
+            self.change_tick_color("right", True)
+            self.activate_button(self.match_btn)
+            self.cluster.matches.add(self._get_image_object(self.right_image_index))
+            self.cluster.matches.remove(self._get_image_object(self.left_image_index))
+
+        else:
+            self.change_tick_color("right", False)
+            self.deactivate_button(self.match_btn)
+            self.current_stage.images_checked.remove(self._get_image_name(self.right_image_index))
 
 
     def create_validation_UI (self):
@@ -478,6 +491,7 @@ class MainUI:
         self.left_info_bar.columnconfigure(1, weight=1)
         self.left_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.left_info_bar, sticky= "w")
         self.left_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.left_info_bar, sticky= "w")
+        _ = self.add_filler(4, 4, 2, 0, 1, 2, self.left_info_bar, "e")
 
         self.right_info_bar = self.add_frame(2, 2, 1, 1, self.root)
         self.right_info_bar.grid_propagate(0)
@@ -504,18 +518,9 @@ class MainUI:
         self.best_image_btn = self.add_button("Best Image", self.cluster_validation_best_image, 2, 4, 3, 0, 1, 1, action_bar)
 
 
-        #option bar
-        option_bar = self.add_frame(0, 3, 1, 1, self.root, "w")
-        option_bar.columnconfigure(0, weight=1)
-        option_bar.rowconfigure(0, weight=1)
-        self.single_option_label = self.add_text("When unmatched, move which image to Singles: ", 0, 0, 1, 1, option_bar, "w")
+        #filler
 
-        r = tk.IntVar()
-        r.set(0)
-        self.left_option_button = tk.Radiobutton(option_bar, text = "left", variable = r, value = 0)
-        self.right_option_button = tk.Radiobutton(option_bar, text = "right", variable = r, value = 1)
-        self.left_option_button.grid(column = 0, row = 1, columnspan= 1 ,rowspan= 1, sticky= "w")
-        self.right_option_button.grid(column = 0, row = 2, columnspan= 1 ,rowspan= 1, sticky= "w")
+        _ = self.add_frame(0, 3, 1, 1, self.root, "w")
 
     def start (self):
         self.create_validation_UI()
