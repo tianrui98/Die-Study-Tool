@@ -16,6 +16,7 @@ class Cluster:
     """Class object for a cluster of coins
     images, best_images : Updated dynamically
     name: updated upon saving
+    number: updated upon saving
     """
     def __init__ (self, folder_address):
         self.address = folder_address
@@ -23,20 +24,15 @@ class Cluster:
         image_files = sorted([f for f in os.listdir(self.address) if not f.startswith('.')])
         self.images = [ImgObj(os.path.join(self.address, f), self.name) for f in image_files]
         self.identicals = [] #list of sets
-        self.number = len(self.images) #number of coins
-        self.best_image = self.images[0] #default first image
+        self.number = len(self.images) #number of coins - default number of images
+
+        if len(self.images) > 0:
+            self.best_image = self.images[0] #default first image
+        else:
+            self.best_image = None
+
         self.matches = set() #for adding right image obj that belong to the cluster
         self.nomatches = set()
-
-# class Singles:
-#     """Class object for singles folder
-#     """
-#     def __init__ (self, folder_address):
-#         self.name = "Singles"
-#         self.address = folder_address
-#         self.images = dict((i,ImgObj(os.path.join(self.address, i), self.name )) for i in os.listdir(self.address))
-#         self.identicals = {} #key: name value: list of image names
-#         self.number = len(self.images) #number of coins
 
 class Stage:
     """track progress in a stage
@@ -59,7 +55,7 @@ class Stage:
 
 class Records:
     """Cluster and identical coin record for organizing folders & making the final excel sheet
-    Updated dynamically
+    Update upon saving
     """
     def __init__ (self):
         self.clusters = [] #list of Cluster objects
