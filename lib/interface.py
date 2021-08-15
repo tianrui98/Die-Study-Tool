@@ -9,7 +9,8 @@ import os
 from objects import *
 import progress
 import shutil
-
+from root_logger import *
+#%% UI
 class MainUI:
     def __init__(self):
         # main interface
@@ -326,6 +327,8 @@ class MainUI:
 
         self.initialize_image_display()
 
+        logger.info("Open existing project {}".format(self.project_name))
+
     def browse_files(self):
         """Let user choose which new project/folder to start working on
         pass the directory name to the class
@@ -365,6 +368,8 @@ class MainUI:
 
         #close pop-up
         self.open_window.destroy()
+
+        logger.info("Create new project{}".format(self.project_name))
         return None
 
     def load_next_image (self):
@@ -444,7 +449,7 @@ class MainUI:
             if self._get_image_name(self.right_image_index) in self.cluster.nomatches:
                 self.cluster.nomatches.remove(self._get_image_name(self.right_image_index))
                 self.deactivate_button(self.no_match_btn)
-            print("Match ", str(self._get_image_name(self.right_image_index)), "to cluster", self.cluster.name)
+            logger.info("Match {} to cluster {}".format(self._get_image_name(self.right_image_index),self.cluster.name))
 
 
     def cluster_validation_no_match (self):
@@ -472,7 +477,7 @@ class MainUI:
                 self._remove_from_identicals (self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
                 self.deactivate_button(self.identical_btn)
 
-            print("Unmatch ", str(self._get_image_name(self.right_image_index)), "from cluster", self.cluster.name)
+            logger.info("Unmatch {} from cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
 
 
     def cluster_validation_identical (self):
@@ -501,7 +506,7 @@ class MainUI:
                 #add to matches
                 self.cluster_validation_match()
 
-            print("Mark ", str(self._get_image_name(self.right_image_index)), "identical to ", str(self._get_image_name(self.right_image_index)))
+            logger.info("Mark {} identical to {}".format(self._get_image_name(self.right_image_index), self._get_image_name(self.right_image_index)))
 
 
     def cluster_validation_best_image (self):
@@ -554,7 +559,7 @@ class MainUI:
         curr_right_index = self.right_image_index
         self.left_image_index = curr_right_index
         self.right_image_index = curr_left_index
-        print("Make ", str(self._get_image_name(self.right_image_index)), "best image for cluster ", self.cluster.name)
+        logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
 
 
     def check_completion_and_move_on (self):
@@ -565,7 +570,7 @@ class MainUI:
             self.stage = progress.mark_cluster_completed(self.cluster,self.stage)
 
         if progress.check_project_completion(self.cluster, self.stage, self.project_address):
-            print("!!!!project complete!!!!")
+            logger.info("!!!!project complete!!!!")
             #ask user if wants to export and save
             response = self.create_export_results_window()
             if response:
@@ -582,8 +587,8 @@ class MainUI:
         else:
             if progress.check_stage_completion(self.cluster, self.stage):
                 message = "You have completed the current stage."
-                print("_____STAGE COMPLETED_____")
-                print(self.progress_data)
+                logger.info("_____STAGE COMPLETED_____")
+                logger.info(str(self.progress_data))
             else:
                 if progress.check_cluster_completion(self.cluster):
                     message = "You have completed the current cluster."
@@ -599,7 +604,7 @@ class MainUI:
                 if self.cluster:
                     #if next cluster has only 1 image, skip it & recurse
                     if len(self.cluster.images) <= 1:
-                        print("----SKIP ",self.cluster.name, "----")
+                        logger.info("----SKIP ",self.cluster.name, "----")
                         self.stage = progress.mark_cluster_completed(self.cluster,self.stage)
                         self.progress_data, self.cluster = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
                         progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
@@ -620,6 +625,7 @@ class MainUI:
             self.save()
         else:
             shutil.rmtree(self.project_address)
+        logger.info("====EXIT====")
         self.root.destroy()
 
     def create_export_results_window(self):

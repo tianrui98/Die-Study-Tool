@@ -16,11 +16,11 @@ When are data removed? :
 1. When project is completed & excel file is exported
 """
 import json
-from posix import listdir
 from objects import *
 import os
 import shutil
 import pandas as pd
+from root_logger import * 
 
 def _serialize_identicals(identicals):
     res = []
@@ -156,7 +156,7 @@ def inspect_verified_update_folder_and_record(progress_data, project_folder, clu
 
         #2
         shutil.rmtree(matched_cluster_address)
-        print("remove ", matched_cluster_address)
+        logger.info("Remove {}".format(matched_cluster_address))
         os.remove(str(project_folder + "/Verified/" + matched_cluster_name_jpg))
         progress_data[project_folder]["clusters"].pop(matched_cluster_name)
 
@@ -167,7 +167,7 @@ def inspect_verified_update_folder_and_record(progress_data, project_folder, clu
     for matched_cluster_name_jpg in cluster.matches:
         new_cluster_name += "_" + matched_cluster_name_jpg.split(".")[0]
 
-    print("Verified new cluster name: ", new_cluster_name)
+    logger.info("Verified new cluster name: {}".format(new_cluster_name))
     new_cluster_address = project_folder+ "/" + new_cluster_name
     shutil.move(old_cluster_address, new_cluster_address)
     cluster.name = new_cluster_name
@@ -447,7 +447,7 @@ def copy_best_image_to_verified(cluster, project_folder):
     old_image_address = cluster.address + "/" + cluster.best_image.name
     new_image_address = project_folder + "/Verified/" + cluster.name + ".jpg"
     shutil.copyfile(old_image_address, new_image_address)
-    print("COPY BEST IMAGE TO VERIFIED")
+    logger.info("Copied best image of {} to Verified".format(cluster.name))
     return cluster
 
 def _create_a_cluster(stage,project_folder, next_cluster_name):
@@ -510,7 +510,7 @@ def _create_a_cluster(stage,project_folder, next_cluster_name):
 
         next_cluster.images_dict = new_images_dict
 
-    print("New cluster", next_cluster_name, " Stage number ", str(stage.stage_number))
+    logger.info("New cluster {}. Stage number {}".format(next_cluster_name, str(stage.stage_number)))
     return next_cluster
 
 def create_next_cluster(cluster, stage, project_folder):
@@ -519,13 +519,13 @@ def create_next_cluster(cluster, stage, project_folder):
         return None
 
     next_cluster_name = list(stage.clusters_yet_to_check)[0]
-    print("Create next cluster ", next_cluster_name)
+    logger.info("Create next cluster {}".format(next_cluster_name))
     return _create_a_cluster(stage, project_folder, next_cluster_name)
 
 
 def create_next_stage(cluster, stage, project_folder):
     new_stage = Stage(stage.stage_number+1, project_folder)
-    print("Next stage. yet to check:", str(new_stage.clusters_yet_to_check))
+    logger.info("Next stage. yet to check: {}".format(str(new_stage.clusters_yet_to_check)))
     new_cluster = create_next_cluster(cluster, new_stage, project_folder)
 
     return new_cluster, new_stage
