@@ -3,12 +3,10 @@ import tkinter as tk
 from tkinter.constants import CENTER, RAISED, RIDGE
 from PIL import Image, ImageTk
 import math
-import actions
 from tkinter import Toplevel, filedialog
 from tkinter.filedialog import askopenfile
 import os
 from objects import *
-import actions
 import progress
 import shutil
 
@@ -85,6 +83,32 @@ class MainUI:
         if len(left_image_label) > 40:
             left_image_label = left_image_label[:40] + "..."
         self.left_image_name_label.config(text = "Name : " + left_image_label)
+
+    def _open_cluster(self, project_address):
+        """Open an unfinished cluster.
+        Create a Cluster object
+
+        Return: Cluster object
+        """
+        #TODO read log then open undone cluster
+        all_clusters = [f for f in os.listdir(project_address) if not f.startswith('.')]
+        cluster_name =  all_clusters[0]
+        cluster_address = os.path.join(project_address, cluster_name )
+
+        #create cluster object
+        return Cluster(folder_address = cluster_address)
+
+    def _swap_positions(self, list, pos1, pos2):
+
+        # popping both the elements from list
+        first_ele = list.pop(pos1) 
+        second_ele = list.pop(pos2-1)
+
+        # inserting in each others positions
+        list.insert(pos1, second_ele)
+        list.insert(pos2, first_ele)
+
+        return list
 #%% Visuals and Aesthetics
     def add_image(self,  path, column, row, columspan, rowspan, parent, sticky="nsew"):
 
@@ -329,7 +353,7 @@ class MainUI:
         self.stage = Stage(0, self.project_address)
 
         #open the first cluster
-        self.cluster = actions.open_cluster(project_address = self.project_address)
+        self.cluster = self._open_cluster(project_address = self.project_address)
 
         #read or make Singles folder
         if not os.path.exists(dirname + "/" + "Singles"):
@@ -523,6 +547,13 @@ class MainUI:
             self.change_tick_color("right", False)
             self.deactivate_button(self.match_btn)
 
+        #swap the positions of the old best image (now right image) with the old right image (now left image) in the list
+        self.cluster.images = self._swap_positions(self.cluster.images, self.right_image_index, self.left_image_index)
+        #update left and right images' indices
+        curr_left_index = self.left_image_index
+        curr_right_index = self.right_image_index
+        self.left_image_index = curr_right_index
+        self.right_image_index = curr_left_index
         print("Make ", str(self._get_image_name(self.right_image_index)), "best image for cluster ", self.cluster.name)
 
 
