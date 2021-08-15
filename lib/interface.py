@@ -369,7 +369,7 @@ class MainUI:
         #close pop-up
         self.open_window.destroy()
 
-        logger.info("Create new project{}".format(self.project_name))
+        logger.info("_____Create new project{}_____".format(self.project_name))
         return None
 
     def load_next_image (self):
@@ -571,6 +571,7 @@ class MainUI:
 
         if progress.check_project_completion(self.cluster, self.stage, self.project_address):
             logger.info("!!!!project complete!!!!")
+            logger.info(str(self.progress_data))
             #ask user if wants to export and save
             response = self.create_export_results_window()
             if response:
@@ -581,7 +582,6 @@ class MainUI:
                 progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
                 self.progress_data, _, _ = progress.load_progress(self.project_address, False)
                 progress.export_results(self.project_address,self.progress_data, save_address)
-                logger.info(str(self.progress_data))
                 logger.info("====EXPORT====")
                 self.root.destroy()
             else:
@@ -589,8 +589,7 @@ class MainUI:
         else:
             if progress.check_stage_completion(self.cluster, self.stage):
                 message = "You have completed the current stage."
-                logger.info("_____STAGE COMPLETED_____")
-                logger.info(str(self.progress_data))
+                logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
             else:
                 if progress.check_cluster_completion(self.cluster):
                     message = "You have completed the current cluster."
@@ -614,6 +613,8 @@ class MainUI:
                         self.check_completion_and_move_on ()
                     else:
                         self.initialize_image_display()
+                if "stage" in message:
+                    logger.info(str(self.progress_data))
 
     def save(self):
         """save results
@@ -628,7 +629,7 @@ class MainUI:
         else:
             shutil.rmtree(self.project_address)
         logger.info(str(self.progress_data))
-        logger.info("====EXIT====")
+        logger.info("====EXIT====\n\n")
         self.root.destroy()
 
     def create_export_results_window(self):

@@ -33,7 +33,7 @@ class Cluster:
             try:
                 self.best_image = self.images_dict[best_image_name]
             except:
-                print(self.images_dict)
+                print("WARNING: Can't find best image " + str(self.images_dict))
         else:
             if len(self.images) > 0:
                 self.best_image = self.images[0] #default first image

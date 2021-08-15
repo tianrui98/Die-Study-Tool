@@ -73,6 +73,15 @@ def _concatenate_image_names(cluster):
 
     return "_".join(sorted(final_names))
 
+def _change_jpeg_to_jpg (project_folder):
+    all_folders = [f for f in os.listdir(project_folder) if not f.startswith('.')]
+    for folder_name in all_folders:
+        all_images = os.listdir(str(project_folder + "/" + folder_name))
+        for image_name in all_images:
+            if ".jpeg" in image_name:
+                new_name = image_name.split(".")[0] + ".jpg"
+                os.rename(project_folder + "/" + folder_name + "/" + image_name, project_folder + "/" + folder_name + "/" + new_name)
+
 def start_new_project(original_project_folder, project_name):
     new_project_folder =os.getcwd() +"/projects" + "/" + project_name
     shutil.copytree(original_project_folder, new_project_folder)
@@ -81,6 +90,8 @@ def start_new_project(original_project_folder, project_name):
 
     if not os.path.exists(new_project_folder + "/Verified"):
         os.mkdir(new_project_folder + "/Verified")
+
+    _change_jpeg_to_jpg (new_project_folder)
 
     return new_project_folder, progress_data
 
@@ -117,7 +128,6 @@ def cluster_validation_update_folder_and_record(progress_data, project_folder, c
     if project_folder in progress_data and cluster.name in progress_data[project_folder]["clusters"]:
         progress_data[project_folder]["clusters"][new_cluster_name] = progress_data[project_folder]["clusters"].pop(cluster.name)
 
-
     #update cluster object
     cluster.name = new_cluster_name
     cluster.address = new_cluster_address
@@ -133,13 +143,16 @@ def inspect_verified_update_folder_and_record(progress_data, project_folder, clu
     1. Move all images in the matched clusters into the current cluster.
     2. Delete the matched clusters
     3. Rename the current cluster #??? what if there are identicals across two clusters
-    4. Rename the current cluster in record. Add images to matches
+    4. Rename the current cluster in record.
+        Add images to matches
     5. Rename the best image of the current cluster in Verified folder with the new name
     6. If the cluster has no matches and all nomatches ->
     """
     #1
     list_of_matches = list(cluster.matches)
     left_cluster_address = project_folder + "/" + cluster.name
+
+    new_matches = set()
     for matched_cluster_name_jpg in list_of_matches:
         matched_cluster_name = matched_cluster_name_jpg.split(".")[0]
         matched_cluster_address = project_folder+ "/"+ matched_cluster_name
@@ -147,7 +160,7 @@ def inspect_verified_update_folder_and_record(progress_data, project_folder, clu
 
         for image_name in image_names:
             if not image_name.startswith('.'):
-                cluster.matches.add(image_name)
+                new_matches.add(image_name)
                 shutil.move(str(matched_cluster_address+"/"+image_name), str(left_cluster_address+ "/" + image_name))
 
         matched_cluster_identicals = progress_data[project_folder]["clusters"][matched_cluster_name]["identicals"]
@@ -175,6 +188,9 @@ def inspect_verified_update_folder_and_record(progress_data, project_folder, clu
 
     #4
     progress_data[project_folder]["clusters"][new_cluster_name] = progress_data[project_folder]["clusters"].pop(old_cluster_name)
+    old_matches = set(progress_data[project_folder]["clusters"][new_cluster_name]["matches"])
+    new_matches = old_matches.union(new_matches)
+    progress_data[project_folder]["clusters"][new_cluster_name]["matches"] = list(new_matches)
 
     #5
     shutil.move(project_folder+"/Verified/"+old_cluster_name +".jpg", project_folder+"/Verified/"+new_cluster_name +".jpg")
@@ -195,17 +211,11 @@ def verified_vs_singles_update_folder_and_record (progress_data, project_folder,
     5. Rename the best image of the current cluster in Verified folder with the new name
     6. If the cluster has only 1 image, return progress data and None
     """
-    # if len(cluster.images)  <= 1:
-    #     if project_folder in progress_data and cluster.name in progress_data[project_folder]["clusters"]:
-    #         progress_data[project_folder]["clusters"].pop(cluster.name)
-    #     cluster = None
-    #     return progress_data, cluster
 
     #1
     list_of_matches = list(cluster.matches)
     left_cluster_address = project_folder + "/" + cluster.name
     for matched_single_name_jpg in list_of_matches:
-        matched_single_name = matched_single_name_jpg.split(".")[0]
         single_address = project_folder+ "/Singles"
         shutil.move(str(single_address+"/"+matched_single_name_jpg), str(left_cluster_address+ "/" + matched_single_name_jpg))
 
@@ -220,7 +230,9 @@ def verified_vs_singles_update_folder_and_record (progress_data, project_folder,
 
     #4
     progress_data[project_folder]["clusters"][new_cluster_name] = progress_data[project_folder]["clusters"].pop(old_cluster_name)
-
+    old_matches = set(progress_data[project_folder]["clusters"][new_cluster_name]["matches"])
+    new_matches = new_matches = old_matches.union(cluster.matches)
+    progress_data[project_folder]["clusters"][new_cluster_name]["matches"] = list(new_matches)
     #5
     shutil.move(project_folder+"/Verified/"+old_cluster_name +".jpg", project_folder+"/Verified/"+new_cluster_name +".jpg")
 
@@ -234,7 +246,7 @@ def single_vs_single_update_folder_and_record(progress_data, project_folder, clu
     Left: the single that represent its own cluster 
     Right: another single
     1. Move all matches and best image into a new cluster folder with new name
-    2. Add the new cluster to record (? or leave it to save_progress)
+    2. Add the new cluster to record (done in save_progress)
     3. Add the best image of the new cluster to verified & rename
     4. Update the cluster object
     """
@@ -392,9 +404,11 @@ def load_progress(project_folder, create_next_cluster = True):
             cluster = _create_a_cluster(stage, project_folder, next_in_line)
             progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
 
-    if len(stage.clusters_yet_to_check) == 0:
-        #TODO add view cluster mode
-        pass
+        # if current_cluster in progress_data[project_folder]["clusters"]:
+        #     cluster_info = progress_data[project_folder]["clusters"][current_cluster]
+        #     cluster.identicals = _deserialize_identicals(cluster_info["identicals"])
+        #     cluster.matches = set(cluster_info["matches"])
+        #     cluster.nomatches = set(cluster_info["nomatches"])
 
     return progress_data, stage, cluster
 
@@ -584,7 +598,7 @@ def export_results(project_folder, progress_data, save_address):
 
     #move folders
     shutil.move(project_folder, save_address + "/" + project_folder_name)
-    res.to_excel(save_address + "/" + project_folder_name + "/" + "results_" + project_folder_name + ".csv", index= False)
+    res.to_excel(save_address + "/" + project_folder_name + "/" + "results_" + project_folder_name + ".xlsx", index= False)
 
     #wipe out the records in progress data
     _  = progress_data.pop(project_folder)
