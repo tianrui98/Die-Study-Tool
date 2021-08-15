@@ -581,6 +581,8 @@ class MainUI:
                 progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
                 self.progress_data, _, _ = progress.load_progress(self.project_address, False)
                 progress.export_results(self.project_address,self.progress_data, save_address)
+                logger.info(str(self.progress_data))
+                logger.info("====EXPORT====")
                 self.root.destroy()
             else:
                 return None
@@ -625,6 +627,7 @@ class MainUI:
             self.save()
         else:
             shutil.rmtree(self.project_address)
+        logger.info(str(self.progress_data))
         logger.info("====EXIT====")
         self.root.destroy()
 

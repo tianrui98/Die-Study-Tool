@@ -509,8 +509,6 @@ def _create_a_cluster(stage,project_folder, next_cluster_name):
             new_images_dict[image_name] = new_image_obj
 
         next_cluster.images_dict = new_images_dict
-
-    logger.info("New cluster {}. Stage number {}".format(next_cluster_name, str(stage.stage_number)))
     return next_cluster
 
 def create_next_cluster(cluster, stage, project_folder):
@@ -586,7 +584,7 @@ def export_results(project_folder, progress_data, save_address):
 
     #move folders
     shutil.move(project_folder, save_address + "/" + project_folder_name)
-    res.to_csv(save_address + "/" + project_folder_name + "/" + "results_" + project_folder_name + ".csv", index= False)
+    res.to_excel(save_address + "/" + project_folder_name + "/" + "results_" + project_folder_name + ".csv", index= False)
 
     #wipe out the records in progress data
     _  = progress_data.pop(project_folder)
