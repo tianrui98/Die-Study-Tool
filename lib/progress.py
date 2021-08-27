@@ -16,11 +16,11 @@ When are data removed? :
 1. When project is completed & excel file is exported
 """
 import json
-from objects import *
 import os
 import shutil
 import pandas as pd
-from root_logger import * 
+from lib.objects import *
+from lib.root_logger import *
 
 def _serialize_identicals(identicals):
     res = []
@@ -250,7 +250,7 @@ def single_vs_single_update_folder_and_record(progress_data, project_folder, clu
     3. Add the best image of the new cluster to verified & rename
     4. Update the cluster object
     """
-    if len(cluster.matches) == 0 or len(cluster.images) <= 1 :
+    if len(cluster.images) <= 1 :
         return None
 
     else:

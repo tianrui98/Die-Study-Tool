@@ -1,3 +1,7 @@
+from lib.objects import *
+import lib.progress as progress
+from lib.root_logger import *
+
 import shutil
 import tkinter as tk
 from tkinter.constants import CENTER, RAISED, RIDGE
@@ -6,10 +10,8 @@ import math
 from tkinter import Toplevel, filedialog
 from tkinter.filedialog import askopenfile
 import os
-from objects import *
-import progress
 import shutil
-from root_logger import *
+
 #%% UI
 class MainUI:
     def __init__(self):
