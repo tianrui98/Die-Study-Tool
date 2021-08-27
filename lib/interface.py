@@ -104,7 +104,7 @@ class MainUI:
     def _swap_positions(self, list, pos1, pos2):
 
         # popping both the elements from list
-        first_ele = list.pop(pos1) 
+        first_ele = list.pop(pos1)
         second_ele = list.pop(pos2-1)
 
         # inserting in each others positions
