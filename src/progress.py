@@ -21,6 +21,7 @@ import shutil
 import pandas as pd
 from src.objects import *
 from src.root_logger import *
+from datetime import datetime
 
 def _serialize_identicals(identicals):
     res = []
@@ -597,11 +598,11 @@ def export_results(project_folder, progress_data, save_address, keep_progress):
     project_folder_name = project_folder.split("/")[-1]
 
     if keep_progress:
-        shutil.copytree(project_folder, save_address + "/" + project_folder_name)
+        shutil.copytree(project_folder, save_address + "/" + project_folder_name + "_" + str(datetime.today().date()))
         res.to_excel(save_address + "/" + project_folder_name + "/" + "results_" + project_folder_name + ".xlsx", index= False)
     else:
         #move folders
-        shutil.move(project_folder, save_address + "/" + project_folder_name)
+        shutil.move(project_folder, save_address + "/" + project_folder_name + "_" + str(datetime.today().date()))
         res.to_excel(save_address + "/" + project_folder_name + "/" + "results_" + project_folder_name + ".xlsx", index= False)
 
         #wipe out the records in progress data

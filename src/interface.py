@@ -716,7 +716,7 @@ class MainUI:
                 progress.export_results(self.project_address,self.progress_data, save_address, keep_progress)
                 logger.info("====EXPORT====")
                 if not keep_progress:
-                    self.exit()
+                    self.root.destroy()
 
     def create_export_results_window(self):
         response = messagebox.askokcancel("Export results", "You have completed the current project.\nExport the results?" )
