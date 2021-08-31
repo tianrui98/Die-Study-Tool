@@ -4,6 +4,7 @@ This application is designed for die analysis.
 
 To open the application, execute in terminal:
 
-`cd _PathToFolder_`  
+*if you download the application to desktop
+`cd Desktop/Die-Study-Tool-main`  
 
 `python3 DieStudy.py`
