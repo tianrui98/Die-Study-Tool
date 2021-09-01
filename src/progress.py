@@ -71,8 +71,11 @@ def _concatenate_image_names(cluster):
             matches.append(image_id)
 
     final_names = identical_group_list + matches
-
-    return "_".join(sorted(final_names))
+    new_cluster_name = "_".join(sorted(final_names))
+    #!!!max file name (255)
+    if len(new_cluster_name) > 150:
+        new_cluster_name = new_cluster_name[:147] + "_etc"
+    return new_cluster_name
 
 def _change_jpeg_to_jpg (project_folder):
     all_folders = [f for f in os.listdir(project_folder) if not f.startswith('.')]
@@ -92,7 +95,7 @@ def start_new_project(original_project_folder, project_name):
     if not os.path.exists(new_project_folder + "/Verified"):
         os.mkdir(new_project_folder + "/Verified")
 
-    _change_jpeg_to_jpg (new_project_folder)
+    _change_jpeg_to_jpg(new_project_folder)
 
     return new_project_folder, progress_data
 
@@ -119,6 +122,7 @@ def cluster_validation_update_folder_and_record(progress_data, project_folder, c
     #only rename cluster when it's completed
     if check_cluster_completion(cluster):
         new_cluster_name = _concatenate_image_names(cluster)
+
     else:
         new_cluster_name = cluster.name
     new_cluster_address = project_folder + "/" + new_cluster_name
@@ -180,6 +184,8 @@ def inspect_verified_update_folder_and_record(progress_data, project_folder, clu
     new_cluster_name = old_cluster_name
     for matched_cluster_name_jpg in cluster.matches:
         new_cluster_name += "_" + matched_cluster_name_jpg.split(".")[0]
+    if len(new_cluster_name) > 150:
+        new_cluster_name = new_cluster_name[:147] + "_etc"
 
     logger.info("Verified new cluster name: {}".format(new_cluster_name))
     new_cluster_address = project_folder+ "/" + new_cluster_name
@@ -447,13 +453,14 @@ def mark_cluster_completed(cluster, stage):
     cluster_id = cluster.name.split(".")[0]
     if cluster_id in stage.clusters_yet_to_check:
         stage.clusters_yet_to_check.remove(cluster_id)
+        logger.info("Removed {} off clusters_yet_to_check".format(cluster_id))
 
-    #Inspect Verified Stage: move the matched clusters off the yet_to_check list
+    #Inspect Verified Stage and the rest: move the matched clusters off the yet_to_check list
     if stage.stage_number > 0:
         for image_name in list(cluster.matches):
             if image_name.split(".")[0] in stage.clusters_yet_to_check:
                 stage.clusters_yet_to_check.remove(image_name.split(".")[0])
-
+                logger.info("Removed {} off clusters_yet_to_check".format(image_name.split(".")[0]))
     return stage
 
 def copy_best_image_to_verified(cluster, project_folder):
@@ -595,14 +602,14 @@ def export_results(project_folder, progress_data, save_address, keep_progress):
     res = pd.DataFrame(data, columns=columns)
     res = res.applymap(lambda x : x.split('.')[0])
 
-    project_folder_name = project_folder.split("/")[-1]
+    project_folder_name = project_folder.split("/")[-1] + "_" + str(datetime.today().date())
 
     if keep_progress:
-        shutil.copytree(project_folder, save_address + "/" + project_folder_name + "_" + str(datetime.today().date()))
+        shutil.copytree(project_folder, save_address + "/" + project_folder_name )
         res.to_excel(save_address + "/" + project_folder_name + "/" + "results_" + project_folder_name + ".xlsx", index= False)
     else:
         #move folders
-        shutil.move(project_folder, save_address + "/" + project_folder_name + "_" + str(datetime.today().date()))
+        shutil.move(project_folder, save_address + "/" + project_folder_name )
         res.to_excel(save_address + "/" + project_folder_name + "/" + "results_" + project_folder_name + ".xlsx", index= False)
 
         #wipe out the records in progress data

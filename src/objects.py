@@ -61,7 +61,7 @@ class Stage:
             #all images in clusters (not singles)
             cluster_folders = [f for f in os.listdir(project_address) if (not f.startswith('.')) and (not f.startswith("Singles")) and (not f.startswith("Verified"))]
             for cluster_name in cluster_folders:
-                    self.clusters_yet_to_check.add(cluster_name)
+                    self.clusters_yet_to_check.add(cluster_name.split('.')[0])
 
         elif stage_number == 1 or stage_number == 2:
             #all images in Verified represent their cluster

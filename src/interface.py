@@ -386,12 +386,13 @@ class MainUI:
         for folder in os.listdir(dirname):
             if not folder.startswith("."):
                 is_folder = os.path.isdir(dirname + "/" + folder)
-                valid = valid and is_folder
+                no_dot = "." not in folder
+                valid = valid and is_folder and no_dot
 
         valid = valid and "Singles" in os.listdir(dirname)
 
         if not valid:
-            messagebox.askokcancel("Invalid folder", "The folder you have chosen is not valid." )
+            messagebox.askokcancel("Invalid folder", "The folder you have chosen is not valid. \nIt should contain cluster folders and a 'Singles' folder and nothing else." )
             return None
 
         self.project_name = dirname.split("/")[-1]
@@ -619,19 +620,21 @@ class MainUI:
 
 
     def check_completion_and_move_on (self):
-        """This function is called when user clicks "next" while at the last image"""
-        #don't mark complete till the user says "OK"
+        """This function is called when user clicks "next" while at the last image
+        !!! only mark cluster complete if user clicks ok"""
 
         if progress.check_cluster_completion(self.cluster):
-            self.stage = progress.mark_cluster_completed(self.cluster,self.stage)
-
+            cluster_id = self.cluster.name.split(".")[0]
+            if cluster_id in self.stage.clusters_yet_to_check:
+                self.stage.clusters_yet_to_check.remove(cluster_id)
+        #!!! only remove the cluster off yet to check. Restore it later if user clicks no 
         if progress.check_project_completion(self.cluster, self.stage, self.project_address):
             logger.info("!!!!project complete!!!!")
             logger.info(str(self.progress_data))
             self.export()
         else:
             if progress.check_stage_completion(self.cluster, self.stage):
-                message = "You have completed the current stage."
+                message = "You have completed the current *STAGE*."
                 logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
             else:
                 if progress.check_cluster_completion(self.cluster):
@@ -641,6 +644,7 @@ class MainUI:
 
             response = self.create_save_progress_window(message)
             if response:
+                progress.mark_cluster_completed(self.cluster,self.stage)
                 self.progress_data, self.cluster = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
                 progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
                 self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
@@ -658,6 +662,8 @@ class MainUI:
                         self.initialize_image_display()
                 if "stage" in message:
                     logger.info(str(self.progress_data))
+            else:
+                self.stage.clusters_yet_to_check.add(cluster_id)
 
     def save(self):
         """save results
@@ -820,4 +826,7 @@ class MainUI:
 
     def start (self):
         self.create_main_UI()
-        self.root.mainloop()
+        try:
+            self.root.mainloop()
+        except:
+            logger.error("====Error in main loop====")
