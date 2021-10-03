@@ -41,6 +41,7 @@ class Cluster:
 
         self.matches = matches #for adding right image name that belong to the cluster
         self.nomatches = nomatches #for adding right image name that does not belong to the cluster
+        self.compared_before = set()
 
     def get_best_image_index(self):
         best_image_name = self.best_image.name

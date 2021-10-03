@@ -156,6 +156,18 @@ class MainUI:
             self.left_image_index = best_image_index
             self.right_image_index = 0
 
+        #skip the image already compared with left image
+        if self.stage.stage_number > 0 and self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]:
+            #mark them unmatched
+            self.cluster.nomatches.add(self._get_image_name(self.right_image_index))
+            #skip the right image
+            self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
+            print("Skip already compared")
+
+        #skip the index of left image
+        if self.right_image_index == self.left_image_index:
+            self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
+
         self.project_title_label.config(text = str("Project Title: " + self.project_name))
         self.stage_label.config(text = str("Current Stage: " + self.stage.name))
 
@@ -420,10 +432,20 @@ class MainUI:
         """Change right image. Erase old image, Add the next in line image. function for "next" button
 
         """
-        #skip the index of left image
         self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
+        #skip the image already compared with left image
+        print("past comparison {}".format(self.stage.past_comparisons))
+        while self.stage.stage_number > 0 and self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]:
+            #mark them compared before
+            self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
+            #skip the right image
+            self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
+            print("Skip already compared")
+
+        #skip the index of left image
         if self.right_image_index == self.left_image_index:
             self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
+
 
         self.right_image.grid_forget()
 
@@ -469,11 +491,17 @@ class MainUI:
         When user reach the index 1 image, can't move forward anymore
 
         """
-        #skip the index of left image
+        curr_right_image_index = self.right_image_index
         self.right_image_index = max(0, self.right_image_index - 1)
+        while self.stage.stage_number > 0 and self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]:
+            self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
+            self.right_image_index = max(0, self.right_image_index - 1)
+            print("Skip already compared")
+
+        #skip the index of left image
         if self.right_image_index == self.left_image_index:
             if self.left_image_index == 0:
-                self.right_image_index = 1
+                self.right_image_index = curr_right_image_index
             else:
                 self.right_image_index = max(0, self.right_image_index - 1)
 
@@ -509,8 +537,6 @@ class MainUI:
                 self.deactivate_button(self.no_match_btn)
             logger.info("Match {} to cluster {}".format(self._get_image_name(self.right_image_index),self.cluster.name))
 
-            self.stage = progress.mark_compared(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), self.stage)
-
 
     def cluster_validation_no_match (self):
         """During cluster validation stage, unmatch left and right image
@@ -539,7 +565,6 @@ class MainUI:
 
             logger.info("Unmatch {} from cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
 
-            self.stage = progress.mark_compared(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), self.stage)
 
 
     def cluster_validation_identical (self):
@@ -569,7 +594,6 @@ class MainUI:
                 self.cluster_validation_match()
 
             logger.info("Mark {} identical to {}".format(self._get_image_name(self.right_image_index), self._get_image_name(self.right_image_index)))
-            self.stage = progress.mark_compared(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), self.stage)
 
     def cluster_validation_best_image (self):
         """During cluster validation, mark right image the best image of the cluster
@@ -609,7 +633,6 @@ class MainUI:
             self.cluster.matches.add(self._get_image_name(self.right_image_index))
             if self._get_image_name(self.left_image_index) in self.cluster.matches:
                 self.cluster.matches.remove(self._get_image_name(self.left_image_index))
-            self.stage = progress.mark_compared(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), self.stage)
 
         else:
             self.change_tick_color("right", False)
@@ -668,7 +691,7 @@ class MainUI:
                 if "stage" in message:
                     logger.info(str(self.progress_data))
             else:
-                self.stage.clusters_yet_to_check.add(cluster_id)
+                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
 
     def save(self):
         """save results

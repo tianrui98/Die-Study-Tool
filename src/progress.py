@@ -447,20 +447,14 @@ def check_cluster_completion(cluster,stage):
     """Check if all images in the current cluster have all been processed
     Cluster == None is for situations where the completed cluster has only 1 image & get deleted
     """
-    if stage.stage_number == 0:
-        #this stage allows change of best_image
-        return cluster == None or (len(cluster.matches) + len(cluster.nomatches) == len(cluster.images) - 1)
-    else:
-        print("past comparisons {}".format(stage.past_comparisons))
-        print("cluster_images {}".format(cluster.images))
-        return cluster == None or (len(stage.past_comparisons[cluster.best_image.name]) == len(cluster.images) - 1)
+    return cluster == None or (len(cluster.matches) + len(cluster.nomatches) + len(cluster.compared_before)== len(cluster.images) - 1)
+
 
 def check_stage_completion(cluster, stage):
-    stage_complete = len(stage.clusters_yet_to_check) == 0
-    # last_cluster_complete = check_cluster_completion(cluster, stage) and len(stage.clusters_yet_to_check) == 1 and cluster.name.split(".")[0] == list(stage.clusters_yet_to_check)[0]
-    one_remaining_comparison = stage.stage_number> 0 and check_cluster_completion(cluster, stage) and stage.remaining_comparisons == 0
-    print("Remaining comp: {}".format(stage.remaining_comparisons))
-    return stage_complete or one_remaining_comparison
+    if stage.stage_number == 0:
+        return len(stage.clusters_yet_to_check) == 0
+    else:
+        return len(stage.clusters_yet_to_check) == 1
 
 def check_project_completion(cluster, stage, project_folder):
     stage_completed = check_stage_completion(cluster, stage)
@@ -476,10 +470,15 @@ def check_project_completion(cluster, stage, project_folder):
 
     return case1 or case2 or case3
 
-def mark_compared(left_name, right_name, stage, is_match = False):
+def mark_compared(left_name, right_name, stage):
     stage.past_comparisons[left_name].add(right_name)
     stage.past_comparisons[right_name].add(left_name)
 
+    return stage
+
+def unmark_compared(left_name, right_name, stage):
+    stage.past_comparisons[left_name].remove(right_name)
+    stage.past_comparisons[right_name].remove(left_name)
     return stage
 
 def mark_cluster_completed(cluster, stage):
@@ -491,17 +490,17 @@ def mark_cluster_completed(cluster, stage):
     if cluster_id in stage.clusters_yet_to_check:
         stage.clusters_yet_to_check.remove(cluster_id)
         logger.info("Removed {} off clusters_yet_to_check".format(cluster_id))
-        stage.remaining_comparisons -= len(stage.clusters_yet_to_check)
-        logger.info("Remaining comparisons {}".format(stage.remaining_comparisons))
 
     #Inspect Verified Stage and the rest: move the matched clusters off the yet_to_check list
     if stage.stage_number > 0:
         for image_name in list(cluster.matches):
+            stage = mark_compared(cluster.best_image.name, image_name,stage)
             if image_name.split(".")[0] in stage.clusters_yet_to_check:
                 stage.clusters_yet_to_check.remove(image_name.split(".")[0])
                 logger.info("Removed {} off clusters_yet_to_check".format(image_name.split(".")[0]))
-                stage.remaining_comparisons -= len(stage.clusters_yet_to_check)
-                logger.info("Remaining comparisons {}".format(stage.remaining_comparisons))
+        for image_name in list(cluster.nomatches):
+            stage = mark_compared(cluster.best_image.name, image_name,stage)
+
     return stage
 
 def unmark_cluster_completed(cluster,stage):
@@ -511,19 +510,18 @@ def unmark_cluster_completed(cluster,stage):
 
     cluster_id = cluster.name.split(".")[0]
     if cluster_id not in stage.clusters_yet_to_check:
-        stage.remaining_comparisons += len(stage.clusters_yet_to_check)
         stage.clusters_yet_to_check.add(cluster_id)
-        logger.info("Remaining comparisons {}".format(stage.remaining_comparisons))
         logger.info("Add {} back to clusters_yet_to_check".format(cluster_id))
 
     #Inspect Verified Stage and the rest: move the matched clusters off the yet_to_check list
     if stage.stage_number > 0:
         for image_name in list(cluster.matches):
+            stage = unmark_compared(cluster.best_image.name, image_name,stage)
             if image_name.split(".")[0] not in stage.clusters_yet_to_check:
-                stage.remaining_comparisons += len(stage.clusters_yet_to_check)
-                logger.info("Remaining comparisons {}".format(stage.remaining_comparisons))
                 stage.clusters_yet_to_check.add(image_name.split(".")[0])
                 logger.info("Add {} back to clusters_yet_to_check".format(image_name.split(".")[0]))
+        for image_name in list(cluster.nomatches):
+            stage = unmark_compared(cluster.best_image.name, image_name,stage)
 
     return stage
 
@@ -564,7 +562,7 @@ def _create_a_cluster(stage,project_folder, next_cluster_name):
             new_images_dict[image_name] = new_image_obj
 
         next_cluster.images_dict = new_images_dict
-        next_cluster.images = _filter_compared_images(best_image_name_jpg, next_cluster.images,stage.past_comparisons)
+        # next_cluster.images = _filter_compared_images(best_image_name_jpg, next_cluster.images,stage.past_comparisons)
 
     elif stage.stage_number == 2:
         #A cluster should include all images in the Singles folder + best_image from one of the Verified. Cluster named after verified
@@ -588,14 +586,14 @@ def _create_a_cluster(stage,project_folder, next_cluster_name):
         next_cluster.images = [best_image_obj] + next_cluster.images
         next_cluster.best_image = best_image_obj
 
-        next_cluster.images = _filter_compared_images(best_image_name_jpg, next_cluster.images,stage.past_comparisons)
+        # next_cluster.images = _filter_compared_images(best_image_name_jpg, next_cluster.images,stage.past_comparisons)
 
 
     elif stage.stage_number == 3:
         #A cluster should include all images in the Singles folder, except those have been matched
 
         best_image_name_jpg = next_cluster_name+".jpg"
-        best_image_address = project_folder + "/Singles/" + best_image_name
+        best_image_address = project_folder + "/Singles/" + best_image_name_jpg
 
         next_cluster = Cluster(str(project_folder +"/Singles"), cluster_name = next_cluster_name, identicals = [], best_image_name = best_image_name_jpg, matches = set(), nomatches = set())
         #replace the image's cluster name with Singles
@@ -606,7 +604,7 @@ def _create_a_cluster(stage,project_folder, next_cluster_name):
             new_images_dict[image_name] = new_image_obj
 
         next_cluster.images_dict = new_images_dict
-        next_cluster.images = _filter_compared_images(best_image_name_jpg, next_cluster.images,stage.past_comparisons)
+        # next_cluster.images = _filter_compared_images(best_image_name_jpg, next_cluster.images,stage.past_comparisons)
 
     return next_cluster
 
