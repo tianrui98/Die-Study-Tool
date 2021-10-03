@@ -460,6 +460,7 @@ class MainUI:
 
         #check for completion at the last image
         if self.right_image_index == len(self.cluster.images):
+            print("last image, check completion")
             self.check_completion_and_move_on()
         return None
 
@@ -508,6 +509,8 @@ class MainUI:
                 self.deactivate_button(self.no_match_btn)
             logger.info("Match {} to cluster {}".format(self._get_image_name(self.right_image_index),self.cluster.name))
 
+            self.stage = progress.mark_compared(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), self.stage)
+
 
     def cluster_validation_no_match (self):
         """During cluster validation stage, unmatch left and right image
@@ -535,6 +538,8 @@ class MainUI:
                 self.deactivate_button(self.identical_btn)
 
             logger.info("Unmatch {} from cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
+
+            self.stage = progress.mark_compared(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), self.stage)
 
 
     def cluster_validation_identical (self):
@@ -564,7 +569,7 @@ class MainUI:
                 self.cluster_validation_match()
 
             logger.info("Mark {} identical to {}".format(self._get_image_name(self.right_image_index), self._get_image_name(self.right_image_index)))
-
+            self.stage = progress.mark_compared(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), self.stage)
 
     def cluster_validation_best_image (self):
         """During cluster validation, mark right image the best image of the cluster
@@ -604,6 +609,7 @@ class MainUI:
             self.cluster.matches.add(self._get_image_name(self.right_image_index))
             if self._get_image_name(self.left_image_index) in self.cluster.matches:
                 self.cluster.matches.remove(self._get_image_name(self.left_image_index))
+            self.stage = progress.mark_compared(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), self.stage)
 
         else:
             self.change_tick_color("right", False)
@@ -623,11 +629,10 @@ class MainUI:
         """This function is called when user clicks "next" while at the last image
         !!! only mark cluster complete if user clicks ok"""
 
-        if progress.check_cluster_completion(self.cluster):
-            cluster_id = self.cluster.name.split(".")[0]
-            if cluster_id in self.stage.clusters_yet_to_check:
-                self.stage.clusters_yet_to_check.remove(cluster_id)
-        #!!! only remove the cluster off yet to check. Restore it later if user clicks no 
+        if progress.check_cluster_completion(self.cluster,self.stage):
+            self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
+        # !!! only remove the cluster off yet to check. Restore it later if user clicks no
+
         if progress.check_project_completion(self.cluster, self.stage, self.project_address):
             logger.info("!!!!project complete!!!!")
             logger.info(str(self.progress_data))
@@ -637,7 +642,7 @@ class MainUI:
                 message = "You have completed the current *STAGE*."
                 logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
             else:
-                if progress.check_cluster_completion(self.cluster):
+                if progress.check_cluster_completion(self.cluster, self.stage):
                     message = "You have completed the current cluster."
                 else:
                     return None

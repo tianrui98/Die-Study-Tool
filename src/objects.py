@@ -1,5 +1,6 @@
 import os
-from typing import DefaultDict
+from collections import defaultdict
+import math
 
 class ImgObj:
     """Class object for an image
@@ -75,3 +76,12 @@ class Stage:
             single_names = [f for f in os.listdir(project_address+"/Singles") if (not f.startswith('.'))]
             for single_name in single_names:
                 self.clusters_yet_to_check.add(single_name.split(".")[0])
+
+        #if A is compared with B:{A: {B}, B:{A}}
+        self.past_comparisons = defaultdict(set)
+
+        #total number of comparisons
+        if len(self.clusters_yet_to_check) <= 2:
+            self.remaining_comparisons = 1
+        else:
+            self.remaining_comparisons = math.factorial(len(self.clusters_yet_to_check)) / (2 * math.factorial(len(self.clusters_yet_to_check) - 2) )
