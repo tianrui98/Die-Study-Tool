@@ -157,12 +157,12 @@ class MainUI:
             self.right_image_index = 0
 
         #skip the image already compared with left image
-        if self.stage.stage_number > 0 and self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]:
+        while self.stage.stage_number > 0 and self.right_image_index < len(self.cluster.images) and self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]:
             #mark them unmatched
-            self.cluster.nomatches.add(self._get_image_name(self.right_image_index))
+            self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
             #skip the right image
+            print("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
             self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
-            print("Skip already compared")
 
         #skip the index of left image
         if self.right_image_index == self.left_image_index:
@@ -435,16 +435,16 @@ class MainUI:
         self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
         #skip the image already compared with left image
         print("past comparison {}".format(self.stage.past_comparisons))
-        while self.stage.stage_number > 0 and self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]:
-            #mark them compared before
-            self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
-            #skip the right image
-            self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
-            print("Skip already compared")
-
-        #skip the index of left image
-        if self.right_image_index == self.left_image_index:
-            self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
+        while self.stage.stage_number > 0 and self.right_image_index < len(self.cluster.images) and (self.right_image_index == self.left_image_index or  self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
+                    #skip the index of left image
+            if self.right_image_index == self.left_image_index:
+                self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
+            else:
+                #mark them compared before
+                self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
+                #skip the right image
+                print("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
+                self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
 
 
         self.right_image.grid_forget()
@@ -493,17 +493,19 @@ class MainUI:
         """
         curr_right_image_index = self.right_image_index
         self.right_image_index = max(0, self.right_image_index - 1)
-        while self.stage.stage_number > 0 and self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]:
-            self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
-            self.right_image_index = max(0, self.right_image_index - 1)
-            print("Skip already compared")
-
-        #skip the index of left image
-        if self.right_image_index == self.left_image_index:
-            if self.left_image_index == 0:
-                self.right_image_index = curr_right_image_index
+        while self.stage.stage_number > 0 and self.right_image_index > 0 and (self.right_image_index == self.left_image_index or self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
+            if self.right_image_index == self.left_image_index:
+                if self.left_image_index == 0:
+                    self.right_image_index = curr_right_image_index
+                else:
+                    self.right_image_index = max(0, self.right_image_index - 1)
             else:
+                self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
+                print("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
                 self.right_image_index = max(0, self.right_image_index - 1)
+
+        if self.right_image_index == 0 and self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]:
+            self.right_image_index = curr_right_image_index
 
         self.right_image.grid_forget()
         if self.right_image_index >= 0:
@@ -659,7 +661,8 @@ class MainUI:
         if progress.check_project_completion(self.cluster, self.stage, self.project_address):
             logger.info("!!!!project complete!!!!")
             logger.info(str(self.progress_data))
-            self.export()
+            self.export_btn()
+            self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
         else:
             if progress.check_stage_completion(self.cluster, self.stage):
                 message = "You have completed the current *STAGE*."
@@ -672,17 +675,18 @@ class MainUI:
 
             response = self.create_save_progress_window(message)
             if response:
-                progress.mark_cluster_completed(self.cluster,self.stage)
-                self.progress_data, self.cluster = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
+                self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
+
+                self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
                 progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
                 self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
 
                 if self.cluster:
                     #if next cluster has only 1 image, skip it & recurse
                     if len(self.cluster.images) <= 1:
-                        logger.info("----SKIP ",self.cluster.name, "----")
+                        logger.info("----SKIP {}----".format(self.cluster.name))
                         self.stage = progress.mark_cluster_completed(self.cluster,self.stage)
-                        self.progress_data, self.cluster = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
+                        self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
                         progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
                         self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
                         self.check_completion_and_move_on ()
@@ -697,7 +701,7 @@ class MainUI:
         """save results
         """
         if len(self.progress_data) > 0:
-            self.progress_data, self.cluster = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster,self.stage)
+            self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster,self.stage)
             progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
 
     def exit(self):
@@ -720,35 +724,30 @@ class MainUI:
         logger.info("====EXIT====\n\n")
         self.root.destroy()
 
-    def export(self):
+    def export(self, keep_progress = False):
+        save_address = filedialog.askdirectory() # asks user to choose a directory
+        if not save_address:
+            return None
+        self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
+        progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
+        self.progress_data, _, _ = progress.load_progress(self.project_address, False)
+        progress.export_results(self.project_address,self.progress_data, save_address, keep_progress)
+        logger.info("====EXPORT====")
+        self.root.destroy()
+
+
+    def export_btn(self):
         project_completed = progress.check_project_completion(self.cluster, self.stage, self.project_address)
         if project_completed:
-            #ask user if wants to export and save
             response = self.create_export_results_window()
             if response:
-                save_address = filedialog.askdirectory() # asks user to choose a directory
-                if not save_address:
-                    return None
-                self.progress_data, self.cluster = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
-                progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
-                self.progress_data, _, _ = progress.load_progress(self.project_address, False)
-                progress.export_results(self.project_address,self.progress_data, save_address, False)
-                logger.info("====EXPORT====")
-                self.root.destroy()
-            else:
-                return None
+                self.export()
+
         else:
             response = messagebox.askokcancel("Export intermediate results", "You have NOT completed the current project.\nExport the intermediate results?" )
             keep_progress = messagebox.askyesno("Export intermediate results", "Keep your current progress in the system ?" )
             if response:
-                save_address = filedialog.askdirectory() # asks user to choose a directory
-                if not save_address:
-                    return None
-                self.progress_data, self.cluster = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
-                progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
-                self.progress_data, _, _ = progress.load_progress(self.project_address, False)
-                progress.export_results(self.project_address,self.progress_data, save_address, keep_progress)
-                logger.info("====EXPORT====")
+                self.export(keep_progress)
                 if not keep_progress:
                     self.root.destroy()
 
@@ -808,7 +807,7 @@ class MainUI:
         # right_menu_bar.columnconfigure(1, weight=1)
         _ = self.add_filler(1,1, 0, 0, 1, 1, right_menu_bar, sticky= "w", content = "", color = "yellow")
         self.open_btn = self.add_button("Open", self.create_open_window, 2, 3, 1, 0, 1, 1, right_menu_bar, sticky = "e")
-        self.undo_btn = self.add_button("Export", self.export, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
+        self.undo_btn = self.add_button("Export", self.export_btn, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
         self.save_btn = self.add_button("Save", self.save, 2, 3, 3, 0, 1, 1, right_menu_bar, sticky = "e")
         self.exit_btn = self.add_button("Exit", self.exit, 2, 3, 4, 0, 1, 1, right_menu_bar, sticky = "e")
 
@@ -858,3 +857,5 @@ class MainUI:
             self.root.mainloop()
         except:
             logger.error("====Error in main loop====")
+
+# %%
