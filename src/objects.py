@@ -54,12 +54,12 @@ class Stage:
     name: "Validate Clusters", "Inspect Verified", "Verified vs Singles", "Singles vs Singles"
     """
     def __init__(self, stage_number, project_address):
-        self.stages = ["Validate Clusters", "Inspect Verified", "Verified vs Singles", "Singles vs Singles"]
+        self.stages = ["Validate Clusters", "Inspect Verified", "Verified vs Singles", "Singles vs Singles", "Find Identicals"]
         self.stage_number = stage_number
         self.name = self.stages[self.stage_number]
         self.clusters_yet_to_check = set() #cluster names
 
-        if stage_number == 0:
+        if stage_number == 0 or stage_number == 4:
             #all images in clusters (not singles)
             cluster_folders = [f for f in os.listdir(project_address) if (not f.startswith('.')) and (not f.startswith("Singles")) and (not f.startswith("Verified"))]
             for cluster_name in cluster_folders:
@@ -72,7 +72,7 @@ class Stage:
                 self.clusters_yet_to_check.add(cluster_name.split(".")[0])
 
 
-        else:
+        elif stage_number == 3:
             #all images in Singles are considered a single cluster
             single_names = [f for f in os.listdir(project_address+"/Singles") if (not f.startswith('.'))]
             for single_name in single_names:
@@ -80,9 +80,3 @@ class Stage:
 
         #if A is compared with B:{A: {B}, B:{A}}
         self.past_comparisons = defaultdict(set)
-
-        #total number of comparisons
-        if len(self.clusters_yet_to_check) <= 2:
-            self.remaining_comparisons = 1
-        else:
-            self.remaining_comparisons = math.factorial(len(self.clusters_yet_to_check)) / (2 * math.factorial(len(self.clusters_yet_to_check) - 2) )

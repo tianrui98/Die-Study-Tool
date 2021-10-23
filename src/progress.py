@@ -476,7 +476,10 @@ def check_stage_completion(cluster, stage):
     else:
         return len(stage.clusters_yet_to_check) <= 1
 
-def check_project_completion(cluster, stage, project_folder):
+def check_project_completion(stage):
+    return check_stage_completion(stage) and stage.stage_number == 4
+
+def check_part1_completion(cluster,stage,project_folder):
     stage_completed = check_stage_completion(cluster, stage)
     is_last_stage = stage.stage_number == 3
     case1 = stage_completed and is_last_stage
