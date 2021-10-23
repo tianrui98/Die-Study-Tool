@@ -18,4 +18,4 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 # set the logger level
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)

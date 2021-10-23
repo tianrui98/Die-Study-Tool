@@ -669,7 +669,7 @@ class MainUI:
         if progress.check_cluster_completion(self.cluster,self.stage):
             self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
 
-        if progress.check_project_completion(self.cluster, self.stage, self.project_address):
+        if progress.check_project_completion(self.stage):
             logger.info("!!!!project complete!!!!")
             logger.info(str(self.progress_data))
             self.export_btn()
@@ -748,7 +748,7 @@ class MainUI:
 
 
     def export_btn(self):
-        project_completed = progress.check_project_completion(self.cluster,self.stage, self.project_address)
+        project_completed = progress.check_project_completion(self.stage)
         if project_completed:
             response = self.create_export_results_window()
             if response:
