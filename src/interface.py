@@ -162,7 +162,7 @@ class MainUI:
 
         #skip the image already compared with left image
         while self.stage.stage_number > 0 and self.right_image_index < len(self.cluster.images) and self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]:
-            #mark them unmatched
+            #mark them compared
             self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
             #skip the right image
             logger.info("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
@@ -514,7 +514,7 @@ class MainUI:
                 print("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
                 self.right_image_index = max(0, self.right_image_index - 1)
 
-        if self.right_image_index == 0 and self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]:
+        if self.right_image_index == 0 and (self.right_image_index == self.left_image_index or self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
             self.right_image_index = curr_right_image_index
 
         self.right_image.grid_forget()
@@ -542,12 +542,13 @@ class MainUI:
             self.change_tick_color ("right", checked = True)
             self.activate_button(self.match_btn)
 
-            self.cluster.matches.add(self._get_image_name(self.right_image_index))
-            #delist from nomatches
-            if self._get_image_name(self.right_image_index) in self.cluster.nomatches:
-                self.cluster.nomatches.remove(self._get_image_name(self.right_image_index))
-                self.deactivate_button(self.no_match_btn)
-            logger.info("Match {} to cluster {}".format(self._get_image_name(self.right_image_index),self.cluster.name))
+            if self._get_image_name(self.right_image_index) not in self.cluster.compared_before:
+                self.cluster.matches.add(self._get_image_name(self.right_image_index))
+                #delist from nomatches
+                if self._get_image_name(self.right_image_index) in self.cluster.nomatches:
+                    self.cluster.nomatches.remove(self._get_image_name(self.right_image_index))
+                    self.deactivate_button(self.no_match_btn)
+                logger.info("Match {} to cluster {}".format(self._get_image_name(self.right_image_index),self.cluster.name))
 
 
     def cluster_validation_no_match (self):
@@ -565,15 +566,17 @@ class MainUI:
         if self.right_image_index < len(self.cluster.images):
             self.change_tick_color ("right", checked = True)
             self.activate_button(self.no_match_btn)
-            self.cluster.nomatches.add(self._get_image_name(self.right_image_index))
-            #delist from matches
-            if self._get_image_name(self.right_image_index) in self.cluster.matches:
-                self.cluster.matches.remove(self._get_image_name(self.right_image_index))
-                self.deactivate_button(self.match_btn)
-            #delist from identicals
-            if self._is_identical(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index)):
-                self._remove_from_identicals (self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
-                self.deactivate_button(self.identical_btn)
+
+            if self._get_image_name(self.right_image_index) not in self.cluster.compared_before:
+                self.cluster.nomatches.add(self._get_image_name(self.right_image_index))
+                #delist from matches
+                if self._get_image_name(self.right_image_index) in self.cluster.matches:
+                    self.cluster.matches.remove(self._get_image_name(self.right_image_index))
+                    self.deactivate_button(self.match_btn)
+                #delist from identicals
+                if self._is_identical(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index)):
+                    self._remove_from_identicals (self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
+                    self.deactivate_button(self.identical_btn)
 
             logger.info("Unmatch {} from cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
 
@@ -659,7 +662,6 @@ class MainUI:
         self.right_image_index = curr_left_index
         logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
 
-
     def check_completion_and_move_on (self):
         """This function is called when user clicks "next" while at the last image
         !!! only mark cluster complete if user clicks ok"""
@@ -667,15 +669,15 @@ class MainUI:
         if progress.check_cluster_completion(self.cluster,self.stage):
             self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
 
-        if progress.check_project_completion(self.stage):
+        if progress.check_project_completion(self.cluster, self.stage, self.project_address):
             logger.info("!!!!project complete!!!!")
             logger.info(str(self.progress_data))
             self.export_btn()
             self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
         else:
-            if progress.check_part1_completion(self.cluster,self.stage, self.project_address) or progress.check_stage_completion(self.stage):
-                    message = "You have completed the current *STAGE*."
-                    logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
+            if progress.check_stage_completion(self.stage):
+                message = "You have completed the current *STAGE*."
+                logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
             else:
                 if progress.check_cluster_completion(self.cluster, self.stage):
                     message = "You have completed the current cluster."
@@ -684,6 +686,8 @@ class MainUI:
 
             response = self.create_save_progress_window(message)
             if response:
+                self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
+
                 self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
                 progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
                 self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
@@ -695,16 +699,10 @@ class MainUI:
                         self.stage = progress.mark_cluster_completed(self.cluster,self.stage)
                         self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
                         progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
-                        logger.info(f"progress_data: {self.progress_data}")
-                        logger.info(f"cluster: {self.cluster}")
-                        logger.info(f"stage: {self.stage}")
                         self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
                         self.check_completion_and_move_on ()
                     else:
-                        part1_completed = False
-                        if self.stage.stage_number == 3:
-                            part1_completed = progress.check_part1_completion(self.cluster,self.stage, self.project_address)
-                        self.initialize_image_display(part1_completed)
+                        self.initialize_image_display()
                 if "stage" in message:
                     logger.info(str(self.progress_data))
             else:
@@ -750,7 +748,7 @@ class MainUI:
 
 
     def export_btn(self):
-        project_completed = progress.check_project_completion(self.stage)
+        project_completed = progress.check_project_completion(self.cluster,self.stage, self.project_address)
         if project_completed:
             response = self.create_export_results_window()
             if response:

@@ -473,11 +473,11 @@ def check_stage_completion(stage):
     else:
         return len(stage.clusters_yet_to_check) <= 1
 
-def check_project_completion(stage):
-    return check_stage_completion(stage) and stage.stage_number == 4
+# def check_project_completion(stage):
+#     return check_stage_completion(stage) and stage.stage_number == 4
 
 
-def check_part1_completion(cluster,stage,project_folder):
+def check_project_completion(cluster,stage,project_folder):
     """To be used at stage 3 only"""
     stage_completed = check_stage_completion(stage)
     is_third_stage = stage.stage_number == 3
@@ -721,7 +721,7 @@ def check_completion_and_save(cluster, stage, project_folder, progress_data):
 
     new_progress_data = checkout_progress()
 
-    if check_project_completion(stage):
+    if check_project_completion(cluster,stage,project_folder):
         pass
     else:
         if check_stage_completion(stage):
