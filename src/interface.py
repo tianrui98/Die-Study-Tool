@@ -144,8 +144,12 @@ class MainUI:
                        sticky=sticky)
         return img_label
 
-
-    def initialize_image_display(self):
+    def initialize_image_display(self, part2 = False):
+        if part2:
+            self.initialize_part2_display()
+        else:
+            self.initialize_part1_display()
+    def initialize_part1_display(self):
         """initialize left and right image display"""
 
         best_image_index = self.cluster.get_best_image_index()
@@ -161,7 +165,7 @@ class MainUI:
             #mark them unmatched
             self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
             #skip the right image
-            print("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
+            logger.info("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
             self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
 
         #skip the index of left image
@@ -179,10 +183,16 @@ class MainUI:
         #update image info display
         self._update_image_label()
         self._update_cluster_label()
-
-
         self.update_icon_button_color()
 
+    def initialize_part2_display(self):
+        """initialize interface for "Find Identicals" stage """
+        self.right_image.grid_forget()
+        self.left_image.grid_forget()
+        self.project_title_label.config(text = str("Project Title: " + self.project_name))
+        self.stage_label.config(text = str("Current Stage: " + self.stage.name))
+
+        pass
 
     def add_icon(self, path, height, width,  column, row, columspan, rowspan, parent, sticky="nsew"):
 
@@ -656,17 +666,16 @@ class MainUI:
 
         if progress.check_cluster_completion(self.cluster,self.stage):
             self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
-        # !!! only remove the cluster off yet to check. Restore it later if user clicks no
 
-        if progress.check_project_completion(self.cluster, self.stage, self.project_address):
+        if progress.check_project_completion(self.stage):
             logger.info("!!!!project complete!!!!")
             logger.info(str(self.progress_data))
             self.export_btn()
             self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
         else:
-            if progress.check_stage_completion(self.cluster, self.stage):
-                message = "You have completed the current *STAGE*."
-                logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
+            if progress.check_part1_completion(self.cluster,self.stage, self.project_address) or progress.check_stage_completion(self.stage):
+                    message = "You have completed the current *STAGE*."
+                    logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
             else:
                 if progress.check_cluster_completion(self.cluster, self.stage):
                     message = "You have completed the current cluster."
@@ -675,8 +684,6 @@ class MainUI:
 
             response = self.create_save_progress_window(message)
             if response:
-                self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
-
                 self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
                 progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
                 self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
@@ -688,10 +695,16 @@ class MainUI:
                         self.stage = progress.mark_cluster_completed(self.cluster,self.stage)
                         self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
                         progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
+                        logger.info(f"progress_data: {self.progress_data}")
+                        logger.info(f"cluster: {self.cluster}")
+                        logger.info(f"stage: {self.stage}")
                         self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
                         self.check_completion_and_move_on ()
                     else:
-                        self.initialize_image_display()
+                        part1_completed = False
+                        if self.stage.stage_number == 3:
+                            part1_completed = progress.check_part1_completion(self.cluster,self.stage, self.project_address)
+                        self.initialize_image_display(part1_completed)
                 if "stage" in message:
                     logger.info(str(self.progress_data))
             else:
@@ -737,7 +750,7 @@ class MainUI:
 
 
     def export_btn(self):
-        project_completed = progress.check_project_completion(self.cluster, self.stage, self.project_address)
+        project_completed = progress.check_project_completion(self.stage)
         if project_completed:
             response = self.create_export_results_window()
             if response:

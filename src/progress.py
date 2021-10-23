@@ -358,8 +358,7 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
                             "stages": { 0: {
                                         "current_cluster" : ,
                                         "clusters_yet_to_check": [],
-                                        "past_comparisons": {img_name : []},
-                                        "remaining_comparisons":  }}
+                                        "past_comparisons": {img_name : []} }}
     }
 
     *the update on "clusters" will only happen for stage 0 and 3
@@ -406,7 +405,6 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
             progress_data[project_folder]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
             #update past_comparisons
             progress_data[project_folder]["stages"][str(stage.stage_number)]["past_comparisons"] = _serialize_past_comparisons(stage.past_comparisons)
-            progress_data[project_folder]["stages"][str(stage.stage_number)]["remaining_comparisons"] = stage.remaining_comparisons
     data_file = open("data.json", "w")
     json.dump(progress_data, data_file)
     data_file.close()
@@ -428,7 +426,6 @@ def load_progress(project_folder, create_next_cluster = True):
     stage = Stage(int(stage_number), project_folder)
     stage.clusters_yet_to_check = set(stage_info["clusters_yet_to_check"])
     stage.past_comparisons= _deserialize_past_comparisons(stage_info["past_comparisons"])
-    stage.remaining_comparisons = int(stage_info["remaining_comparisons"])
     #retrieve latest cluster
     current_cluster = stage_info["current_cluster"]
     if not create_next_cluster:
@@ -470,7 +467,7 @@ def check_cluster_completion(cluster,stage):
     return cluster == None or (len(cluster.matches) + len(cluster.nomatches) + len(cluster.compared_before)== len(cluster.images) - 1)
 
 
-def check_stage_completion(cluster, stage):
+def check_stage_completion(stage):
     if stage.stage_number == 0:
         return len(stage.clusters_yet_to_check) == 0
     else:
@@ -479,10 +476,12 @@ def check_stage_completion(cluster, stage):
 def check_project_completion(stage):
     return check_stage_completion(stage) and stage.stage_number == 4
 
+
 def check_part1_completion(cluster,stage,project_folder):
-    stage_completed = check_stage_completion(cluster, stage)
-    is_last_stage = stage.stage_number == 3
-    case1 = stage_completed and is_last_stage
+    """To be used at stage 3 only"""
+    stage_completed = check_stage_completion(stage)
+    is_third_stage = stage.stage_number == 3
+    case1 = stage_completed and is_third_stage
 
     #case2 we are at stage 1 and there is no singles in the folder
     singles_in_folder = [f for f in str(project_folder + "/Singles") if not f.startswith('.')]
@@ -722,10 +721,10 @@ def check_completion_and_save(cluster, stage, project_folder, progress_data):
 
     new_progress_data = checkout_progress()
 
-    if check_project_completion(cluster,stage, project_folder):
+    if check_project_completion(stage):
         pass
     else:
-        if check_stage_completion(cluster, stage):
+        if check_stage_completion(stage):
             new_cluster, new_stage = create_next_stage(cluster, stage, project_folder)
             save_progress_data(project_folder,new_stage, new_cluster, new_progress_data)
 
