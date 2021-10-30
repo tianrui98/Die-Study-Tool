@@ -25,18 +25,23 @@ class MainUI:
 
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
-        self.image_height = self._pixel_to_char(int(self.root.winfo_height() * 0.6))
+
         initial_width = int(self.screen_width * 0.8)
         initial_height = int(self.screen_height * 0.8)
         self.root.geometry("{}x{}".format(str(initial_width), str(initial_height)))
         self.root.minsize(width=initial_width, height=initial_height)
-        self.root.columnconfigure(0, weight=1)
+
+        self.root.columnconfigure(0, weight=1) 
         self.root.columnconfigure(1, weight=1)
         self.root.columnconfigure(2, weight=1)
         self.root.rowconfigure(0, weight=0)
         self.root.rowconfigure(1, weight=2)
         self.root.rowconfigure(2, weight=0)
         self.root.rowconfigure(3, weight=0)
+
+        self.image_height_char = self._pixel_to_char(int(initial_height * 0.7))
+        self.image_height_pixel = int(initial_height * 0.7)
+        print(f"image_height_pixel = {self.image_height_pixel}")
 
 #%% Shortcuts
 
@@ -132,7 +137,23 @@ class MainUI:
 
         image = Image.open(path)
         iw, ih = int(image.width), int(image.height)
-        h = int(self.root.winfo_height() * 0.7)
+        h = self.image_height_pixel
+        image = image.resize((math.ceil(h/ih * iw), h), Image. ANTIALIAS)
+        img = ImageTk.PhotoImage(image)
+        img_label = tk.Label(parent, image=img)
+        img_label.image = img
+        img_label.grid(column=column,
+                       row=row,
+                       columnspan=columspan,
+                       rowspan=rowspan,
+                       sticky=sticky)
+        return img_label
+
+    def add_image_identical (self,  path, column, row, columspan, rowspan, parent, sticky="nsew"):
+        image = Image.open(path)
+        iw, ih = int(image.width), int(image.height)
+        h = int(self.image_height_pixel // 2)
+        print(f"h = {h}")
         image = image.resize((math.ceil(h/ih * iw), h), Image. ANTIALIAS)
         img = ImageTk.PhotoImage(image)
         img_label = tk.Label(parent, image=img)
@@ -808,15 +829,15 @@ class MainUI:
     def create_main_UI (self):
 
         #initialize left and right images
-        self.left_image = self.add_filler(self.image_height,self.image_height, 0, 1, 1, 1, self.root, sticky = "w", content = "", color = "green")
+        self.left_image = self.add_filler(self.image_height_char,self.image_height_char, 0, 1, 1, 1, self.root, sticky = "w", content = "", color = "green")
         # _ = self.add_filler(1, 1, 1, 0, 1, 4, self.root, sticky = "w") #divider
-        self.right_image = self.add_filler(self.image_height,self.image_height, 2, 1, 1, 1, self.root, sticky = "w", content = "", color = "green")
+        self.right_image = self.add_filler(self.image_height_char,self.image_height_char, 2, 1, 1, 1, self.root, sticky = "w", content = "", color = "green")
 
         # menu bar
         right_menu_bar = self.add_frame(2, 0, 1, 1, self.root, "e")
         # right_menu_bar.rowconfigure(0, weight=1)
         # right_menu_bar.columnconfigure(1, weight=1)
-        _ = self.add_filler(1,1, 0, 0, 1, 1, right_menu_bar, sticky= "w", content = "", color = "yellow")
+        # _ = self.add_filler(1,1, 0, 0, 1, 1, right_menu_bar, sticky= "w", content = "", color = "yellow")
         self.open_btn = self.add_button("Open", self.create_open_window, 2, 3, 1, 0, 1, 1, right_menu_bar, sticky = "e")
         self.undo_btn = self.add_button("Export", self.export_btn, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
         self.save_btn = self.add_button("Save", self.save, 2, 3, 3, 0, 1, 1, right_menu_bar, sticky = "e")
@@ -861,6 +882,34 @@ class MainUI:
         self.identical_btn = self.add_button("Identical", self.cluster_validation_identical, action_button_height, 4, 2, 0, 1, 1, action_bar)
         self.best_image_btn = self.add_button("Best Image", self.cluster_validation_best_image, action_button_height, 4, 3, 0, 1, 1, action_bar)
 
+    def create_identical_UI (self):
+
+            #TODO replace None with actual functions
+            # menu bar
+            right_menu_bar = self.add_frame(2, 0, 1, 1, self.root, "e")
+            self.open_btn = self.add_button("Open", None, 2, 3, 1, 0, 1, 1, right_menu_bar, sticky = "e")
+            self.undo_btn = self.add_button("Export", None, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
+            self.save_btn = self.add_button("Save", None, 2, 3, 3, 0, 1, 1, right_menu_bar, sticky = "e")
+            self.exit_btn = self.add_button("Exit", None, 2, 3, 4, 0, 1, 1, right_menu_bar, sticky = "e")
+
+            left_menu_bar = self.add_frame(0, 0, 1, 1, self.root, "w")
+            self.project_title_label = self.add_text("Project Title: ", 0, 0, 1, 1, left_menu_bar, sticky= "w")
+            self.stage_label = self.add_text("Current Stage: ", 0, 1, 1, 1, left_menu_bar, sticky= "w")
+
+            #left main frame: display coin images
+            #right main frame: display current identical groups
+            self.left_main_frame = self.add_frame(0, 1, 1, 1, self.root, "w")
+            self.right_main_frame = self.add_frame(1, 1, 1, 1, self.root, "e")
+
+            #Left main frame can display max 6 pictures
+            self.image_frames = []
+            for i in range(6):
+                col = i % 3
+                row = i // 3
+                # frame = self.add_frame(col, row, 1, 1, self.left_main_frame)
+                image_filler = self.add_image_identical("/Users/rui/Desktop/Die-Study-Tool/images/blank.png", col, row, 1, 1, self.left_main_frame, "we")
+                self.image_frames.append(image_filler)
+
 
     def start (self):
         self.create_main_UI()
@@ -868,5 +917,9 @@ class MainUI:
             self.root.mainloop()
         except:
             logger.error("====Error in main loop====")
+
+    def start_identical (self):
+        self.create_identical_UI()
+        self.root.mainloop()
 
 # %%
