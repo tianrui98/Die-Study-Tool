@@ -43,7 +43,6 @@ class MainUI:
         self.button_frame_width = self.root.winfo_width() * 0.45
         self.button_frame_height = self.root.winfo_height() * 0.2
         self.identical_image_height_pixel = int(self.initial_height * 0.9 * 0.5)
-        print(f"image_height_pixel = {self.image_height_pixel}")
 
 #%% Shortcuts
 
@@ -135,11 +134,10 @@ class MainUI:
         font_size = f.measure('m')
         return int(char*font_size)
 #%% Visuals and Aesthetics
-    def add_image(self,  path, column, row, columspan, rowspan, parent, sticky="nsew", max_height = None):
+    def add_image(self,  path, column, row, columspan, rowspan, parent, sticky="nsew", max_height = None, padx = 0, pady = 0):
 
         image = Image.open(path)
         iw, ih = int(image.width), int(image.height)
-        print(f"add_image default max_height = {int(self.root.winfo_height() * 0.7)}")
         if not max_height:
             h = int(self.root.winfo_height() * 0.7)
 
@@ -153,23 +151,7 @@ class MainUI:
                        row=row,
                        columnspan=columspan,
                        rowspan=rowspan,
-                       sticky=sticky, padx = 5, pady = 5)
-        return img_label
-
-    def add_image_identical (self,  path, column, row, columspan, rowspan, parent, sticky="nsew"):
-        image = Image.open(path)
-        iw, ih = int(image.width), int(image.height)
-        h = int(self.image_height_pixel // 2)
-        print(f"h = {h}")
-        image = image.resize((math.ceil(h/ih * iw), h), Image. ANTIALIAS)
-        img = ImageTk.PhotoImage(image)
-        img_label = tk.Label(parent, image=img)
-        img_label.image = img
-        img_label.grid(column=column,
-                       row=row,
-                       columnspan=columspan,
-                       rowspan=rowspan,
-                       sticky=sticky)
+                       sticky=sticky, padx = padx, pady = pady)
         return img_label
 
     def initialize_image_display(self, part2 = False):
@@ -265,7 +247,7 @@ class MainUI:
     def add_frame(self, height, width, column, row, columspan, rowspan, parent, sticky="nsew"):
         frame_width =width
         frame_height =height
-        frame = tk.Frame(parent, padx=6, pady=6, bd=0, width = frame_height , height = frame_width, background= "red")
+        frame = tk.Frame(parent, bd=0, width = frame_height , height = frame_width, background= "red")
         frame.grid(column=column,
                    row=row,
                    columnspan=columspan,
@@ -472,7 +454,6 @@ class MainUI:
         """
         self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
         #skip the image already compared with left image
-        print("past comparison {}".format(self.stage.past_comparisons))
         while self.stage.stage_number > 0 and self.right_image_index < len(self.cluster.images) and (self.right_image_index == self.left_image_index or  self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
                     #skip the index of left image
             if self.right_image_index == self.left_image_index:
@@ -890,6 +871,10 @@ class MainUI:
         #TODO replace None with actual functions
         # menu bar
 
+        self.left_main_frame_width_pixel = int(self.initial_width * 0.68)
+        self.right_main_frame_width_pixel = int(self.initial_width * 0.28)
+        self.main_frame_height = int(self.initial_height * 0.9)
+
         left_menu_bar = self.add_frame(int(self.initial_height * 0.1), int(self.initial_width * 0.5),0, 0, 1, 1, self.root, "w")
         self.project_title_label = self.add_text("Project Title: ", 0, 0, 1, 1, left_menu_bar, sticky= "w")
         self.stage_label = self.add_text("Current Stage: ", 0, 1, 1, 1, left_menu_bar, sticky= "w")
@@ -901,32 +886,20 @@ class MainUI:
         self.exit_btn = self.add_button("Exit", None, 2, 3, 4, 0, 1, 1, right_menu_bar, sticky = "e")
 
         #left main frame: display coin images Height: 0.8 * window, width: 0.7 * window width
-        self.left_main_frame = self.add_frame(int(self.initial_height * 0.9), int(self.initial_width * 0.7), 0, 1, 1, 3, self.root, "nsew")
+        self.left_main_frame = self.add_frame(self.main_frame_height, self.left_main_frame_width_pixel, 0, 1, 1, 3, self.root, "nsew")
         #right main frame: display current identical groups
-        self.right_main_frame = self.add_frame(int(self.initial_height * 0.9), int(self.initial_width * 0.3), 1, 1, 1, 3, self.root, "nsew")
+        self.right_main_frame = self.add_frame(self.main_frame_height, self.right_main_frame_width_pixel, 1, 1, 1, 3, self.root, "nsew")
 
         #Left main frame can display max 6 pictures. 
         self.image_frames = []
         for i in range(6):
             col = i % 3
             row = i // 3
-            image_filler = self.add_image("images/blank.png", col, row, 1, 1, self.left_main_frame, "nsew", int(self.initial_height * 0.45))
+            image_filler = self.add_image("images/blank.png", col, row, 1, 1, self.left_main_frame, "nsew", int(self.main_frame_height * 0.5))
             self.image_frames.append(image_filler)
 
-        # scale = self.identical_image_height_pixel
-        # print(f"winfo_height = {self.root.winfo_reqheight()}")
-        # print(f"image height identical {scale}")
-        # image_1 = self.add_image("images/blank.png", 0, 0, 1, 1, self.left_main_frame, "nsew", scale)
-        # image_2 = self.add_image("images/blank.png", 1, 0, 1, 1, self.left_main_frame, "nsew", scale)
-        # image_3 = self.add_image("images/blank.png", 2, 0, 1, 1, self.left_main_frame, "nsew", scale)
-        # image_4 = self.add_image("images/blank.png", 0, 1, 1, 1, self.left_main_frame, "nsew", scale)
-        # image_5 = self.add_image("images/blank.png", 1, 1, 1, 1, self.left_main_frame, "nsew", scale)
-        # image_6 = self.add_image("images/blank.png", 2, 1, 1, 1, self.left_main_frame, "nsew", scale)
-
-        # self.image_frames = [image_1, image_2, image_3, image_4, image_5, image_6]
-
         #a small image for easy comparison
-        self.right_image_window = self.add_image("images/blank.png", 0,0,1,1,self.right_main_frame, "w", int(self.initial_height * 0.9 * 0.3))
+        self.right_image_window = self.add_image("images/blank.png", 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
         identical_header = self.add_text("Identical coins: ", 0, 1, 1, 1, self.right_main_frame, "w")
 
         # a list bar for all the identicals that are added to the group
@@ -934,8 +907,8 @@ class MainUI:
 
         self.scrollbar = tk.Scrollbar(self.right_main_frame, orient = tk.VERTICAL)
         self.identical_list_box = tk.Listbox(self.right_main_frame, 
-                                            height = self._pixel_to_char(int(self.initial_height * 0.1)),
-                                            width = self._pixel_to_char(int(self.initial_height * 0.9 * 0.3)),
+                                            height = self._pixel_to_char(int(self.main_frame_height * 0.1)),
+                                            width = self._pixel_to_char(int(self.right_main_frame_width_pixel * 0.8)),
                                             yscrollcommand= self.scrollbar.set)
 
 
@@ -947,10 +920,15 @@ class MainUI:
         self.identical_list_box.grid(column = 0, row = 2, columnspan= 1, rowspan= 1, sticky = "we" )
 
         #buttons
-        add_identical_button = self.add_button("Add", None, 5, 5, 0, 3, 1,1, self.right_main_frame)
+        list_button_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 3,2,1,self.right_main_frame, "w")
+        _ = self.add_button("Remove from list", None, 2, 13, 0, 3, 1,1, list_button_frame, "w")
+        _ = self.add_button("Confirm current list", None, 2,13, 1, 3, 1,1, list_button_frame, "e")
 
+        _ = self.add_button("Finish current cluster", None, 3, 15, 0, 4, 2, 1, self.right_main_frame, "we" )
 
-
+        prev_next_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 5, 2,1,self.right_main_frame, "w")
+        _ = self.add_button("Prev", None, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="w")
+        _ = self.add_button("Next", None, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="w")
 
     def start (self):
         self.create_main_UI()
