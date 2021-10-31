@@ -934,8 +934,8 @@ class MainUI:
 
         self.scrollbar = tk.Scrollbar(self.right_main_frame, orient = tk.VERTICAL)
         self.identical_list_box = tk.Listbox(self.right_main_frame, 
-                                            height = self._pixel_to_char(int(self.initial_height * 0.1)), 
-                                            width = self._pixel_to_char(int(self.initial_height * 0.9 * 0.3)),  
+                                            height = self._pixel_to_char(int(self.initial_height * 0.1)),
+                                            width = self._pixel_to_char(int(self.initial_height * 0.9 * 0.3)),
                                             yscrollcommand= self.scrollbar.set)
 
 
@@ -946,7 +946,9 @@ class MainUI:
             self.identical_list_box.insert(tk.END, item)
         self.identical_list_box.grid(column = 0, row = 2, columnspan= 1, rowspan= 1, sticky = "we" )
 
-        
+        #buttons
+        add_identical_button = self.add_button("Add", None, 5, 5, 0, 3, 1,1, self.right_main_frame)
+
 
 
 
