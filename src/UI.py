@@ -14,13 +14,13 @@ import json
 from tkinter import font
 #%% UI
 class UI:
-    def __init__(self, image_height_ratio):
+    def __init__(self, image_height_ratio, project_name = "", project_address = "", progress_data = {}):
         # main interface
         self.root = tk.Tk()
         self.root.title("Die Study Tool")
-        self.project_name = ""
-        self.project_address = ""
-        self.progress_data = {}
+        self.project_name = project_name
+        self.project_address = project_address
+        self.progress_data = progress_data
         self.demo_mode = False
 
         self.screen_width = self.root.winfo_screenwidth()
@@ -152,7 +152,7 @@ class UI:
     def add_frame(self, height, width, column, row, columspan, rowspan, parent, sticky="nsew"):
         frame_width =width
         frame_height =height
-        frame = tk.Frame(parent, bd=0, width = frame_height , height = frame_width, background= "red")
+        frame = tk.Frame(parent, bd=0, width = frame_height , height = frame_width, background= None)
         frame.grid(column=column,
                    row=row,
                    columnspan=columspan,
@@ -161,7 +161,7 @@ class UI:
 
         return frame
 
-    def add_filler(self, height, width, column, row, columspan, rowspan, parent, sticky="nsew", content = "", color = "blue"):
+    def add_filler(self, height, width, column, row, columspan, rowspan, parent, sticky="nsew", content = "", color = None):
         filler = tk.Label(parent, width=width, height=height, text = content, bg = color)
         filler.grid(column=column,
                     row=row,
@@ -430,11 +430,7 @@ class UI:
         self.choose_project_window.mainloop()
 
     def start (self):
-        self.create_UI()
-        try:
-            self.root.mainloop()
-        except:
-            logger.error("====Error in main loop====")
+        pass
 
     def create_UI (self):
         pass

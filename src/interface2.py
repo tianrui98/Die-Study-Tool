@@ -8,13 +8,31 @@ from PIL import Image, ImageTk
 from tkinter import Toplevel, filedialog, messagebox
 from tkinter import font
 
+
+
 class IdenticalUI (UI):
 
-    def __init__(self):
-        super().__init__(0.48)
+    def __init__(self, project_name = "", project_address = "", progress_data = {}, cluster = None, stage = None):
+        super().__init__(0.48, project_name, project_address, progress_data)
+
+        #the first 6 images will be on page 0, the next 6 on page 1 etc.
+        self.current_page = 0
+        self.cluster = cluster
+        self.stage = stage
+
+    #visuals
+    def refresh_image_display(self) -> None:
+        """show current cluster's coin images"""
+        for i in range(self.current_page*6, min(len(self.cluster.images), (self.current_page + 1)*6)):
+            image_path = self._get_image_object(i).address
+            col = i % 3
+            row = i // 3
+            image_label = self.add_image(image_path, col, row, 1, 1, self.left_main_frame, "n", int(self.main_frame_height * 0.49))
+            print(f"add image from path {image_path}")
+            elem_index = self.current_page // 6
+            self.image_labels[elem_index] = image_label
 
     def create_UI (self):
-
         #TODO replace None with actual functions
         # menu bar
 
@@ -38,12 +56,16 @@ class IdenticalUI (UI):
         self.right_main_frame = self.add_frame(self.main_frame_height, self.right_main_frame_width_pixel, 1, 1, 1, 3, self.root, "nsew")
 
         #Left main frame can display max 6 pictures. 
-        self.image_frames = []
+        self.image_labels = []
+        self.add_button_labels = []
         for i in range(6):
             col = i % 3
             row = i // 3
-            image_filler = self.add_image("images/blank.png", col, row, 1, 1, self.left_main_frame, "nsew", int(self.main_frame_height * 0.5))
-            self.image_frames.append(image_filler)
+            image_frame = self.add_frame(int(self.main_frame_height * 0.5),int(self.main_frame_height * 0.5), col, row, 1, 1, self.left_main_frame, "nsew")
+            image_filler = self.add_image("images/blank.png", 0, 0, 1, 1, image_frame, "n", int(self.main_frame_height * 0.49))
+            add_identical_button = self.add_button("Add", None, self._pixel_to_char(int(self.main_frame_height * 0.01)), 5, 0,1,1,1, image_frame, "s")
+            self.image_labels.append(image_filler)
+            self.add_button_labels.append(add_identical_button)
 
         #a small image for easy comparison
         self.right_image_window = self.add_image("images/blank.png", 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
@@ -57,7 +79,6 @@ class IdenticalUI (UI):
                                             height = self._pixel_to_char(int(self.main_frame_height * 0.1)),
                                             width = self._pixel_to_char(int(self.right_main_frame_width_pixel * 0.8)),
                                             yscrollcommand= self.scrollbar.set)
-
 
         self.scrollbar.config(command = self.identical_list_box.yview)
         self.scrollbar.grid(column = 1, row = 2, sticky = "ns")
@@ -74,6 +95,14 @@ class IdenticalUI (UI):
         _ = self.add_button("Finish current cluster", None, 3, 15, 0, 4, 2, 1, self.right_main_frame, "we" )
 
         prev_next_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 5, 2,1,self.right_main_frame, "w")
-        _ = self.add_button("Prev", None, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="w")
-        _ = self.add_button("Next", None, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="w")
+        _ = self.add_button("Prev", None, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
+        _ = self.add_button("Next", None, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
+
+    def start(self):
+        self.create_UI()
+        self.refresh_image_display()
+        try:
+            self.root.mainloop()
+        except:
+            logger.error("====Error in main loop====")
 

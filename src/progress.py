@@ -29,7 +29,7 @@ from src.root_logger import *
 from datetime import datetime
 from collections import defaultdict
 import re
-
+from pathlib import Path
 def _serialize_identicals(identicals):
     res = []
     for s in identicals:
@@ -419,14 +419,25 @@ def checkout_progress():
     progress_data = json.loads(data_file.read())
     return progress_data
 
-def load_progress(project_folder, create_next_cluster = True):
+def load_progress(project_folder, create_next_cluster = True, data_address = "data.json"):
     """read progress data and create objects"""
-    data_file = open("data.json", "r")
+    app_folder = str(Path(__file__).resolve().parent.parent)
+    if app_folder not in data_address:
+        data_address_full = os.path.join(app_folder, data_address)
+    else:
+        data_address_full = data_address
+
+    if app_folder not in project_folder:
+        project_address_full = os.path.join(app_folder, project_folder)
+    else:
+        project_address_full = project_folder
+
+    data_file = open(data_address_full, "r")
     progress_data = json.loads(data_file.read())
     #retrieve latest stage
     stage_number= max(progress_data[project_folder]["stages"].keys())
     stage_info = progress_data[project_folder]["stages"][stage_number]
-    stage = Stage(int(stage_number), project_folder)
+    stage = Stage(int(stage_number), project_address_full)
     stage.clusters_yet_to_check = set(stage_info["clusters_yet_to_check"])
     stage.past_comparisons= _deserialize_past_comparisons(stage_info["past_comparisons"])
     #retrieve latest cluster
@@ -444,11 +455,11 @@ def load_progress(project_folder, create_next_cluster = True):
         if len(stage.clusters_yet_to_check) == 0:
             cluster = None
         elif current_cluster in stage.clusters_yet_to_check:
-            cluster = _create_a_cluster(stage,project_folder,current_cluster)
+            cluster = _create_a_cluster(stage,project_address_full,current_cluster)
         # if current cluster has already been checked. give the next cluster in line
         else:
             next_in_line = list(stage.clusters_yet_to_check)[0]
-            cluster = _create_a_cluster(stage, project_folder, next_in_line)
+            cluster = _create_a_cluster(stage, project_address_full, next_in_line)
             progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
 
 

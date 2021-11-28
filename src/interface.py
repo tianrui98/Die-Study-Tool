@@ -332,7 +332,6 @@ class MainUI(UI):
             self.update_icon_button_color ()
 
         else:
-            # self.right_image = self.add_filler(self.image_height,self.image_height, 2, 1, 1, 1, self.root, content = "End of Cluster", color = "purple")
             image = Image.open("images/end.png")
             iw, ih = int(image.width), int(image.height)
             h = int(self.root.winfo_height() * 0.7)
@@ -340,7 +339,7 @@ class MainUI(UI):
             img = ImageTk.PhotoImage(image)
             img_label = tk.Label(self.root, image=img)
             img_label.image = img
-            img_label.grid(column=2,
+            img_label.grid(column=1,
                         row=1,
                         columnspan=1,
                         rowspan=1,
