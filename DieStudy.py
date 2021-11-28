@@ -1,12 +1,13 @@
-import src.interface
+from src.interface import MainUI
+from src.interface2 import IdenticalUI
 
 
 def main():
-    src.interface.MainUI().start()
+    MainUI().start()
 
 def identical():
-    src.interface.MainUI().start_identical()
+    IdenticalUI().start()
 
 if __name__ == "__main__":
-    # main()
+    #main()
     identical()
