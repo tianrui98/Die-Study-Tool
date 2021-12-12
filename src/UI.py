@@ -108,6 +108,25 @@ class UI:
                        sticky=sticky, padx = padx, pady = pady)
         return img_label
 
+    def add_image_darken(self,  path, column, row, columspan, rowspan, parent, sticky="nsew", max_height = None, padx = 0, pady = 0):
+        image_raw = Image.open(path)
+        image = image_raw.point(lambda p : p *0.6)
+        iw, ih = int(image.width), int(image.height)
+        if not max_height:
+            h = int(self.root.winfo_height() * self.image_height_ratio)
+
+        else:
+            h = max_height
+        image = image.resize((math.ceil(h/ih * iw), h), Image. ANTIALIAS)
+        img = ImageTk.PhotoImage(image)
+        img_label = tk.Label(parent, image=img)
+        img_label.image = img
+        img_label.grid(column=column,
+                       row=row,
+                       columnspan=columspan,
+                       rowspan=rowspan,
+                       sticky=sticky, padx = padx, pady = pady)
+        return img_label
 
     def add_icon(self, path, height, width,  column, row, columspan, rowspan, parent, sticky="nsew"):
 
@@ -288,50 +307,7 @@ class UI:
         pass
 
     def check_completion_and_move_on (self):
-        """This function is called when user clicks "next" while at the last image
-        !!! only mark cluster complete if user clicks ok"""
-
-        if progress.check_cluster_completion(self.cluster,self.stage):
-            self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
-
-        if progress.check_project_completion(self.stage):
-            logger.info("!!!!project complete!!!!")
-            logger.info(str(self.progress_data))
-            self.export_btn()
-            self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
-        else:
-            if progress.check_stage_completion(self.stage):
-                message = "You have completed the current *STAGE*."
-                logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
-            else:
-                if progress.check_cluster_completion(self.cluster, self.stage):
-                    message = "You have completed the current cluster."
-                else:
-                    return None
-
-            response = self.create_save_progress_window(message)
-            if response:
-                self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
-
-                self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
-                progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
-                self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
-
-                if self.cluster:
-                    #if next cluster has only 1 image, skip it & recurse
-                    if len(self.cluster.images) <= 1:
-                        logger.info("----SKIP {}----".format(self.cluster.name))
-                        self.stage = progress.mark_cluster_completed(self.cluster,self.stage)
-                        self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
-                        progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
-                        self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
-                        self.check_completion_and_move_on ()
-                    else:
-                        self.initialize_image_display()
-                if "stage" in message:
-                    logger.info(str(self.progress_data))
-            else:
-                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
+        pass
 
     def save(self):
         """save results
@@ -380,8 +356,8 @@ class UI:
 
         else:
             response = messagebox.askokcancel("Export intermediate results", "You have NOT completed the current project.\nExport the intermediate results?" )
-            keep_progress = messagebox.askyesno("Export intermediate results", "Keep your current progress in the system ?" )
             if response:
+                keep_progress = messagebox.askyesno("Export intermediate results", "Keep your current progress in the system ?" )
                 self.export(keep_progress)
                 if not keep_progress:
                     self.root.destroy()

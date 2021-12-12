@@ -29,6 +29,8 @@ class IdenticalUI (UI):
             return None
         if image_object.name in self.identical_coin_dict:
             return None
+        if image_object.name in self.marked_identical_coin_dict:
+            return None
         self.identical_coin_dict[image_object.name] = image_object
         self.identical_list_box.insert(tk.END, image_object.name)
         #display current image in the small window if it's the first on the list
@@ -112,25 +114,92 @@ class IdenticalUI (UI):
         """mark the images on the list identical and un-display their widgets.
         reset the identical list and display window.
         """
-        pass
+        if len(self.identical_coin_dict) <= 1:
+            return None
+        #reset list
+        self.cluster.identicals.append(set(list(self.identical_coin_dict.keys())))
+        self.identical_list_box.delete(0,tk.END)
+        self.marked_identical_coin_dict.update(self.identical_coin_dict)
+        self.identical_coin_dict = {}
+
+        #reset right window
+        self.right_image_window.grid_forget()
+        self.right_image_window = self.add_image("images/blank.png", 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
+
+        #reset left window
+        self.refresh_image_display()
+
+    def check_completion_and_move_on(self):
+        """This function is called when user clicks "next" while at the last image
+        !!! only mark cluster complete if user clicks ok"""
+
+        self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
+
+        if progress.check_project_completion(self.stage):
+            logger.info("!!!!project complete!!!!")
+            logger.info(str(self.progress_data))
+            self.export_btn()
+            self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
+        else:
+            if progress.check_stage_completion(self.stage):
+                message = "You have completed the current *STAGE*."
+                logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
+            else:
+                message = "You have completed the current cluster."
+
+            response = self.create_save_progress_window(message)
+            if response:
+                self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
+                progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
+                self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
+                if "stage" in message:
+                    logger.info(str(self.progress_data))
+            else:
+                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
+
+    def next_cluster(self) -> None:
+        """Save current progress and display next cluster
+        If all clusters have been visited -> end of project
+        """
+        self.check_completion_and_move_on()
+        self.current_page = 0
+        self.refresh_image_display()
+
+    def load_next_image(self) -> None:
+        self.current_page = min(self.current_page + 1, math.ceil(len(self.cluster.images)/6 ) - 1)
+        print(f"num of images = {len(self.cluster.images)}")
+        print(f"max page = {math.ceil(len(self.cluster.images)/6 ) - 1}")
+        print(f"current page = {self.current_page}")
+        self.refresh_image_display()
+
+    def load_prev_image(self) -> None:
+        self.current_page = max(self.current_page - 1, 0)
+        print(f"current page = {self.current_page}")
+        self.refresh_image_display()
 
     #visuals
     def refresh_image_display(self) -> None:
         """show current cluster's coin images. Add the image widgets to the image_widgets dictionary"""
-        for i in range(self.current_page*6, min(len(self.cluster.images), (self.current_page + 1)*6)):
-            image_object = self._get_image_object(i)
+        for i in range(self.current_page*6, (self.current_page + 1)*6):
             display_index = i % 6
-            print(f"i = {i}, elem index = {display_index}")
             old_image_widget = self.image_on_display[display_index][1]
             old_image_widget.grid_forget()
-            image_frame = self.image_frames[i]
-            new_image_widget =self.add_image(image_object.address, 0, 0, 1, 1, image_frame, "n", int(self.main_frame_height * 0.49))
+            image_frame = self.image_frames[display_index]
+
+            if i >= len(self.cluster.images):
+                new_image_widget =self.add_image("images/blank.png", 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.49))
+                image_object = None
+            else:
+                image_object = self._get_image_object(i)
+                self.image_label_widgets[display_index].config(text = image_object.name)
+                if image_object.name in self.marked_identical_coin_dict:
+                    new_image_widget =self.add_image_darken(image_object.address, 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.49))
+                else:
+                    new_image_widget =self.add_image(image_object.address, 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.49))
             self.image_on_display[display_index] = (image_object, new_image_widget)
-        print(f"refresh image display, {self.image_on_display}")
 
     def create_UI (self):
         # menu bar
-
         self.left_main_frame_width_pixel = int(self.initial_width * 0.68)
         self.right_main_frame_width_pixel = int(self.initial_width * 0.28)
         self.main_frame_height = int(self.initial_height * 0.9)
@@ -152,9 +221,8 @@ class IdenticalUI (UI):
 
         # a dictionary of identical image objects currently on the stack. Key: image name. Value: image object
         self.identical_coin_dict = {}
-
-        # the first identical added to the list. type: image object
-        self.identical_coin_ref = None
+        #keep track of identical coins that have been confirmed
+        self.marked_identical_coin_dict = {}
 
         #identical coin list box displays the names of the identical coins
         self.scrollbar = tk.Scrollbar(self.right_main_frame, orient = tk.VERTICAL)
@@ -173,7 +241,7 @@ class IdenticalUI (UI):
         #Left main frame can display max 6 pictures.
         self.image_on_display = {} #key: element index (0-5), value: (image object, image widget)
         #0:(None,None),1:(None,None),2:(None,None), 3:(None,None),4:(None,None),5:(None,None)
-        self.add_button_widgets = []
+        self.image_label_widgets = []
         self.image_frames = []
 
         for i in range(6):
@@ -181,13 +249,13 @@ class IdenticalUI (UI):
             row = i // 3
             image_frame = self.add_frame(int(self.main_frame_height * 0.5),int(self.main_frame_height * 0.5), col, row, 1, 1, self.left_main_frame, "nsew")
             self.image_frames.append(image_frame)
-            image_filler = self.add_image("images/blank.png", 0, 0, 1, 1, image_frame, "n", int(self.main_frame_height * 0.49))
+            image_filler = self.add_image("images/blank.png", 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.49))
             self.image_on_display[i] = (None, image_filler)
+            image_label = self.add_text("", 0,1,1,1, image_frame, "se")
             add_function = self._add_function_n(i)
-            add_identical_button = self.add_button("Add", add_function , self._pixel_to_char(int(self.main_frame_height * 0.01)), 5, 0,1,1,1, image_frame, "s")
-            self.add_button_widgets.append(add_identical_button)
+            _ = self.add_button("Add", add_function , self._pixel_to_char(int(self.main_frame_height * 0.01)), 5, 1,1,1,1, image_frame, "se")
+            self.image_label_widgets.append(image_label)
 
-        print(f"initial image on display {self.image_on_display}")
         #a small image for easy comparison
         self.right_image_window = self.add_image("images/blank.png", 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
         identical_header = self.add_text("Identical coins: ", 0, 1, 1, 1, self.right_main_frame, "w")
@@ -195,13 +263,14 @@ class IdenticalUI (UI):
         #buttons
         list_button_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 3,2,1,self.right_main_frame, "w")
         _ = self.add_button("Remove from list", self.remove_image_from_list, 2, 13, 0, 3, 1,1, list_button_frame, "w")
-        _ = self.add_button("Confirm current list", None, 2,13, 1, 3, 1,1, list_button_frame, "e")
+        _ = self.add_button("Confirm current list", self.confirm_current_list, 2,13, 1, 3, 1,1, list_button_frame, "e")
 
-        _ = self.add_button("Finish current cluster", None, 3, 15, 0, 4, 2, 1, self.right_main_frame, "we" )
 
-        prev_next_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 5, 2,1,self.right_main_frame, "w")
-        _ = self.add_button("Prev", None, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
-        _ = self.add_button("Next", None, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
+        prev_next_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 4, 2,1,self.right_main_frame, "w")
+        _ = self.add_button("◀", self.load_prev_image, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
+        _ = self.add_button("▶", self.load_next_image, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
+
+        _ = self.add_button("Next Cluster", self.next_cluster, 3, 15, 1, 2, 1, 1, self.root, "sw" )
 
     def start(self):
         self.create_UI()

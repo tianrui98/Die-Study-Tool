@@ -522,6 +522,51 @@ class MainUI(UI):
         self.left_image_index = curr_right_index
         self.right_image_index = curr_left_index
         logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
+    def check_completion_and_move_on (self):
+        """This function is called when user clicks "next" while at the last image
+        !!! only mark cluster complete if user clicks ok"""
+
+        if progress.check_cluster_completion(self.cluster,self.stage):
+            self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
+
+        if progress.check_project_completion(self.stage):
+            logger.info("!!!!project complete!!!!")
+            logger.info(str(self.progress_data))
+            self.export_btn()
+            self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
+        else:
+            if progress.check_stage_completion(self.stage):
+                message = "You have completed the current *STAGE*."
+                logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
+            else:
+                if progress.check_cluster_completion(self.cluster, self.stage):
+                    message = "You have completed the current cluster."
+                else:
+                    return None
+
+            response = self.create_save_progress_window(message)
+            if response:
+                self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
+
+                self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
+                progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
+                self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
+
+                if self.cluster:
+                    #if next cluster has only 1 image, skip it & recurse
+                    if len(self.cluster.images) <= 1:
+                        logger.info("----SKIP {}----".format(self.cluster.name))
+                        self.stage = progress.mark_cluster_completed(self.cluster,self.stage)
+                        self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
+                        progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
+                        self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
+                        self.check_completion_and_move_on ()
+                    else:
+                        self.initialize_image_display()
+                if "stage" in message:
+                    logger.info(str(self.progress_data))
+            else:
+                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
 
     def create_UI (self):
 
@@ -575,4 +620,9 @@ class MainUI(UI):
         self.identical_btn = self.add_button("Identical", self.mark_identical, action_button_height, 4, 2, 0, 1, 1, action_bar)
         self.best_image_btn = self.add_button("Best Image", self.mark_best_image, action_button_height, 4, 3, 0, 1, 1, action_bar)
 
-# %%
+    def start(self):
+        self.create_UI()
+        try:
+            self.root.mainloop()
+        except:
+            logger.error("====Error in main loop====")

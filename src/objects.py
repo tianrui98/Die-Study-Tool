@@ -9,6 +9,7 @@ class ImgObj:
     def __init__(self, address, category_name):
         self.name = address.split("/")[-1] #with .jpg
         self.id = self.name.split(".")[0] #without .jpg
+        self.suffix = self.name.split(".")[1]
         self.address = address
         self.cluster = category_name #either cluster name or "Singles"
 
@@ -31,10 +32,8 @@ class Cluster:
         self.number = len(self.images) #number of coins - default number of images
 
         if best_image_name:
-            try:
-                self.best_image = self.images_dict[best_image_name]
-            except:
-                print("WARNING: Can't find best image " + str(self.images_dict))
+            self.best_image = self.images_dict[best_image_name]
+
         else:
             if len(self.images) > 0:
                 self.best_image = self.images[0] #default first image
@@ -73,10 +72,10 @@ class Stage:
 
 
         elif stage_number == 3:
-            #all images in Singles are considered a single cluster
+            #all images in Singles are considered one cluster
             single_names = [f for f in os.listdir(project_address+"/Singles") if (not f.startswith('.'))]
             for single_name in single_names:
                 self.clusters_yet_to_check.add(single_name.split(".")[0])
 
-        #if A is compared with B:{A: {B}, B:{A}}
+        #if A is compared with B => {A: {B}, B:{A}}
         self.past_comparisons = defaultdict(set)
