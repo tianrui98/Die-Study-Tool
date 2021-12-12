@@ -1,6 +1,6 @@
 from json import load
-from src.interface import MainUI
-from src.interface2 import IdenticalUI
+from src.main_interface import MainUI
+from src.identical_interface import IdenticalUI
 from src.progress import load_progress
 import os
 
