@@ -272,6 +272,9 @@ class IdenticalUI (UI):
 
         _ = self.add_button("Next Cluster", self.next_cluster, 3, 15, 1, 2, 1, 1, self.root, "sw" )
 
+
+
+
     def start(self):
         self.create_UI()
         self.refresh_image_display()

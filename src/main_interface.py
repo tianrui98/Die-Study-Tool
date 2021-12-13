@@ -14,6 +14,12 @@ from tkinter import font
 class MainUI(UI):
     def __init__(self):
         super().__init__(0.7)
+        #key binding
+        self.root.bind('<Right>', lambda event: self.load_next_image())
+        self.root.bind('<Left>', lambda event: self.load_prev_image())
+        self.root.bind('m', lambda event: self.mark_match())
+        self.root.bind('n', lambda event: self.mark_no_match())
+        self.root.bind('b', lambda event: self.mark_best_image())
 
 #%% Shortcuts
 
@@ -179,10 +185,10 @@ class MainUI(UI):
         """
         #disable best image and identical button if stage is not 0
         if self.stage.stage_number != 0:
-            self.identical_btn["state"] = "disabled"
+            # self.identical_btn["state"] = "disabled"
             self.best_image_btn["state"] = "disabled"
         else:
-            self.identical_btn["state"] = "normal"
+            # self.identical_btn["state"] = "normal"
             self.best_image_btn["state"] = "normal"
 
         #the pair has been previously matched
@@ -202,10 +208,10 @@ class MainUI(UI):
             self.deactivate_button(self.no_match_btn)
 
         #if the pair are identicals:
-        if self._is_identical(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index)):
-            self.activate_button(self.identical_btn)
-        else:
-            self.deactivate_button(self.identical_btn)
+        # if self._is_identical(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index)):
+            # self.activate_button(self.identical_btn)
+        # else:
+        #     self.deactivate_button(self.identical_btn)
 
 
     def change_button_color (self, button_widget, new_fg = "black", new_font = ("Arial", "14")):
@@ -349,7 +355,6 @@ class MainUI(UI):
             self.change_tick_color("right", False)
             self.deactivate_button(self.match_btn)
             self.deactivate_button(self.no_match_btn)
-            self.deactivate_button(self.identical_btn)
             self.right_cluster_label.config(text = "Cluster: " + new_cluster_label)
 
         #update image labels
@@ -437,7 +442,7 @@ class MainUI(UI):
                 #delist from identicals
                 if self._is_identical(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index)):
                     self._remove_from_identicals (self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
-                    self.deactivate_button(self.identical_btn)
+                    # self.deactivate_button(self.identical_btn)
 
             logger.info("Unmatch {} from cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
 
@@ -460,12 +465,12 @@ class MainUI(UI):
             if self._is_identical(left,right):
                 #delist form identicals
                 self._remove_from_identicals(left,right)
-                self.deactivate_button(self.identical_btn)
+                # self.deactivate_button(self.identical_btn)
 
             else:
                 #add to identicals
                 self._add_to_identicals (left,right)
-                self.activate_button(self.identical_btn)
+                # self.activate_button(self.identical_btn)
                 #add to matches
                 self.mark_match()
 
@@ -567,6 +572,7 @@ class MainUI(UI):
                     logger.info(str(self.progress_data))
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
+        self.root.after(1, lambda: self.root.focus_force())
 
     def create_UI (self):
 
@@ -604,21 +610,20 @@ class MainUI(UI):
         self.right_tick = self.add_filler(1, 1, 1, 0, 1, 1, self.right_info_bar, sticky = "e")
 
         #navigation buttons
-        self.prev_btn = self.add_button("Prev", self.load_prev_image, 4, 4, 2, 0, 1, 2, self.right_info_bar, sticky="e")
-        self.next_btn = self.add_button("Next", self.load_next_image, 4, 4, 3, 0, 1, 2, self.right_info_bar, sticky="e")
+        self.prev_btn = self.add_button("◀", self.load_prev_image, 4, 4, 2, 0, 1, 2, self.right_info_bar, sticky="e")
+        self.next_btn = self.add_button("▶", self.load_next_image, 4, 4, 3, 0, 1, 2, self.right_info_bar, sticky="e")
 
         # action buttons
-        action_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 3, 1, 1, self.root)
+        action_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 3, 1, 1, self.root, "se")
         action_bar.rowconfigure(0, weight=1)
         for i in range(4):
             action_bar.columnconfigure(i, weight=1)
 
         action_button_height = 4
 
-        self.match_btn = self.add_button("Match", self.mark_match, action_button_height, 4, 0, 0, 1, 1, action_bar)
-        self.no_match_btn = self.add_button("No Match", self.mark_no_match, action_button_height, 4, 1, 0, 1, 1, action_bar)
-        self.identical_btn = self.add_button("Identical", self.mark_identical, action_button_height, 4, 2, 0, 1, 1, action_bar)
-        self.best_image_btn = self.add_button("Best Image", self.mark_best_image, action_button_height, 4, 3, 0, 1, 1, action_bar)
+        self.best_image_btn = self.add_button("Best Image", self.mark_best_image, action_button_height, 8, 0, 0, 1, 1, action_bar,"se")
+        self.no_match_btn = self.add_button("No Match", self.mark_no_match, action_button_height, 8, 1, 0, 1, 1, action_bar, "se")
+        self.match_btn = self.add_button("Match", self.mark_match, action_button_height, 8, 2, 0, 1, 1, action_bar, "se")
 
     def start(self):
         self.create_UI()
@@ -626,3 +631,4 @@ class MainUI(UI):
             self.root.mainloop()
         except:
             logger.error("====Error in main loop====")
+# %%

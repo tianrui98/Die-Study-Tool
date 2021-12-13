@@ -26,5 +26,6 @@ if __name__ == "__main__":
 #todo:
 #1. allow the option to clear cache when user clicks exit. do not save by default
 #2. remove identical button in the main UI
-#3. add project title to the identical UI
+#3. add project title and cluster name to the identical UI
 #4. merge two UIs
+#5. auto clear old log.. only keep the latest one

@@ -220,6 +220,7 @@ class UI:
         self.initialize_image_display()
 
         #close pop-up
+        self.open_window.quit()
         self.open_window.destroy()
 
         logger.info("_____Create demo project{}_____".format(self.project_name))
@@ -327,7 +328,11 @@ class UI:
             shutil.rmtree(self.project_address)
         else:
             if len(self.progress_data) > 0:
-                self.save()
+                keep_progress = messagebox.askyesno("Exit", "Save your current progress in the system ?" )
+                if keep_progress:
+                    self.save()
+                else:
+                    shutil.rmtree(self.project_address)
             else:
                 shutil.rmtree(self.project_address)
 
