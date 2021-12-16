@@ -380,7 +380,7 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
                                         "past_comparisons": {img_name : []} }}
     }
 
-    *the update on "clusters" will only happen for stage 0 and 3
+    *the update on "clusters" will only happen for stage 0, 3 and 4
     """
     #new project
     if project_folder not in progress_data:
@@ -396,37 +396,36 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
     if cluster:
         #if the cluster has only 1 image -> move that to singles
         cluster_images = [f for f in os.listdir(cluster.address) if not f.startswith('.')]
-        if stage.stage_number == 0 and len(cluster_images) == 1:
+        if (stage.stage_number == 0 or stage.stage_number == 4) and len(cluster_images) == 1:
             shutil.move(cluster.best_image.address, project_folder + "/Singles/" + cluster.best_image.name)
             shutil.rmtree(cluster.address)
 
             if project_folder in progress_data and cluster.name in progress_data[project_folder]["clusters"]:
                 progress_data[project_folder]["clusters"].pop(cluster.name)
 
-        else:
-            #update current cluster
-            progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
+        #update current cluster
+        progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
 
-            if stage.stage_number == 0 or (stage.stage_number == 3 and (cluster.name not in progress_data[project_folder]["clusters"] and len(cluster.matches) > 0)):
-                #overwrite cluster info
-                progress_data[project_folder]["clusters"][cluster.name] = {
-                    "cluster_address": cluster.address,
-                    "cluster_name": cluster.name,
-                    "identicals": _serialize_identicals(cluster.identicals),
-                    "matches": list(cluster.matches),
-                    "nomatches": list(cluster.nomatches),
-                    "best_image_name": cluster.best_image.name
-                    }
-            if stage.stage_number == 4:
-                #overwrite only the identicals info
-                progress_data[project_folder]["clusters"][cluster.name]["identicals"] = _serialize_identicals(cluster.identicals)
+        #overwrite cluster info
+        if stage.stage_number == 0 or (stage.stage_number == 3 and (cluster.name not in progress_data[project_folder]["clusters"] and len(cluster.matches) > 0)):
+            progress_data[project_folder]["clusters"][cluster.name] = {
+                "cluster_address": cluster.address,
+                "cluster_name": cluster.name,
+                "identicals": _serialize_identicals(cluster.identicals),
+                "matches": list(cluster.matches),
+                "nomatches": list(cluster.nomatches),
+                "best_image_name": cluster.best_image.name
+                }
+        elif stage.stage_number == 4:
+            #overwrite only the identicals info
+            progress_data[project_folder]["clusters"][cluster.name]["identicals"] = _serialize_identicals(cluster.identicals)
 
-            #update current cluster
-            progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
-            #update clusters_yet_to_check
-            progress_data[project_folder]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
-            #update past_comparisons
-            progress_data[project_folder]["stages"][str(stage.stage_number)]["past_comparisons"] = _serialize_past_comparisons(stage.past_comparisons)
+        #update current cluster
+        progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
+        #update clusters_yet_to_check
+        progress_data[project_folder]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
+        #update past_comparisons
+        progress_data[project_folder]["stages"][str(stage.stage_number)]["past_comparisons"] = _serialize_past_comparisons(stage.past_comparisons)
     data_file = open("data.json", "w")
     json.dump(progress_data, data_file)
     data_file.close()
@@ -514,7 +513,7 @@ def check_part1_completion(cluster,stage,project_folder):
     singles_in_folder = [f for f in str(project_folder + "/Singles") if not f.startswith('.')]
     case2 = stage.stage_number == 1 and len(singles_in_folder) == 0
 
-    #case3 we are at stage 2 or 3 and took all images (or all but one image) in "Singles" to the current cluster
+    #case3 we are at stage 2 or 3 and have matched all images (or all but one image) in "Singles" to the current cluster
     case3 = (stage.stage_number >= 2 and stage.stage_number < 4) and check_cluster_completion(cluster, stage) and len(cluster.nomatches) <= 1
 
     return case1 or case2 or case3
@@ -650,7 +649,7 @@ def _create_a_cluster(stage,project_folder, next_cluster_name):
 
     return next_cluster
 
-def create_next_cluster(cluster, stage, project_folder):
+def create_next_cluster(stage, project_folder):
     """If the new cluster has only 1 image. the interface will take care of it"""
     if len(stage.clusters_yet_to_check) == 0:
         logger.error("clusters yet to check is zero")
@@ -661,10 +660,17 @@ def create_next_cluster(cluster, stage, project_folder):
     return _create_a_cluster(stage, project_folder, next_cluster_name)
 
 
-def create_next_stage(cluster, stage, project_folder):
+def create_next_stage( stage, project_folder):
     new_stage = Stage(stage.stage_number+1, project_folder)
     logger.info("Next stage. yet to check: {}".format(str(new_stage.clusters_yet_to_check)))
-    new_cluster = create_next_cluster(cluster, new_stage, project_folder)
+    new_cluster = create_next_cluster(new_stage, project_folder)
+
+    return new_cluster, new_stage
+
+def create_find_identical_stage(project_folder):
+    new_stage = Stage(4, project_folder)
+    logger.info("Next stage. yet to check: {}".format(str(new_stage.clusters_yet_to_check)))
+    new_cluster = create_next_cluster(new_stage, project_folder)
 
     return new_cluster, new_stage
 
@@ -720,7 +726,7 @@ def export_results(project_folder, progress_data, save_address, keep_progress):
     res = pd.DataFrame(data, columns=columns)
     res = res.applymap(lambda x : x.split('.')[0])
 
-    project_folder_name = project_folder.split("/")[-1] + "_" + str(datetime.today().date())
+    project_folder_name = project_folder.split("/")[-1] + "_" + str(datetime.now().strftime('%Y-%m-%d-%H-%M'))
 
     if keep_progress:
         shutil.copytree(project_folder, save_address + "/" + project_folder_name )
@@ -741,6 +747,7 @@ def export_results(project_folder, progress_data, save_address, keep_progress):
 
 def check_completion_and_save(cluster, stage, project_folder, progress_data):
     """
+    Saves current data to data.json and creates new cluster or stage
     This function is called when user clicks "save" or "exit"
     Called after "update_folder_and_record" is done
     """
@@ -749,14 +756,18 @@ def check_completion_and_save(cluster, stage, project_folder, progress_data):
 
     new_progress_data = checkout_progress()
 
+    #create new cluster or stage
     if check_project_completion(stage):
         pass
+    elif check_part1_completion(cluster,stage,project_folder):
+        new_cluster, new_stage = create_find_identical_stage(project_folder)
+        save_progress_data(project_folder,new_stage, new_cluster, new_progress_data)
     else:
         if check_stage_completion(stage):
-            new_cluster, new_stage = create_next_stage(cluster, stage, project_folder)
+            new_cluster, new_stage = create_next_stage(stage, project_folder)
             save_progress_data(project_folder,new_stage, new_cluster, new_progress_data)
 
         else:
             if check_cluster_completion(cluster, stage):
-                new_cluster = create_next_cluster(cluster, stage, project_folder)
+                new_cluster = create_next_cluster(stage, project_folder)
                 save_progress_data(project_folder,stage, new_cluster, new_progress_data)

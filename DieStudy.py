@@ -29,3 +29,5 @@ if __name__ == "__main__":
 #3. add project title and cluster name to the identical UI
 #4. merge two UIs
 #5. auto clear old log.. only keep the latest one
+#6. implement menu buttons for identical UI
+#7. continue existing project mode -> enable open identical UI if stage == 4

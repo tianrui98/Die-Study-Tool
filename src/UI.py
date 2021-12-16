@@ -14,9 +14,13 @@ import json
 from tkinter import font
 #%% UI
 class UI:
-    def __init__(self, image_height_ratio, project_name = "", project_address = "", progress_data = {}):
+    def __init__(self, image_height_ratio, project_name = "", project_address = "", progress_data = {},  part2 = False, root = None):
         # main interface
-        self.root = tk.Tk()
+        if part2:
+            self.root = tk.Toplevel()
+            self.mainUI = root
+        else:
+            self.root = tk.Tk()
         self.root.title("Die Study Tool")
         self.project_name = project_name
         self.project_address = project_address
@@ -223,6 +227,7 @@ class UI:
         self.open_window.quit()
         self.open_window.destroy()
 
+
         logger.info("_____Create demo project{}_____".format(self.project_name))
         return None
 
@@ -338,7 +343,9 @@ class UI:
 
         logger.info(str(self.progress_data))
         logger.info("====EXIT====\n\n")
+        self.root.quit()
         self.root.destroy()
+        self.mainUI.destroy()
 
     def export(self, keep_progress = False):
         save_address = filedialog.askdirectory() # asks user to choose a directory
@@ -348,12 +355,14 @@ class UI:
         progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
         self.progress_data, _, _ = progress.load_progress(self.project_address, False)
         progress.export_results(self.project_address,self.progress_data, save_address, keep_progress)
-        logger.info("====EXPORT====")
+        logger.info("====EXPORTED RESULTS====")
+        self.root.quit()
         self.root.destroy()
+        if self.mainUI:
+            self.mainUI.quit()
+            self.mainUI.destroy()
 
-
-    def export_btn(self):
-        project_completed = progress.check_project_completion(self.stage)
+    def export_btn(self, project_completed = False):
         if project_completed:
             response = self.create_export_results_window()
             if response:
@@ -364,8 +373,7 @@ class UI:
             if response:
                 keep_progress = messagebox.askyesno("Export intermediate results", "Keep your current progress in the system ?" )
                 self.export(keep_progress)
-                if not keep_progress:
-                    self.root.destroy()
+
 
     def create_export_results_window(self):
         response = messagebox.askokcancel("Export results", "You have completed the current project.\nExport the results?" )

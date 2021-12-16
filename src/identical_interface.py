@@ -12,13 +12,14 @@ from tkinter import font
 
 class IdenticalUI (UI):
 
-    def __init__(self, project_name = "", project_address = "", progress_data = {}, cluster = None, stage = None):
-        super().__init__(0.48, project_name, project_address, progress_data)
+    def __init__(self, project_name = "", project_address = "", progress_data = {}, cluster = None, stage = None, root = None):
+        super().__init__(0.48, project_name, project_address, progress_data, True, root)
 
         #the first 6 images will be on page 0, the next 6 on page 1 etc.
         self.current_page = 0
         self.cluster = cluster
         self.stage = stage
+
 
     #functionality
     def _add_image_to_identical (self, image_object):
@@ -136,24 +137,17 @@ class IdenticalUI (UI):
         self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
 
         if progress.check_project_completion(self.stage):
-            logger.info("!!!!project complete!!!!")
+            logger.info("_____PROJECT COMPLETED_____")
             logger.info(str(self.progress_data))
-            self.export_btn()
+            self.export_btn(project_completed= True)
             self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
         else:
-            if progress.check_stage_completion(self.stage):
-                message = "You have completed the current *STAGE*."
-                logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
-            else:
-                message = "You have completed the current cluster."
-
+            message = "You have completed the current cluster."
             response = self.create_save_progress_window(message)
             if response:
                 self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
                 progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
                 self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
-                if "stage" in message:
-                    logger.info(str(self.progress_data))
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
 
@@ -164,22 +158,22 @@ class IdenticalUI (UI):
         self.check_completion_and_move_on()
         self.current_page = 0
         self.refresh_image_display()
+        self.root.after(1, lambda: self.root.focus_force())
 
-    def load_next_image(self) -> None:
+    def load_next_page(self) -> None:
         self.current_page = min(self.current_page + 1, math.ceil(len(self.cluster.images)/6 ) - 1)
-        print(f"num of images = {len(self.cluster.images)}")
-        print(f"max page = {math.ceil(len(self.cluster.images)/6 ) - 1}")
-        print(f"current page = {self.current_page}")
         self.refresh_image_display()
 
-    def load_prev_image(self) -> None:
+    def load_prev_page(self) -> None:
         self.current_page = max(self.current_page - 1, 0)
-        print(f"current page = {self.current_page}")
         self.refresh_image_display()
 
     #visuals
     def refresh_image_display(self) -> None:
         """show current cluster's coin images. Add the image widgets to the image_widgets dictionary"""
+
+        self.project_title_label.config(text = str("Project Title: " + self.project_name))
+        self.stage_label.config(text = str("Current Stage: " + self.stage.name))
         for i in range(self.current_page*6, (self.current_page + 1)*6):
             display_index = i % 6
             old_image_widget = self.image_on_display[display_index][1]
@@ -267,17 +261,27 @@ class IdenticalUI (UI):
 
 
         prev_next_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 4, 2,1,self.right_main_frame, "w")
-        _ = self.add_button("◀", self.load_prev_image, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
-        _ = self.add_button("▶", self.load_next_image, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
+        _ = self.add_button("◀", self.load_prev_page, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
+        _ = self.add_button("▶", self.load_next_page, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
 
         _ = self.add_button("Next Cluster", self.next_cluster, 3, 15, 1, 2, 1, 1, self.root, "sw" )
-
-
 
 
     def start(self):
         self.create_UI()
         self.refresh_image_display()
+        self.root.bind('<Right>', lambda event: self.load_next_page())
+        self.root.bind('<Left>', lambda event: self.load_prev_page())
+        self.root.bind('c', lambda event: self.confirm_current_list())
+        self.root.bind('r', lambda event: self.remove_image_from_list())
+        self.root.bind('n', lambda event: self.next_cluster())
+        self.root.bind('1', lambda event: self._add_function_0())
+        self.root.bind('2', lambda event: self._add_function_1())
+        self.root.bind('3', lambda event: self._add_function_2())
+        self.root.bind('4', lambda event: self._add_function_3())
+        self.root.bind('5', lambda event: self._add_function_4())
+        self.root.bind('6', lambda event: self._add_function_5())
+
         try:
             self.root.mainloop()
         except:

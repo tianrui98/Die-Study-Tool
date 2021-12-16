@@ -2,7 +2,7 @@ from src.objects import *
 import src.progress as progress
 from src.root_logger import *
 from src.UI import UI
-
+from src.identical_interface import IdenticalUI
 import tkinter as tk
 from tkinter.constants import CENTER, RAISED, RIDGE, VERTICAL
 from PIL import Image, ImageTk
@@ -14,12 +14,6 @@ from tkinter import font
 class MainUI(UI):
     def __init__(self):
         super().__init__(0.7)
-        #key binding
-        self.root.bind('<Right>', lambda event: self.load_next_image())
-        self.root.bind('<Left>', lambda event: self.load_prev_image())
-        self.root.bind('m', lambda event: self.mark_match())
-        self.root.bind('n', lambda event: self.mark_no_match())
-        self.root.bind('b', lambda event: self.mark_best_image())
 
 #%% Shortcuts
 
@@ -527,6 +521,7 @@ class MainUI(UI):
         self.left_image_index = curr_right_index
         self.right_image_index = curr_left_index
         logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
+
     def check_completion_and_move_on (self):
         """This function is called when user clicks "next" while at the last image
         !!! only mark cluster complete if user clicks ok"""
@@ -534,11 +529,23 @@ class MainUI(UI):
         if progress.check_cluster_completion(self.cluster,self.stage):
             self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
 
-        if progress.check_project_completion(self.stage):
-            logger.info("!!!!project complete!!!!")
+        if progress.check_part1_completion(self.cluster, self.stage, self.project_address):
+            logger.info("_____PART 1 COMPLETED_____")
             logger.info(str(self.progress_data))
-            self.export_btn()
-            self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
+            message = "You have completed the current *STAGE*."
+            response = self.create_save_progress_window(message)
+            if response:
+                self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
+                progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
+                self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
+
+                self.root.withdraw()
+                #start identical UI
+                UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root)
+                UI.start()
+                return None
+            else:
+                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
         else:
             if progress.check_stage_completion(self.stage):
                 message = "You have completed the current *STAGE*."
@@ -627,6 +634,13 @@ class MainUI(UI):
 
     def start(self):
         self.create_UI()
+        #key binding
+        self.root.bind('<Right>', lambda event: self.load_next_image())
+        self.root.bind('<Left>', lambda event: self.load_prev_image())
+        self.root.bind('m', lambda event: self.mark_match())
+        self.root.bind('n', lambda event: self.mark_no_match())
+        self.root.bind('b', lambda event: self.mark_best_image())
+
         try:
             self.root.mainloop()
         except:
