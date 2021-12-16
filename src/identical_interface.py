@@ -139,8 +139,9 @@ class IdenticalUI (UI):
         if progress.check_project_completion(self.stage):
             logger.info("_____PROJECT COMPLETED_____")
             logger.info(str(self.progress_data))
-            self.export_btn(project_completed= True)
-            self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
+            exported = self.export_btn(project_completed= True)
+            if not exported:
+                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
         else:
             message = "You have completed the current cluster."
             response = self.create_save_progress_window(message)
@@ -171,7 +172,6 @@ class IdenticalUI (UI):
     #visuals
     def refresh_image_display(self) -> None:
         """show current cluster's coin images. Add the image widgets to the image_widgets dictionary"""
-
         self.project_title_label.config(text = str("Project Title: " + self.project_name))
         self.stage_label.config(text = str("Current Stage: " + self.stage.name))
         for i in range(self.current_page*6, (self.current_page + 1)*6):

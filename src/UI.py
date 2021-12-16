@@ -356,24 +356,23 @@ class UI:
         self.progress_data, _, _ = progress.load_progress(self.project_address, False)
         progress.export_results(self.project_address,self.progress_data, save_address, keep_progress)
         logger.info("====EXPORTED RESULTS====")
-        self.root.quit()
-        self.root.destroy()
-        if self.mainUI:
-            self.mainUI.quit()
-            self.mainUI.destroy()
+
+        if not keep_progress:
+            self.root.destroy()
+            if self.mainUI:
+                self.mainUI.destroy()
 
     def export_btn(self, project_completed = False):
         if project_completed:
             response = self.create_export_results_window()
             if response:
                 self.export()
-
         else:
             response = messagebox.askokcancel("Export intermediate results", "You have NOT completed the current project.\nExport the intermediate results?" )
             if response:
                 keep_progress = messagebox.askyesno("Export intermediate results", "Keep your current progress in the system ?" )
                 self.export(keep_progress)
-
+        return response
 
     def create_export_results_window(self):
         response = messagebox.askokcancel("Export results", "You have completed the current project.\nExport the results?" )
