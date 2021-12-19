@@ -25,7 +25,9 @@ class UI:
         self.project_name = project_name
         self.project_address = project_address
         self.progress_data = progress_data
+        self.part2 = part2
         self.demo_mode = False
+        self.quit = False
 
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
@@ -345,7 +347,9 @@ class UI:
         logger.info("====EXIT====\n\n")
         self.root.quit()
         self.root.destroy()
-        self.mainUI.destroy()
+        if self.part2:
+            self.mainUI.destroy()
+        self.quit = True
 
     def export(self, keep_progress = False):
         save_address = filedialog.askdirectory() # asks user to choose a directory
@@ -361,6 +365,7 @@ class UI:
             self.root.destroy()
             if self.mainUI:
                 self.mainUI.destroy()
+            self.quit = True
 
     def export_btn(self, project_completed = False):
         if project_completed:

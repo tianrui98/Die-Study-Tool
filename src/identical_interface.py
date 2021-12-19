@@ -157,9 +157,10 @@ class IdenticalUI (UI):
         If all clusters have been visited -> end of project
         """
         self.check_completion_and_move_on()
-        self.current_page = 0
-        self.refresh_image_display()
-        self.root.after(1, lambda: self.root.focus_force())
+        if not self.quit:
+            self.current_page = 0
+            self.refresh_image_display()
+            self.root.after(1, lambda: self.root.focus_force())
 
     def load_next_page(self) -> None:
         self.current_page = min(self.current_page + 1, math.ceil(len(self.cluster.images)/6 ) - 1)
