@@ -98,6 +98,7 @@ class IdenticalUI (UI):
             self.right_image_window.grid_forget()
             self.right_image_window = self.add_image("images/blank.png", 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
 
+
     def onselect(self, evt):
         """update the display window according to the image being selected
 
@@ -120,6 +121,7 @@ class IdenticalUI (UI):
         #reset list
         self.cluster.identicals.append(set(list(self.identical_coin_dict.keys())))
         self.identical_list_box.delete(0,tk.END)
+        logger.info(f"Confirm identical list {self.identical_coin_dict}")
         self.marked_identical_coin_dict.update(self.identical_coin_dict)
         self.identical_coin_dict = {}
 
@@ -139,7 +141,7 @@ class IdenticalUI (UI):
         if progress.check_project_completion(self.stage):
             logger.info("_____PROJECT COMPLETED_____")
             logger.info(str(self.progress_data))
-            exported = self.export_btn(project_completed= True)
+            exported = self.export(project_completed= True)
             if not exported:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
         else:
@@ -161,6 +163,7 @@ class IdenticalUI (UI):
             self.current_page = 0
             self.refresh_image_display()
             self.root.after(1, lambda: self.root.focus_force())
+            logger.info("Next cluster.")
 
     def load_next_page(self) -> None:
         self.current_page = min(self.current_page + 1, math.ceil(len(self.cluster.images)/6 ) - 1)
@@ -175,6 +178,7 @@ class IdenticalUI (UI):
         """show current cluster's coin images. Add the image widgets to the image_widgets dictionary"""
         self.project_title_label.config(text = str("Project Title: " + self.project_name))
         self.stage_label.config(text = str("Current Stage: " + self.stage.name))
+        self.current_cluster_label.config(text = f"Current Cluster: " + self.cluster.name)
         for i in range(self.current_page*6, (self.current_page + 1)*6):
             display_index = i % 6
             old_image_widget = self.image_on_display[display_index][1]
@@ -204,10 +208,9 @@ class IdenticalUI (UI):
         self.stage_label = self.add_text("Current Stage: ", 0, 1, 1, 1, left_menu_bar, sticky= "w")
 
         right_menu_bar = self.add_frame(int(self.initial_height * 0.1), int(self.initial_width * 0.5),1, 0, 1, 1, self.root, "e")
-        self.open_btn = self.add_button("Open", None, 2, 3, 1, 0, 1, 1, right_menu_bar, sticky = "e")
-        self.undo_btn = self.add_button("Export", None, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
-        self.save_btn = self.add_button("Save", None, 2, 3, 3, 0, 1, 1, right_menu_bar, sticky = "e")
-        self.exit_btn = self.add_button("Exit", None, 2, 3, 4, 0, 1, 1, right_menu_bar, sticky = "e")
+        self.export_btn = self.add_button("Export", self.export, 2, 3, 1, 0, 1, 1, right_menu_bar, sticky = "e")
+        self.save_btn = self.add_button("Save", self.save, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
+        self.exit_btn = self.add_button("Exit", self.exit, 2, 3, 3, 0, 1, 1, right_menu_bar, sticky = "e")
 
         #left main frame: display coin images Height: 0.8 * window, width: 0.7 * window width
         self.left_main_frame = self.add_frame(self.main_frame_height, self.left_main_frame_width_pixel, 0, 1, 1, 3, self.root, "nsew")
@@ -266,7 +269,7 @@ class IdenticalUI (UI):
         _ = self.add_button("▶", self.load_next_page, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
 
         _ = self.add_button("Next Cluster", self.next_cluster, 3, 15, 1, 2, 1, 1, self.root, "sw" )
-
+        self.current_cluster_label  = self.add_text("Current cluster: ",0, 2, 1, 1, self.root, "w" )
 
     def start(self):
         self.create_UI()

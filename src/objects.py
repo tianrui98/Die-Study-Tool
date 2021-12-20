@@ -77,5 +77,10 @@ class Stage:
             for single_name in single_names:
                 self.clusters_yet_to_check.add(single_name.split(".")[0])
 
+        elif stage_number == 4:
+            cluster_folders = [f for f in os.listdir(project_address) if (not f.startswith('.')) and (not f.startswith("Singles")) and (not f.startswith("Verified"))]
+            for cluster_name in cluster_folders:
+                    self.clusters_yet_to_check.add(cluster_name.split('.')[0])
+            self.clusters_yet_to_check.add("Singles")
         #if A is compared with B => {A: {B}, B:{A}}
         self.past_comparisons = defaultdict(set)

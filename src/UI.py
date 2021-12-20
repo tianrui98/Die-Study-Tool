@@ -1,7 +1,6 @@
 from src.objects import *
 import src.progress as progress
 from src.root_logger import *
-
 import shutil
 import tkinter as tk
 from tkinter.constants import CENTER, RAISED, RIDGE, VERTICAL
@@ -234,20 +233,8 @@ class UI:
         return None
 
     def choose_project(self):
+        pass
 
-        self.progress_data = progress.checkout_progress()
-        existing_projects = {d.split('/')[-1] for d in list(self.progress_data.keys())}
-        if not existing_projects:
-            return
-        self.create_choose_project_window(existing_projects)
-        self.project_address = os.getcwd() + "/projects/" + self.project_name
-
-        self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
-        self.singles = Cluster( str(self.project_address+ "/" + "Singles"))
-
-        self.initialize_image_display()
-
-        logger.info("Open existing project {}".format(self.project_name))
 
     def browse_files(self):
         """Let user choose which new project/folder to start working on
@@ -322,26 +309,21 @@ class UI:
         """
         if len(self.progress_data) > 0:
             self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster,self.stage)
-            progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
+            progress.save_progress_data(self.project_address, self.stage, self.cluster, self.progress_data)
 
     def exit(self):
         #wipe out records at exit for demo projects
         if self.demo_mode:
-            if self.project_address in self.progress_data:
-                _ = self.progress_data.pop(self.project_address)
-            data_file = open("data.json", "w")
-            json.dump(self.progress_data, data_file)
-            data_file.close()
-            shutil.rmtree(self.project_address)
+            progress.clear_current_project(self.project_address, self.progress_data)
         else:
             if len(self.progress_data) > 0:
                 keep_progress = messagebox.askyesno("Exit", "Save your current progress in the system ?" )
                 if keep_progress:
                     self.save()
                 else:
-                    shutil.rmtree(self.project_address)
+                    progress.clear_current_project(self.project_address, self.progress_data)
             else:
-                shutil.rmtree(self.project_address)
+                progress.clear_current_project(self.project_address, self.progress_data)
 
         logger.info(str(self.progress_data))
         logger.info("====EXIT====\n\n")
@@ -351,7 +333,7 @@ class UI:
             self.mainUI.destroy()
         self.quit = True
 
-    def export(self, keep_progress = False):
+    def export_data(self, keep_progress = False):
         save_address = filedialog.askdirectory() # asks user to choose a directory
         if not save_address:
             return None
@@ -367,16 +349,16 @@ class UI:
                 self.mainUI.destroy()
             self.quit = True
 
-    def export_btn(self, project_completed = False):
+    def export(self, project_completed = False):
         if project_completed:
             response = self.create_export_results_window()
             if response:
-                self.export()
+                self.export_data()
         else:
             response = messagebox.askokcancel("Export intermediate results", "You have NOT completed the current project.\nExport the intermediate results?" )
             if response:
                 keep_progress = messagebox.askyesno("Export intermediate results", "Keep your current progress in the system ?" )
-                self.export(keep_progress)
+                self.export_data(keep_progress)
         return response
 
     def create_export_results_window(self):

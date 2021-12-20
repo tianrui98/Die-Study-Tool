@@ -30,4 +30,7 @@ if __name__ == "__main__":
 #4. merge two UIs
 #5. auto clear old log.. only keep the latest one
 #6. implement menu buttons for identical UI
+# 6.5 add singles to identical stage + add logs
 #7. continue existing project mode -> enable open identical UI if stage == 4
+#implement new saving logic -> in project folder put all images in the same folder. keep track of clusters and singles using data.json only. no need cluster address then.
+  #only put images in folders during exportre

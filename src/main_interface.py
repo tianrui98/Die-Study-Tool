@@ -243,10 +243,8 @@ class MainUI(UI):
         logger.info("_____Create demo project{}_____".format(self.project_name))
         return None
 
+
     def choose_project(self):
-
-        #TODO: change starting index according to progress?
-
         self.progress_data = progress.checkout_progress()
         existing_projects = {d.split('/')[-1] for d in list(self.progress_data.keys())}
         if not existing_projects:
@@ -257,9 +255,14 @@ class MainUI(UI):
         self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
         self.singles = Cluster( str(self.project_address+ "/" + "Singles"))
 
-        self.initialize_image_display()
-
-        logger.info("Open existing project {}".format(self.project_name))
+        logger.info(f"Open project {self.project_name} at stage {self.stage.stage_number} ")
+        if self.stage.stage_number < 4:
+            self.initialize_image_display()
+        else:
+            #start identical UI
+            self.root.withdraw()
+            UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root)
+            UI.start()
 
     def browse_files(self):
         """Let user choose which new project/folder to start working on
@@ -539,8 +542,8 @@ class MainUI(UI):
                 progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
                 self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
 
-                self.root.withdraw()
                 #start identical UI
+                self.root.withdraw()
                 UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root)
                 UI.start()
                 return None
@@ -590,7 +593,7 @@ class MainUI(UI):
         # menu bar
         right_menu_bar = self.add_frame(self.button_frame_height, self.button_frame_width, 1, 0, 1, 1, self.root, "e")
         self.open_btn = self.add_button("Open", self.create_open_window, 2, 3, 1, 0, 1, 1, right_menu_bar, sticky = "e")
-        self.undo_btn = self.add_button("Export", self.export_btn, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
+        self.export_btn = self.add_button("Export", self.export, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
         self.save_btn = self.add_button("Save", self.save, 2, 3, 3, 0, 1, 1, right_menu_bar, sticky = "e")
         self.exit_btn = self.add_button("Exit", self.exit, 2, 3, 4, 0, 1, 1, right_menu_bar, sticky = "e")
 
