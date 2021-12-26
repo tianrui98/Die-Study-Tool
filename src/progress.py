@@ -261,8 +261,8 @@ def verified_vs_singles_update_folder_and_record (progress_data, project_folder,
     #1
     list_of_matches = list(cluster.matches)
     left_cluster_address = project_folder + "/" + cluster.name
+    single_address = project_folder+ "/Singles"
     for matched_single_name_jpg in list_of_matches:
-        single_address = project_folder+ "/Singles"
         shutil.move(str(single_address+"/"+matched_single_name_jpg), str(left_cluster_address+ "/" + matched_single_name_jpg))
 
     #3
@@ -270,7 +270,6 @@ def verified_vs_singles_update_folder_and_record (progress_data, project_folder,
     old_cluster_address = left_cluster_address
     new_cluster_name = _concatenate_image_names(cluster)
     new_cluster_address = project_folder+ "/" + new_cluster_name
-    stage = _change_name_in_clusters_yet_to_check(old_cluster_name, new_cluster_name, stage)
     shutil.move(old_cluster_address, new_cluster_address)
     cluster.name = new_cluster_name
     cluster.address = new_cluster_address
@@ -289,6 +288,7 @@ def verified_vs_singles_update_folder_and_record (progress_data, project_folder,
     #update past comparisons
     stage = _change_name_in_past_comparisons (old_cluster_name + '.jpg', new_cluster_name + ".jpg", stage)
 
+
     data_file = open("data.json", "w")
     json.dump(progress_data, data_file)
     data_file.close()
@@ -303,8 +303,9 @@ def single_vs_single_update_folder_and_record(progress_data, project_folder, clu
     3. Add the best image of the new cluster to verified & rename
     4. Update the cluster object
     """
-    if len(cluster.images) <= 1 :
-        return None
+    #no change to the data
+    if len(cluster.images) <= 1 or len(cluster.matches) == 0 :
+        return progress_data, project_folder, cluster, stage
 
     else:
         new_cluster_address = project_folder + "/temp_new_cluster"
@@ -335,6 +336,8 @@ def single_vs_single_update_folder_and_record(progress_data, project_folder, clu
 def find_identical_update_folder_and_record(progress_data, project_folder, cluster,stage):
     #only rename cluster when it's completed
     old_cluster_name = cluster.name
+    if old_cluster_name == "Singles":
+        return progress_data, cluster,stage
     new_cluster_name = _concatenate_image_names(cluster)
     new_cluster_address = project_folder + "/" + new_cluster_name
     shutil.move(cluster.address, new_cluster_address)
@@ -379,6 +382,7 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
                                                         "identicals":,
                                                         "matches":,
                                                         "nomatches":
+                                                        "best_image_name":
                                                     }
                                             }
                             "stages": { 0: {
@@ -403,7 +407,7 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
     if cluster:
         #if the cluster has only 1 image -> move that to singles
         cluster_images = [f for f in os.listdir(cluster.address) if not f.startswith('.')]
-        if (stage.stage_number == 0 or stage.stage_number == 4) and len(cluster_images) == 1:
+        if cluster.name != "Singles" and (stage.stage_number == 0 or stage.stage_number == 4) and len(cluster_images) == 1:
             shutil.move(cluster.best_image.address, project_folder + "/Singles/" + cluster.best_image.name)
             shutil.rmtree(cluster.address)
 
@@ -423,6 +427,9 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
                 "best_image_name": cluster.best_image.name
                 }
         elif stage.stage_number == 4:
+        #create "Singles" cluster
+            if "Singles" not in progress_data[project_folder]["clusters"]:
+                progress_data[project_folder]["clusters"]["Singles"] =  {"identicals": [], "matches": [], "nomatches":[], "cluster_address": ""}
             #overwrite only the identicals info
             progress_data[project_folder]["clusters"][cluster.name]["identicals"] = _serialize_identicals(cluster.identicals)
             progress_data[project_folder]["clusters"][cluster.name]["cluster_address"] = cluster.address
@@ -547,8 +554,7 @@ def unmark_compared(left_name, right_name, stage):
 
 def mark_cluster_completed(cluster, stage):
     """Remove current cluster name from clusters_yet_to_check. Before updating cluster name"""
-    logger.info("Mark cluster complete")
-    logger.info(str(stage.clusters_yet_to_check))
+    logger.info(f"Mark cluster {cluster.name} complete")
 
     cluster_id = cluster.name.split(".")[0]
     if cluster_id in stage.clusters_yet_to_check:
@@ -673,44 +679,50 @@ def create_next_cluster(stage, project_folder):
 
     next_cluster_name = list(stage.clusters_yet_to_check)[0]
     logger.info("Create next cluster {}".format(next_cluster_name))
-    return _create_a_cluster(stage, project_folder, next_cluster_name)
+    next_cluster = _create_a_cluster(stage, project_folder, next_cluster_name)
+    return next_cluster
 
 
 def create_next_stage( stage, project_folder):
     new_stage = Stage(stage.stage_number+1, project_folder)
-    logger.info("Next stage. yet to check: {}".format(str(new_stage.clusters_yet_to_check)))
+    logger.info(f"Next stage {new_stage.name}. yet to check: {new_stage.clusters_yet_to_check}")
     new_cluster = create_next_cluster(new_stage, project_folder)
 
     return new_cluster, new_stage
 
 def create_find_identical_stage(project_folder):
     new_stage = Stage(4, project_folder)
-    logger.info("Next stage. yet to check: {}".format(str(new_stage.clusters_yet_to_check)))
+    logger.info(f"Next stage {new_stage.name}. yet to check: {new_stage.clusters_yet_to_check}")
     new_cluster = create_next_cluster(new_stage, project_folder)
 
     return new_cluster, new_stage
+
+def _concatenate_identical_set(identical_set):
+    identical_group_name = ""
+    prev_type = ""
+
+    for image_name in sorted(identical_set):
+        image_id = image_name.split(".")[0] #without .jpg
+        curr_type, curr_name = image_id.split(";")
+        if curr_type != prev_type:
+            identical_group_name += image_id
+        else:
+            identical_group_name += str("_" + curr_name)
+        prev_type = curr_type
+    return str("(" + identical_group_name +")")
 
 def _concatenate_identicals(identicals):
     final_name = ""
     number_to_deduct = 0
     for identical_set in sorted(identicals):
-        identical_group_name = ""
-        prev_type = ""
-
-        for image_name in sorted(identical_set):
-            image_id = image_name.split(".")[0] #without .jpg
-            curr_type, curr_name = image_id.split(";")
-            if curr_type != prev_type:
-                identical_group_name += image_id
-            else:
-                identical_group_name += str("_" + curr_name)
-            prev_type = curr_type
-        final_name += str("(" + identical_group_name +")")
+        final_name += _concatenate_identical_set(identical_set)
         number_to_deduct += len(identical_set) - 1
     return final_name, number_to_deduct
 
 def export_results(project_folder, progress_data, save_address, keep_progress):
     """Generate excel sheet & move cluster out & wipe out progress data"""
+
+    #write none-single clusters
     clusters = progress_data[project_folder]["clusters"]
     max_length = 0
     total_number = 0
@@ -719,24 +731,40 @@ def export_results(project_folder, progress_data, save_address, keep_progress):
 
     columns = list(range(1, max_length + 1)) + ["Identical", "Num"]
     data = []
-    for _, cluster in clusters.items():
-        all_images = cluster["matches"] + [cluster["best_image_name"]]
-        all_images = sorted(list(all_images))
-        data_row = all_images + [""] * (max_length - len(all_images))
-        identicals = cluster["identicals"]
-        final_name, number_to_deduct = _concatenate_identicals(identicals)
-        data_row.append(final_name)
-        data_row.append(str(len(all_images) - number_to_deduct))
-        total_number += len(all_images) - number_to_deduct
-        data.append(data_row)
+    for cluster_name, cluster in clusters.items():
+        if cluster_name != "Singles":
+            all_images = cluster["matches"] + [cluster["best_image_name"]]
+            all_images = sorted(list(all_images))
+            data_row = all_images + [""] * (max_length - len(all_images))
+            identicals = cluster["identicals"]
+            final_name, number_to_deduct = _concatenate_identicals(identicals)
+            data_row.append(final_name)
+            data_row.append(str(len(all_images) - number_to_deduct))
+            total_number += len(all_images) - number_to_deduct
+            data.append(data_row)
 
-    all_singles = [f for f in os.listdir(str(project_folder + "/Singles")) if not f.startswith('.')]
-    for single_jpg in all_singles:
-        data_row = [single_jpg.split(".")[0]] + [""] * (max_length - 1)
-        data_row.append("")
-        data_row.append(str(1))
-        data.append(data_row)
+    #write "Singles" cluster
+    all_singles = set([f for f in os.listdir(str(project_folder + "/Singles")) if not f.startswith('.')])
+    identicals = progress_data[project_folder]["clusters"]["Singles"]["identicals"]
+    singles_seen = set()
+    for identical_set in identicals:
+        all_images = sorted(list(identical_set))
+        data_row = all_images + [""] * (max_length - len(all_images))
+        identical_final_name = _concatenate_identical_set(identical_set)
+        data_row.append(identical_final_name)
+        data_row.append("1")
         total_number += 1
+        data.append(data_row)
+        set.union(singles_seen, identical_set)
+
+    for single_jpg in all_singles:
+        single_id = single_jpg.split(".")[0]
+        if single_id not in singles_seen:
+            data_row = [single_id] + [""] * (max_length - 1)
+            data_row.append("")
+            data_row.append(str(1))
+            data.append(data_row)
+            total_number += 1
 
     data.append([""] * max_length +["sum"] + [str(total_number)])
     res = pd.DataFrame(data, columns=columns)
@@ -788,4 +816,9 @@ def check_completion_and_save(cluster, stage, project_folder, progress_data):
         else:
             if check_cluster_completion(cluster, stage):
                 new_cluster = create_next_cluster(stage, project_folder)
+                #if the "Singles" cluster has no images, skip to the next
+                if len(new_cluster.images) == 0:
+                    logger.info(f"Skip cluster {new_cluster.name}")
+                    stage = mark_cluster_completed(new_cluster, stage)
+                    check_completion_and_save(new_cluster, stage, project_folder, progress_data )
                 save_progress_data(project_folder,stage, new_cluster, new_progress_data)

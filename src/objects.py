@@ -58,7 +58,7 @@ class Stage:
         self.name = self.stages[self.stage_number]
         self.clusters_yet_to_check = set() #cluster names
 
-        if stage_number == 0 or stage_number == 4:
+        if stage_number == 0:
             #all images in clusters (not singles)
             cluster_folders = [f for f in os.listdir(project_address) if (not f.startswith('.')) and (not f.startswith("Singles")) and (not f.startswith("Verified"))]
             for cluster_name in cluster_folders:
