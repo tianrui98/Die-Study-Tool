@@ -148,8 +148,13 @@ def cluster_validation_update_folder_and_record(progress_data, project_folder, c
             image_object.address = new_image_address
             shutil.move(old_image_address, new_image_address)
 
+    #remove cluster from progress_data if it's all unmatches
     if len(cluster.matches) == 0 and len(cluster.nomatches) > 0:
-        return progress_data, cluster, stage
+        if project_folder in progress_data:
+            progress_data[project_folder]["clusters"].pop(cluster.name)
+            logger.info(f"Removed {cluster.name} from progress data")
+            logger.info(f"progress data: {progress_data}")
+            return progress_data, cluster, stage
 
     #only rename cluster when it's completed
     old_cluster_name = cluster.name
@@ -162,7 +167,7 @@ def cluster_validation_update_folder_and_record(progress_data, project_folder, c
     shutil.move(cluster.address, new_cluster_address)
     stage = _change_name_in_clusters_yet_to_check(old_cluster_name, new_cluster_name, stage)
     #update cluster name in record
-    if project_folder in progress_data and cluster.name in progress_data[project_folder]["clusters"]:
+    if project_folder in progress_data:
         progress_data[project_folder]["clusters"][new_cluster_name] = progress_data[project_folder]["clusters"].pop(cluster.name)
 
     #update cluster object
@@ -305,7 +310,7 @@ def single_vs_single_update_folder_and_record(progress_data, project_folder, clu
     """
     #no change to the data
     if len(cluster.images) <= 1 or len(cluster.matches) == 0 :
-        return progress_data, project_folder, cluster, stage
+        return progress_data, cluster, stage
 
     else:
         new_cluster_address = project_folder + "/temp_new_cluster"
@@ -410,15 +415,13 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
         if cluster.name != "Singles" and (stage.stage_number == 0 or stage.stage_number == 4) and len(cluster_images) == 1:
             shutil.move(cluster.best_image.address, project_folder + "/Singles/" + cluster.best_image.name)
             shutil.rmtree(cluster.address)
-
-            if project_folder in progress_data and cluster.name in progress_data[project_folder]["clusters"]:
+            if cluster.name in progress_data[project_folder]["clusters"]:
                 progress_data[project_folder]["clusters"].pop(cluster.name)
-
-        #update current cluster
-        progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
+                logger.info(f"Removed {cluster.name} from progress data")
+                logger.info(f"progress data: {progress_data}")
 
         #overwrite cluster info
-        if stage.stage_number == 0 or (stage.stage_number == 3 and (cluster.name not in progress_data[project_folder]["clusters"] and len(cluster.matches) > 0)):
+        elif stage.stage_number == 0 or (stage.stage_number == 3 and (cluster.name not in progress_data[project_folder]["clusters"] and len(cluster.matches) > 0)):
             progress_data[project_folder]["clusters"][cluster.name] = {
                 "cluster_address": cluster.address,
                 "identicals": _serialize_identicals(cluster.identicals),
@@ -439,9 +442,11 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
         progress_data[project_folder]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
         #update past_comparisons
         progress_data[project_folder]["stages"][str(stage.stage_number)]["past_comparisons"] = _serialize_past_comparisons(stage.past_comparisons)
+
     data_file = open("data.json", "w")
     json.dump(progress_data, data_file)
     data_file.close()
+    logger.info(f"Save progress data {progress_data}")
 
 def clear_current_project(project_folder, progress_data):
     """remove current project from progress data & delete project folder
@@ -559,10 +564,10 @@ def mark_cluster_completed(cluster, stage):
     cluster_id = cluster.name.split(".")[0]
     if cluster_id in stage.clusters_yet_to_check:
         stage.clusters_yet_to_check.remove(cluster_id)
-        logger.info("Removed {} off clusters_yet_to_check".format(cluster_id))
+        logger.info(f"Removed {cluster_id} off clusters_yet_to_check. Left with {stage.clusters_yet_to_check}")
 
     #Inspect Verified Stage and the rest: move the matched clusters off the yet_to_check list
-    if stage.stage_number > 0:
+    if stage.stage_number > 0 and stage.stage_number < 4:
         for image_name in list(cluster.matches):
             stage = mark_compared(cluster.best_image.name, image_name,stage)
             if image_name.split(".")[0] in stage.clusters_yet_to_check:
@@ -584,7 +589,7 @@ def unmark_cluster_completed(cluster,stage):
         logger.info("Add {} back to clusters_yet_to_check".format(cluster_id))
 
     #Inspect Verified Stage and the rest: move the matched clusters off the yet_to_check list
-    if stage.stage_number > 0:
+    if stage.stage_number > 0 and stage.stage_number < 4:
         for image_name in list(cluster.matches):
             stage = unmark_compared(cluster.best_image.name, image_name,stage)
             if image_name.split(".")[0] not in stage.clusters_yet_to_check:
@@ -755,11 +760,11 @@ def export_results(project_folder, progress_data, save_address, keep_progress):
         data_row.append("1")
         total_number += 1
         data.append(data_row)
-        set.union(singles_seen, identical_set)
+        singles_seen = set.union(singles_seen, identical_set)
 
     for single_jpg in all_singles:
         single_id = single_jpg.split(".")[0]
-        if single_id not in singles_seen:
+        if single_jpg not in singles_seen:
             data_row = [single_id] + [""] * (max_length - 1)
             data_row.append("")
             data_row.append(str(1))
