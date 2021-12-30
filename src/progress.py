@@ -219,6 +219,7 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
     #if Cluster is None (end of project) then do nothing
     if cluster:
         old_cluster_name = cluster.name
+        new_cluster_name = None
         if stage.stage_number == 0:
             #move nomatches to singles cluster
             for image_name in cluster.nomatches:
@@ -269,6 +270,11 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
         elif stage.stage_number == 4:
             #overwrite only the identicals info
             clusters_data[cluster.name]["identicals"] = _serialize_identicals(cluster.identicals)
+
+        if new_cluster_name:
+            stage = _change_name_in_clusters_yet_to_check(old_cluster_name, new_cluster_name, stage)
+            stage = _change_name_in_past_comparisons(old_cluster_name, new_cluster_name, stage)
+
         #update current cluster
         progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = new_cluster_name
         #update clusters_yet_to_check
@@ -279,7 +285,7 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
     data_file = open("data.json", "w")
     json.dump(progress_data, data_file)
     data_file.close()
-    logger.info(f"Save progress data {progress_data}")
+    logger.debug(f"Save progress data {progress_data}")
 
 def clear_current_project(project_folder, progress_data):
     """remove current project from progress data & delete project folder
@@ -292,7 +298,7 @@ def clear_current_project(project_folder, progress_data):
     shutil.rmtree(project_folder)
 
 def checkout_progress():
-    """read progress data
+    """read json into dictionary
     """
     data_file = open("data.json", "r")
     progress_data = json.loads(data_file.read())
@@ -316,7 +322,7 @@ def load_progress(project_folder, create_next_cluster = True, data_address = "da
     #retrieve latest stage
     stage_number= max(progress_data[project_folder]["stages"].keys())
     stage_info = progress_data[project_folder]["stages"][stage_number]
-    stage = Stage(int(stage_number), project_address_full)
+    stage = Stage(int(stage_number), progress_data[project_folder])
     stage.clusters_yet_to_check = set(stage_info["clusters_yet_to_check"])
     stage.past_comparisons= _deserialize_past_comparisons(stage_info["past_comparisons"])
     #retrieve latest cluster
@@ -342,10 +348,6 @@ def load_progress(project_folder, create_next_cluster = True, data_address = "da
             progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
 
     return progress_data, stage, cluster
-
-# before saving progress, check for stage and completion.
-# if completed, then save current stage/cluster, then update current stage/cluster to the next in line.
-# save the new cluster/stage to progress so that next time the user opens the project, they will see the new cluster
 
 def check_cluster_completion(cluster,stage):
     """Check if all images in the current cluster have all been processed
@@ -392,12 +394,12 @@ def unmark_compared(left_name, right_name, stage):
 
 def mark_cluster_completed(cluster, stage):
     """Remove current cluster name from clusters_yet_to_check. Before updating cluster name"""
-    logger.info(f"Mark cluster {cluster.name} complete")
+    logger.debug(f"Mark cluster {cluster.name} complete")
 
     cluster_id = cluster.name.split(".")[0]
     if cluster_id in stage.clusters_yet_to_check:
         stage.clusters_yet_to_check.remove(cluster_id)
-        logger.info(f"Removed {cluster_id} off clusters_yet_to_check. Left with {stage.clusters_yet_to_check}")
+        logger.debug(f"Removed {cluster_id} off clusters_yet_to_check. Left with {stage.clusters_yet_to_check}")
 
     #Inspect Verified Stage and the rest: move the matched clusters off the yet_to_check list
     if stage.stage_number > 0 and stage.stage_number < 4:
@@ -405,7 +407,7 @@ def mark_cluster_completed(cluster, stage):
             stage = mark_compared(cluster.best_image.name, image_name,stage)
             if image_name.split(".")[0] in stage.clusters_yet_to_check:
                 stage.clusters_yet_to_check.remove(image_name.split(".")[0])
-                logger.info("Removed {} off clusters_yet_to_check".format(image_name.split(".")[0]))
+                logger.debug("Removed {} off clusters_yet_to_check".format(image_name.split(".")[0]))
         for image_name in list(cluster.nomatches):
             stage = mark_compared(cluster.best_image.name, image_name,stage)
 
@@ -413,13 +415,13 @@ def mark_cluster_completed(cluster, stage):
 
 def unmark_cluster_completed(cluster,stage):
     """reverse marking cluster completed"""
-    logger.info("Undo Mark cluster complete")
-    logger.info(str(stage.clusters_yet_to_check))
+    logger.debug("Undo Mark cluster complete")
+    logger.debug(str(stage.clusters_yet_to_check))
 
     cluster_id = cluster.name.split(".")[0]
     if cluster_id not in stage.clusters_yet_to_check:
         stage.clusters_yet_to_check.add(cluster_id)
-        logger.info("Add {} back to clusters_yet_to_check".format(cluster_id))
+        logger.debug("Add {} back to clusters_yet_to_check".format(cluster_id))
 
     #Inspect Verified Stage and the rest: move the matched clusters off the yet_to_check list
     if stage.stage_number > 0 and stage.stage_number < 4:
@@ -427,7 +429,7 @@ def unmark_cluster_completed(cluster,stage):
             stage = unmark_compared(cluster.best_image.name, image_name,stage)
             if image_name.split(".")[0] not in stage.clusters_yet_to_check:
                 stage.clusters_yet_to_check.add(image_name.split(".")[0])
-                logger.info("Add {} back to clusters_yet_to_check".format(image_name.split(".")[0]))
+                logger.debug("Add {} back to clusters_yet_to_check".format(image_name.split(".")[0]))
         for image_name in list(cluster.nomatches):
             stage = unmark_compared(cluster.best_image.name, image_name,stage)
 
@@ -439,19 +441,16 @@ def copy_best_image_to_verified(cluster, project_folder):
     old_image_address = cluster.address + "/" + cluster.best_image.name
     new_image_address = project_folder + "/Verified/" + cluster.name + ".jpg"
     shutil.copyfile(old_image_address, new_image_address)
-    logger.info("Copied best image of {} to Verified".format(cluster.name))
+    logger.debug("Copied best image of {} to Verified".format(cluster.name))
     return cluster
 
 
-def _create_a_cluster(stage,project_folder, next_cluster_name):
+def _create_a_cluster(stage, clusters_data, next_cluster_name):
     if stage.stage_number == 0 :
-        next_cluster = Cluster(str(project_folder +"/"+next_cluster_name), cluster_name = None, identicals = [], best_image_name = None, matches = set(), nomatches = set())
+        next_cluster = Cluster(cluster_name = next_cluster_name, images = clusters_data[next_cluster_name]["images"], identicals = [], best_image_name = None, matches = set(), nomatches = set())
 
     elif stage.stage_number == 1:
-        #treat the entire Verified folder as a cluster,
-        # minus those images that were previously matched (done in mark_cluster_complete)
-        best_image_name_jpg = next_cluster_name+".jpg"
-        next_cluster = Cluster(str(project_folder +"/Verified"), cluster_name = next_cluster_name, identicals = [], best_image_name = best_image_name_jpg, matches = set(), nomatches = set())
+        next_cluster = Cluster(cluster_name = next_cluster_name, images = [v["best_image_name"] for k, v in clusters_data.items() if not k == "Singles"], identicals = [], best_image_name = clusters_data[next_cluster_name]["best_image_name"], matches = set(), nomatches = set())
 
         #replace the image's cluster name with the cluster it represents
         new_images_dict = {}
@@ -516,21 +515,21 @@ def create_next_cluster(stage, project_folder):
         return None
 
     next_cluster_name = list(stage.clusters_yet_to_check)[0]
-    logger.info("Create next cluster {}".format(next_cluster_name))
+    logger.debug("Create next cluster {}".format(next_cluster_name))
     next_cluster = _create_a_cluster(stage, project_folder, next_cluster_name)
     return next_cluster
 
 
 def create_next_stage( stage, project_folder):
     new_stage = Stage(stage.stage_number+1, project_folder)
-    logger.info(f"Next stage {new_stage.name}. yet to check: {new_stage.clusters_yet_to_check}")
+    logger.debug(f"Next stage {new_stage.name}. yet to check: {new_stage.clusters_yet_to_check}")
     new_cluster = create_next_cluster(new_stage, project_folder)
 
     return new_cluster, new_stage
 
 def create_find_identical_stage(project_folder):
     new_stage = Stage(4, project_folder)
-    logger.info(f"Next stage {new_stage.name}. yet to check: {new_stage.clusters_yet_to_check}")
+    logger.debug(f"Next stage {new_stage.name}. yet to check: {new_stage.clusters_yet_to_check}")
     new_cluster = create_next_cluster(new_stage, project_folder)
 
     return new_cluster, new_stage
@@ -650,7 +649,7 @@ def check_completion_and_save(cluster, stage, project_folder, progress_data):
         if check_stage_completion(stage):
             new_cluster, new_stage = create_next_stage(stage, project_folder)
             while not new_cluster:
-                logger.info(f"Skip stage {new_stage.name}")
+                logger.debug(f"Skip stage {new_stage.name}")
                 new_cluster, new_stage = create_next_stage(new_stage,project_folder)
             save_progress_data(project_folder,new_stage, new_cluster, new_progress_data)    
         else:
@@ -658,7 +657,7 @@ def check_completion_and_save(cluster, stage, project_folder, progress_data):
                 new_cluster = create_next_cluster(stage, project_folder)
                 #if the "Singles" cluster has no images, skip to the next
                 if len(new_cluster.images) == 0:
-                    logger.info(f"Skip cluster {new_cluster.name}")
+                    logger.debug(f"Skip cluster {new_cluster.name}")
                     stage = mark_cluster_completed(new_cluster, stage)
                     check_completion_and_save(new_cluster, stage, project_folder, progress_data )
                 save_progress_data(project_folder,stage, new_cluster, new_progress_data)
