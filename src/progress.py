@@ -201,7 +201,7 @@ def inspect_verified_update_folder_and_record(progress_data, project_folder, clu
     #1
     list_of_matches = list(cluster.matches)
     left_cluster_address = project_folder + "/" + cluster.name
-
+    print(f"list of matches {list_of_matches}")
     new_matches = set()
     for matched_cluster_name_jpg in list_of_matches:
         matched_cluster_name = matched_cluster_name_jpg.split(".")[0]
@@ -219,7 +219,7 @@ def inspect_verified_update_folder_and_record(progress_data, project_folder, clu
 
         #2
         shutil.rmtree(matched_cluster_address)
-        logger.info("Remove {}".format(matched_cluster_address))
+        logger.info("Remove matched cluster {}".format(matched_cluster_address))
         os.remove(str(project_folder + "/Verified/" + matched_cluster_name_jpg))
         progress_data[project_folder]["clusters"].pop(matched_cluster_name)
 

@@ -587,8 +587,8 @@ class MainUI(UI):
     def create_UI (self):
 
         #initialize left and right images
-        self.left_image = self.add_filler(self.image_height_char,self.image_height_char, 0, 1, 1, 1, self.root, sticky = "w", content = "", color = "green")
-        self.right_image = self.add_filler(self.image_height_char,self.image_height_char, 1, 1, 1, 1, self.root, sticky = "w", content = "", color = "green")
+        self.left_image = self.add_filler(self.image_height_char,self.image_height_char, 0, 1, 1, 1, self.root, sticky = "w", content = "", color = None)
+        self.right_image = self.add_filler(self.image_height_char,self.image_height_char, 1, 1, 1, 1, self.root, sticky = "w", content = "", color = None)
 
         # menu bar
         right_menu_bar = self.add_frame(self.button_frame_height, self.button_frame_width, 1, 0, 1, 1, self.root, "e")
@@ -608,7 +608,7 @@ class MainUI(UI):
         # self.left_info_bar.columnconfigure(1, weight=1)
         self.left_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.left_info_bar, sticky= "w")
         self.left_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.left_info_bar, sticky= "w")
-        _ = self.add_filler(4, 4, 2, 0, 1, 2, self.left_info_bar, "e", "", "blue")
+        _ = self.add_filler(4, 4, 2, 0, 1, 2, self.left_info_bar, "e", "", None)
 
         self.right_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 2, 1, 1, self.root)
         self.right_info_bar.grid_propagate(0)
