@@ -229,7 +229,7 @@ class UI:
         self.open_window.destroy()
 
 
-        logger.info("_____Create demo project{}_____".format(self.project_name))
+        logger.info(f"_____CREATE DEMO PROJECT_____")
         return None
 
     def choose_project(self):
@@ -259,7 +259,7 @@ class UI:
             messagebox.askokcancel("Invalid folder", "The folder you have chosen is not valid. \nIt should contain cluster folders and a 'Singles' folder and nothing else." )
             return None
 
-        self.project_name = dirname.split("/")[-1]
+        self.project_name = os.path.basename(dirname)
         self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
         self.stage = Stage(0, self.project_address)
 
