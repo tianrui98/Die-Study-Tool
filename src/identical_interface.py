@@ -118,11 +118,16 @@ class IdenticalUI (UI):
         """
         if len(self.identical_coin_dict) <= 1:
             return None
-        #reset list
+
         self.cluster.identicals.append(set(list(self.identical_coin_dict.keys())))
-        self.identical_list_box.delete(0,tk.END)
         logger.info(f"Confirm identical list {self.identical_coin_dict}")
         self.marked_identical_coin_dict.update(self.identical_coin_dict)
+
+        self.reset_identical_list_box()
+
+    def reset_identical_list_box(self):
+        #reset list
+        self.identical_list_box.delete(0,tk.END)
         self.identical_coin_dict = {}
 
         #reset right window
@@ -158,6 +163,13 @@ class IdenticalUI (UI):
         """Save current progress and display next cluster
         If all clusters have been visited -> end of project
         """
+        if len(self.identical_coin_dict) > 0:
+            confirm_list = messagebox.askyesno("Identical coins", "Confirm current set of identical coins?")
+            if confirm_list:
+                self.confirm_current_list()
+            else:
+                self.reset_identical_list_box()
+
         self.check_completion_and_move_on()
         if not self.quit:
             self.current_page = 0

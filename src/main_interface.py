@@ -322,7 +322,7 @@ class MainUI(UI):
                 #mark them compared before
                 self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
                 #skip the right image
-                print("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
+                logger.info("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
                 self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
 
 
@@ -377,7 +377,7 @@ class MainUI(UI):
                     self.right_image_index = max(0, self.right_image_index - 1)
             else:
                 self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
-                print("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
+                logger.debug("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
                 self.right_image_index = max(0, self.right_image_index - 1)
 
         if self.right_image_index == 0 and (self.right_image_index == self.left_image_index or self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
