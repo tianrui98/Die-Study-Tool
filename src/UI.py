@@ -59,18 +59,21 @@ class UI:
         if image_index < len(self.cluster.images):
             return self.cluster.images[image_index].name
 
-    def _open_cluster(self, project_address):
-        """Open an unfinished cluster.
+    def _get_image_address(self, image_index):
+        if image_index < len(self.cluster.images):
+            return os.path.join(self.project_address, self._get_image_name(image_index))
+
+    def _open_first_cluster(self):
+        """Open the first cluster in stage 0.
         Create a Cluster object
 
         Return: Cluster object
         """
-        all_clusters = [f for f in os.listdir(project_address) if not f.startswith('.')]
+        all_clusters = [c for c in self.progress_data[self.project_address]["clusters"] if c != "Singles"]
         cluster_name =  all_clusters[0]
-        cluster_address = os.path.join(project_address, cluster_name )
 
         #create cluster object
-        return Cluster(folder_address = cluster_address)
+        return Cluster(cluster_name = cluster_name, images = self.progress_data[self.project_address]["clusters"][cluster_name]["original_images"], identicals = [], best_image_name = None, matches = set(), nomatches = set())
 
     def _swap_positions(self, list, pos1, pos2):
 
@@ -206,80 +209,6 @@ class UI:
 
 #%% Actions
 
-    def open_demo_project (self):
-        dirname = "demo"
-        self.demo_mode = True
-        self.project_name = dirname.split("/")[-1]
-        self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
-        self.stage = Stage(0, self.project_address)
-
-        #open the first cluster
-        self.cluster = self._open_cluster(project_address = self.project_address)
-
-        #read or make Singles folder
-        if not os.path.exists(dirname + "/" + "Singles"):
-            os.mkdir(dirname + "/" + "Singles")
-        self.singles = Cluster( str(dirname + "/" + "Singles"))
-
-        #initialize image display
-        self.initialize_image_display()
-
-        #close pop-up
-        self.open_window.quit()
-        self.open_window.destroy()
-
-
-        logger.info(f"_____CREATE DEMO PROJECT_____")
-        return None
-
-    def choose_project(self):
-        pass
-
-
-    def browse_files(self):
-        """Let user choose which new project/folder to start working on
-        pass the directory name to the class
-        show images
-        """
-
-        #TODO: allow user to give project a name
-        dirname = filedialog.askdirectory(parent=self.root)
-
-        #check if the folder is valid
-        valid = True
-        for folder in os.listdir(dirname):
-            if not folder.startswith("."):
-                is_folder = os.path.isdir(dirname + "/" + folder)
-                no_dot = "." not in folder
-                valid = valid and is_folder and no_dot
-
-        valid = valid and "Singles" in os.listdir(dirname)
-
-        if not valid:
-            messagebox.askokcancel("Invalid folder", "The folder you have chosen is not valid. \nIt should contain cluster folders and a 'Singles' folder and nothing else." )
-            return None
-
-        self.project_name = os.path.basename(dirname)
-        self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
-        self.stage = Stage(0, self.project_address)
-
-        #open the first cluster
-        self.cluster = self._open_cluster(project_address = self.project_address)
-
-        #read or make Singles folder
-        if not os.path.exists(dirname + "/" + "Singles"):
-            os.mkdir(dirname + "/" + "Singles")
-        self.singles = Cluster( str(dirname + "/" + "Singles"))
-
-        #initialize image display
-        self.initialize_image_display()
-
-        #close pop-up
-        self.open_window.destroy()
-
-        logger.info("_____Create new project{}_____".format(self.project_name))
-        return None
-
     def initialize_image_display(self) -> None:
         pass
 
@@ -308,8 +237,7 @@ class UI:
         """save results
         """
         if len(self.progress_data) > 0:
-            self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster,self.stage)
-            progress.save_progress_data(self.project_address, self.stage, self.cluster, self.progress_data)
+            _, _ = progress.save_progress_data(self.project_address, self.stage, self.cluster, self.progress_data)
 
     def exit(self):
         #wipe out records at exit for demo projects
@@ -337,9 +265,7 @@ class UI:
         save_address = filedialog.askdirectory() # asks user to choose a directory
         if not save_address:
             return None
-        self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
-        progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
-        self.progress_data, _, _ = progress.load_progress(self.project_address, False)
+        self.progress_data, _ = progress.save_progress_data(self.project_address, self.stage, self.cluster, self.progress_data)
         progress.export_results(self.project_address,self.progress_data, save_address, keep_progress)
         logger.info("====EXPORTED RESULTS====")
 

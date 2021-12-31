@@ -37,7 +37,7 @@ class IdenticalUI (UI):
         #display current image in the small window if it's the first on the list
         if len(self.identical_coin_dict) == 1:
             self.right_image_window.grid_forget()
-            self.right_image_window = self.add_image(image_object.address, 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
+            self.right_image_window = self.add_image(os.path.join(self.project_address, image_object.name), 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
 
     def _add_function_0(self):
         image_object = self.image_on_display[0][0]
@@ -92,7 +92,7 @@ class IdenticalUI (UI):
             default_image_name = self.identical_list_box.get(0)
             default_image_object = self.identical_coin_dict[default_image_name]
             self.right_image_window.grid_forget()
-            self.right_image_window = self.add_image(default_image_object.address, 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
+            self.right_image_window = self.add_image(os.path.join(self.project_address, default_image_object.name), 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
 
         else:
             self.right_image_window.grid_forget()
@@ -110,7 +110,7 @@ class IdenticalUI (UI):
         image_name = w.get(index)
         image_object = self.identical_coin_dict[image_name]
         self.right_image_window.grid_forget()
-        self.right_image_window = self.add_image(image_object.address, 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
+        self.right_image_window = self.add_image(os.path.join(self.project_address, image_object.name), 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
 
     def confirm_current_list (self):
         """mark the images on the list identical and un-display their widgets.
@@ -204,9 +204,9 @@ class IdenticalUI (UI):
                 image_object = self._get_image_object(i)
                 self.image_label_widgets[display_index].config(text = image_object.name)
                 if image_object.name in self.marked_identical_coin_dict:
-                    new_image_widget =self.add_image_darken(image_object.address, 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.49))
+                    new_image_widget =self.add_image_darken(self._get_image_address(i), 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.49))
                 else:
-                    new_image_widget =self.add_image(image_object.address, 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.49))
+                    new_image_widget =self.add_image(self._get_image_address(i), 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.49))
             self.image_on_display[display_index] = (image_object, new_image_widget)
 
     def create_UI (self):

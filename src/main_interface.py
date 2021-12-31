@@ -134,9 +134,9 @@ class MainUI(UI):
         Returns:
             TK Widget: left and right image widgets
         """
-        left_path = self._get_image_object(left_image_number).address
+        left_path = self._get_image_address(left_image_number)
         left_image = self.add_image(left_path, 0, 1, 1, 1, self.root, sticky = "we")
-        right_path = self._get_image_object(right_image_number).address
+        right_path = self._get_image_address(right_image_number)
         right_image = self.add_image(right_path, 1, 1, 1, 1, self.root, sticky = "we")
 
         #initialize tick and button style
@@ -224,25 +224,21 @@ class MainUI(UI):
         self.demo_mode = True
         self.project_name = dirname.split("/")[-1]
         self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
-        self.stage = Stage(0, self.project_address)
+        self.stage = Stage(0, self.progress_data[self.project_address])
 
         #open the first cluster
-        self.cluster = self._open_cluster(project_address = self.project_address)
-
-        #read or make Singles folder
-        if not os.path.exists(dirname + "/" + "Singles"):
-            os.mkdir(dirname + "/" + "Singles")
-        self.singles = Cluster( str(dirname + "/" + "Singles"))
+        self.cluster = self._open_first_cluster()
 
         #initialize image display
         self.initialize_image_display()
 
         #close pop-up
+        self.open_window.quit()
         self.open_window.destroy()
 
-        logger.info("_____Create demo project{}_____".format(self.project_name))
-        return None
 
+        logger.info(f"_____CREATE DEMO PROJECT_____")
+        return None
 
     def choose_project(self):
         self.progress_data = progress.checkout_progress()
@@ -253,7 +249,6 @@ class MainUI(UI):
         self.project_address = os.getcwd() + "/projects/" + self.project_name
 
         self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
-        self.singles = Cluster( str(self.project_address+ "/" + "Singles"))
 
         logger.info(f"Open project {self.project_name} at stage {self.stage.stage_number} ")
         if self.stage.stage_number < 4:
@@ -269,8 +264,6 @@ class MainUI(UI):
         pass the directory name to the class
         show images
         """
-
-        #TODO: allow user to give project a name
         dirname = filedialog.askdirectory(parent=self.root)
 
         #check if the folder is valid
@@ -287,17 +280,12 @@ class MainUI(UI):
             messagebox.askokcancel("Invalid folder", "The folder you have chosen is not valid. \nIt should contain cluster folders and a 'Singles' folder and nothing else." )
             return None
 
-        self.project_name = dirname.split("/")[-1]
+        self.project_name = os.path.basename(dirname)
         self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
-        self.stage = Stage(0, self.project_address)
+        self.stage = Stage(0, self.progress_data[self.project_address])
 
         #open the first cluster
-        self.cluster = self._open_cluster(project_address = self.project_address)
-
-        #read or make Singles folder
-        if not os.path.exists(dirname + "/" + "Singles"):
-            os.mkdir(dirname + "/" + "Singles")
-        self.singles = Cluster( str(dirname + "/" + "Singles"))
+        self.cluster = self._open_first_cluster()
 
         #initialize image display
         self.initialize_image_display()
@@ -329,7 +317,7 @@ class MainUI(UI):
         self.right_image.grid_forget()
 
         if self.right_image_index < len(self.cluster.images):
-            new_image_path = self._get_image_object(self.right_image_index).address
+            new_image_path = self._get_image_address(self.right_image_index)
             self.right_image = self.add_image(new_image_path, 1, 1, 1, 1, self.root, sticky = "we")
             self._update_cluster_label()
             self.update_icon_button_color ()
@@ -385,7 +373,7 @@ class MainUI(UI):
 
         self.right_image.grid_forget()
         if self.right_image_index >= 0:
-            new_image_path = self._get_image_object(self.right_image_index).address
+            new_image_path = self._get_image_address(self.right_image_index)
             self.right_image = self.add_image(new_image_path, 1, 1, 1, 1, self.root, sticky = "we")
             self._update_image_label()
             self._update_cluster_label()
@@ -538,10 +526,8 @@ class MainUI(UI):
             message = "You have completed the current *STAGE*."
             response = self.create_save_progress_window(message)
             if response:
-                self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
-                progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
-                self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
-
+                self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
+                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data)
                 #start identical UI
                 self.root.withdraw()
                 UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root)
@@ -563,18 +549,16 @@ class MainUI(UI):
             if response:
                 self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
 
-                self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
-                progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
-                self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
+                self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
+                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data)
 
                 if self.cluster:
                     #if next cluster has only 1 image, skip it & recurse
                     if len(self.cluster.images) <= 1:
                         logger.info("----SKIP {}----".format(self.cluster.name))
                         self.stage = progress.mark_cluster_completed(self.cluster,self.stage)
-                        self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
-                        progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
-                        self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
+                        self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
+                        self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data)
                         self.check_completion_and_move_on ()
                     else:
                         self.initialize_image_display()
