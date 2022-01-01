@@ -33,6 +33,8 @@ class Cluster:
         else:
             if len(self.images) > 0:
                 self.best_image = self.images[0] #default first image
+            else:
+                self.best_image = None
 
         self.matches = matches #for adding right image name that belong to the cluster
         self.nomatches = nomatches #for adding right image name that does not belong to the cluster

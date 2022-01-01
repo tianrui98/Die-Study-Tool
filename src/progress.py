@@ -203,7 +203,7 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
                                                         "identicals": [],
                                                         "matches": [],
                                                         "nomatches": []:
-                                                        "best_image_name": [] :
+                                                        "best_image_name": "" :
                                                     }
                                             }
                             "stages": { 0: {
@@ -229,7 +229,7 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
                 clusters_data["Singles"]["matches"].append(image_name)
             # if all images do not belong to the cluster -> delete the cluster
             if len(cluster.matches) == 0 and len(cluster.nomatches) > 0:
-                best_image_name = clusters_data[old_cluster_name]["best_image_name"]
+                best_image_name = cluster.best_image.name
                 clusters_data["Singles"]["matches"].append(best_image_name)
                 clusters_data.pop(old_cluster_name)
                 logger.debug(f"Removed cluster {cluster.name} from progress data")
