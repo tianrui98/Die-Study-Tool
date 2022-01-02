@@ -258,7 +258,6 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
             clusters_data, new_cluster_name = _merge_singles(cluster, clusters_data, old_cluster_name)
             #update matches with matched singles
             clusters_data[old_cluster_name]["matches"].extend(list(cluster.matches))
-            clusters_data.pop(old_cluster_name)
             clusters_data[new_cluster_name] = clusters_data.pop(old_cluster_name)
 
         elif stage.stage_number == 3:
