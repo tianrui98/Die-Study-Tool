@@ -468,7 +468,7 @@ class MainUI(UI):
         - Swap the left and right images
         """
         # if right image is already classified as single, no effect
-        if self._get_image_name(self.right_image_index) in self.cluster.nomatches:
+        if self.stage.stage_number > 0 or self._get_image_name(self.right_image_index) in self.cluster.nomatches:
             return None
 
         #swap attributes

@@ -153,9 +153,8 @@ class IdenticalUI (UI):
             message = "You have completed the current cluster."
             response = self.create_save_progress_window(message)
             if response:
-                self.progress_data, self.cluster, self.stage = progress.update_folder_and_record(self.progress_data, self.project_address, self.cluster, self.stage)
-                progress.check_completion_and_save(self.cluster, self.stage, self.project_address, self.progress_data)
-                self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
+                self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
+                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data)
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
 
@@ -163,12 +162,14 @@ class IdenticalUI (UI):
         """Save current progress and display next cluster
         If all clusters have been visited -> end of project
         """
-        if len(self.identical_coin_dict) > 0:
+        if len(self.identical_coin_dict) > 1:
             confirm_list = messagebox.askyesno("Identical coins", "Confirm current set of identical coins?")
             if confirm_list:
                 self.confirm_current_list()
             else:
                 self.reset_identical_list_box()
+        else:
+            self.reset_identical_list_box()
 
         self.check_completion_and_move_on()
         if not self.quit:

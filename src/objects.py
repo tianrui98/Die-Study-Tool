@@ -9,11 +9,7 @@ class ImgObj:
     def __init__(self, name, cluster):
         self.name = name #with .jpg
         self.id = self.name.split(".")[0] #without .jpg
-        try:
-            self.suffix = self.name.split(".")[1]
-        except:
-            print(name)
-
+        self.suffix = self.name.split(".")[1]
         self.cluster = cluster
 
 class Cluster:
