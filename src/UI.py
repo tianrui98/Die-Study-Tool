@@ -246,9 +246,7 @@ class UI:
         else:
             if len(self.progress_data) > 0:
                 keep_progress = messagebox.askyesno("Exit", "Save your current progress in the system ?" )
-                if keep_progress:
-                    self.save()
-                else:
+                if not keep_progress:
                     progress.clear_current_project(self.project_address, self.progress_data)
             else:
                 progress.clear_current_project(self.project_address, self.progress_data)

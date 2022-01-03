@@ -518,7 +518,7 @@ class MainUI(UI):
         !!! only mark cluster complete if user clicks ok"""
 
         if progress.check_cluster_completion(self.cluster,self.stage):
-            self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
+            self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
 
         if progress.check_part1_completion(self.cluster, self.stage, self.project_address):
             logger.info("_____PART 1 COMPLETED_____")
@@ -534,7 +534,7 @@ class MainUI(UI):
                 UI.start()
                 return None
             else:
-                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
+                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
         else:
             if progress.check_stage_completion(self.stage):
                 message = "You have completed the current *STAGE*."
@@ -547,7 +547,7 @@ class MainUI(UI):
 
             response = self.create_save_progress_window(message)
             if response:
-                self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
+                self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
 
                 self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
                 self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data)
@@ -556,7 +556,7 @@ class MainUI(UI):
                     #if next cluster has only 1 image, skip it & recurse
                     if len(self.cluster.images) <= 1:
                         logger.info("----SKIP {}----".format(self.cluster.name))
-                        self.stage = progress.mark_cluster_completed(self.cluster,self.stage)
+                        self.stage = progress.mark_cluster_completed(self.cluster,self.stage, self.progress_data[self.project_address]["clusters"])
                         self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
                         self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data)
                         self.check_completion_and_move_on ()
@@ -565,7 +565,7 @@ class MainUI(UI):
                 if "stage" in message:
                     logger.info(str(self.progress_data))
             else:
-                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
+                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
         self.root.after(1, lambda: self.root.focus_force())
 
     def create_UI (self):

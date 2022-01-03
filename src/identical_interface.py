@@ -141,14 +141,14 @@ class IdenticalUI (UI):
         """This function is called when user clicks "next" while at the last image
         !!! only mark cluster complete if user clicks ok"""
 
-        self.stage = progress.mark_cluster_completed(self.cluster, self.stage)
+        self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
 
         if progress.check_project_completion(self.stage):
             logger.info("_____PROJECT COMPLETED_____")
             logger.info(str(self.progress_data))
             exported = self.export(project_completed= True)
             if not exported:
-                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
+                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
         else:
             message = "You have completed the current cluster."
             response = self.create_save_progress_window(message)
@@ -156,7 +156,7 @@ class IdenticalUI (UI):
                 self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
                 self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data)
             else:
-                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage)
+                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
 
     def next_cluster(self) -> None:
         """Save current progress and display next cluster
