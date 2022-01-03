@@ -198,6 +198,9 @@ def _merge_singles(cluster, clusters_data, new_cluster_name):
         if matched_single_name in images_in_singles:
             images_in_singles.remove(matched_single_name)
         new_cluster_name += "_" + matched_single_name.split(".")[0]
+    if cluster.name in images_in_singles:
+        images_in_singles.remove(cluster.name)
+        new_cluster_name += "_" + cluster.name.split(".")[0]
     if len(new_cluster_name) > 150:
         new_cluster_name = new_cluster_name[:147] + "_etc"
     clusters_data["Singles"]["matches"] = list(images_in_singles)

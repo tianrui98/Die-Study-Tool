@@ -196,6 +196,7 @@ class IdenticalUI (UI):
             display_index = i % 6
             old_image_widget = self.image_on_display[display_index][1]
             old_image_widget.grid_forget()
+            self.image_label_widgets[display_index].config(text = "")
             image_frame = self.image_frames[display_index]
 
             if i >= len(self.cluster.images):
