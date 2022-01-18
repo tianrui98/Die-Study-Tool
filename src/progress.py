@@ -15,7 +15,7 @@ from src.objects import *
 from src.root_logger import *
 from datetime import datetime
 from collections import defaultdict
-import re
+import gc
 from pathlib import Path
 def _serialize_identicals(identicals):
     res = []
@@ -156,12 +156,13 @@ def start_new_project(original_project_address, project_name):
     #populate "cluster" with cluster information based on original project folders
     for cluster_name in os.listdir(original_project_address):
         if not cluster_name.startswith('.'):
+            original_images = sorted([f for f in os.listdir(os.path.join(original_project_address, cluster_name)) if not f.startswith(".")])
             progress_data[new_project_address]["clusters"][cluster_name] = {
-                "original_images": [f for f in os.listdir(os.path.join(original_project_address, cluster_name)) if not f.startswith(".")],
+                "original_images": original_images,
                 "matches": [],
                 "nomatches":[],
                 "identicals":[],
-                "best_image_name": ""}
+                "best_image_name": original_images[0]}
 
     return new_project_address , progress_data
 
@@ -268,6 +269,9 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
                 new_cluster_name = new_cluster_name[:147] + "_etc"
             clusters_data[new_cluster_name] = clusters_data.pop(old_cluster_name)
 
+            del best_image_cluster_dict
+            gc.collect()
+
         elif stage.stage_number == 2 :
             #merge matched singles with current cluster
             clusters_data, new_cluster_name = _merge_singles(cluster, clusters_data, old_cluster_name)
@@ -300,6 +304,16 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
         progress_data[project_folder]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
         #update past_comparisons
         progress_data[project_folder]["stages"][str(stage.stage_number)]["past_comparisons"] = _serialize_past_comparisons(stage.past_comparisons)
+
+    #write new clusters_data
+    progress_data[project_folder]["clusters"] = clusters_data
+    del clusters_data
+    gc.collect()
+
+    #delete previous stage info to reduce memory
+    for i in range(stage.stage_number):
+        if str(i) in progress_data[project_folder]["stages"]:
+            _ = progress_data[project_folder]["stages"].pop(str(i))
 
     data_file = open("data.json", "w")
     json.dump(progress_data, data_file)
@@ -584,7 +598,7 @@ def _create_cluster_folders(project_folder, clusters_data, dest_folder):
             shutil.copy(os.path.join(project_folder, cluster_info["best_image_name"]), os.path.join(dest_cluster_folder, cluster_info["best_image_name"]))
         #copy best image to verified
         if cluster_name != "Singles":
-            shutil.copy(os.path.join(project_folder, cluster_info["best_image_name"]),os.path.join(dest_verified_folder, final_cluster_name + '.' + cluster_info["best_image_name"].split(".")[-1]) )
+            shutil.copy(os.path.join(project_folder, cluster_info["best_image_name"]),os.path.join(dest_verified_folder, final_cluster_name + '.' + cluster_info["best_image_name"].split(".")[-1]))
 
 def export_results(project_folder, progress_data, save_address, keep_progress):
     """Generate excel sheet & move cluster out & wipe out progress data"""
@@ -653,30 +667,35 @@ def export_results(project_folder, progress_data, save_address, keep_progress):
 def _create_best_image_cluster_dict (clusters_data):
     return {v["best_image_name"]: k for k, v in clusters_data.items() if not k == "Singles"}
 
-def create_new_objects(cluster, stage, project_folder, progress_data):
+def create_new_objects(cluster, stage, project_folder, progress_data, completion_status):
     """
     Creates new stage and cluster objects
+    completion_status:
+    - "project" : project complete
+    - "part1": part1 complete
+    - "stage": stage complete
+    - "cluster": cluster complete
     """
-    if check_project_completion(stage):
+    if completion_status == "project":
         pass
-    elif check_part1_completion(cluster,stage,project_folder):
+    elif completion_status == "part1":
         return create_find_identical_stage(progress_data[project_folder])
     else:
-        if check_stage_completion(stage):
+        if completion_status == "stage":
             new_cluster, new_stage = create_next_stage(stage, progress_data[project_folder])
             while (not new_cluster or check_stage_completion(new_stage)):
                 logger.debug(f"Skip stage {new_stage.name}")
                 new_cluster, new_stage = create_next_stage(new_stage,progress_data[project_folder])
             return new_cluster, new_stage
         else:
-            if check_cluster_completion(cluster, stage) or stage.stage_number == 4:
+            if completion_status == "cluster" or stage.stage_number == 4:
                 clusters_data = progress_data[project_folder]["clusters"]
                 new_cluster = create_next_cluster(stage, clusters_data)
                 #if the "Singles" cluster has no images, skip to the next
                 if len(new_cluster.images) == 0:
                     logger.debug(f"Skip cluster {new_cluster.name}")
                     stage = mark_cluster_completed(new_cluster, stage, clusters_data)
-                    new_cluster, stage = create_new_objects(new_cluster, stage, project_folder, progress_data )
+                    new_cluster, stage = create_new_objects(new_cluster, stage, project_folder, progress_data, "cluster" )
                 return new_cluster, stage
 
     return cluster,stage

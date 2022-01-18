@@ -154,7 +154,7 @@ class IdenticalUI (UI):
             response = self.create_save_progress_window(message)
             if response:
                 self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
-                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data)
+                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, "cluster")
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
 

@@ -9,7 +9,9 @@ from PIL import Image, ImageTk
 import math
 from tkinter import filedialog, messagebox
 import os
-from tkinter import font
+import sys
+import gc
+import time
 
 class MainUI(UI):
     def __init__(self):
@@ -516,10 +518,13 @@ class MainUI(UI):
     def check_completion_and_move_on (self):
         """This function is called when user clicks "next" while at the last image
         !!! only mark cluster complete if user clicks ok"""
+        t0 = time.time()
 
         if progress.check_cluster_completion(self.cluster,self.stage):
             self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
 
+        t1 = time.time()
+        logger.debug(f"check project completion = {t1-t0}")
         if progress.check_part1_completion(self.cluster, self.stage, self.project_address):
             logger.info("_____PART 1 COMPLETED_____")
             logger.info(str(self.progress_data))
@@ -527,7 +532,7 @@ class MainUI(UI):
             response = self.create_save_progress_window(message)
             if response:
                 self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
-                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data)
+                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, "part1")
                 #start identical UI
                 self.root.withdraw()
                 UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root)
@@ -535,22 +540,26 @@ class MainUI(UI):
                 return None
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
+            t2 = time.time()
+            logger.debug(f"check part1 completion = {t2-t1}")
         else:
             if progress.check_stage_completion(self.stage):
                 message = "You have completed the current *STAGE*."
+                completion_status = "stage"
                 logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
             else:
                 if progress.check_cluster_completion(self.cluster, self.stage):
                     message = "You have completed the current cluster."
+                    completion_status = "cluster"
                 else:
                     return None
-
+            t3 = time.time()
+            logger.debug(f"check stage & cluster completion = {t3-t1}")
             response = self.create_save_progress_window(message)
             if response:
                 self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
-
                 self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
-                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data)
+                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, completion_status)
 
                 if self.cluster:
                     #if next cluster has only 1 image, skip it & recurse
@@ -558,14 +567,17 @@ class MainUI(UI):
                         logger.info("----SKIP {}----".format(self.cluster.name))
                         self.stage = progress.mark_cluster_completed(self.cluster,self.stage, self.progress_data[self.project_address]["clusters"])
                         self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
-                        self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data)
+                        self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, "cluster")
                         self.check_completion_and_move_on ()
                     else:
                         self.initialize_image_display()
-                if "stage" in message:
+                if completion_status == "stage":
                     logger.info(str(self.progress_data))
+                t4 = time.time()
+                logger.debug(f"create new objects = {t4-t3}")
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
+
         self.root.after(1, lambda: self.root.focus_force())
 
     def create_UI (self):

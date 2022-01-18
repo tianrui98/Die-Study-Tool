@@ -3,7 +3,8 @@ from src.main_interface import MainUI
 from src.identical_interface import IdenticalUI
 from src.progress import load_progress
 import os
-
+from src.data_to_folder import *
+import tracemalloc
 def main():
     MainUI().start()
 
@@ -20,17 +21,19 @@ def test_identical():
     UI.start()
 
 if __name__ == "__main__":
+    tracemalloc.start()
     main()
+    snapshot = tracemalloc.take_snapshot()
+    top_stats = snapshot.statistics('lineno')
+    print("[ Top 10 ]")
+    for stat in top_stats[:10]:
+        print(stat)
     # test_identical()
 
-#todo:
-#1. allow the option to clear cache when user clicks exit. do not save by default
-#2. remove identical button in the main UI
-#3. add project title and cluster name to the identical UI
-#4. merge two UIs
-#5. auto clear old log.. only keep the latest one
-#6. implement menu buttons for identical UI
-# 6.5 add singles to identical stage + add logs
-#7. continue existing project mode -> enable open identical UI if stage == 4
-#implement new saving logic -> in project folder put all images in the same folder. keep track of clusters and singles using data.json only. no need cluster address then.
-  #only put images in folders during exportre
+#TODO
+# fix continue existing project cannot open bug
+#1. Reduce memory usage (currently increases at Step 1)
+#2. Display clusters in ascending order
+#3. Implement test mode
+#4. Remove matches / no matches from progress data. It should only be used in objects
+#5. replace all progress_data with project_data
