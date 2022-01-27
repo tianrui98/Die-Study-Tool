@@ -554,13 +554,16 @@ class MainUI(UI):
                 else:
                     return None
             t3 = time.time()
-            logger.debug(f"check stage & cluster completion = {t3-t1}")
+            logger.debug(f"[check_completion_and_move_on] check stage & cluster completion = {t3-t1}")
             response = self.create_save_progress_window(message)
             if response:
+                t4 = time.time()
                 self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
+                t5 = time.time()
                 self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
+                t6 = time.time()
                 self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, completion_status)
-
+                t7 = time.time()
                 if self.cluster:
                     #if next cluster has only 1 image, skip it & recurse
                     if len(self.cluster.images) <= 1:
@@ -571,10 +574,11 @@ class MainUI(UI):
                         self.check_completion_and_move_on ()
                     else:
                         self.initialize_image_display()
+                    t7= time.time()
                 if completion_status == "stage":
                     logger.info(str(self.progress_data))
-                t4 = time.time()
-                logger.debug(f"create new objects = {t4-t3}")
+                t8 = time.time()
+                logger.debug(f"[check)completion_and_move_on] mark_cluster_completed = {t5-t4}, save_progress_data = {t6 - t5}, create_new_objects = {t7 - t6} log progress_data = {t8-t7}")
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
 
