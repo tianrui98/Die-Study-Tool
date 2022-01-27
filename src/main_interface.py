@@ -617,7 +617,7 @@ class MainUI(UI):
         self.right_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.right_info_bar, sticky="w")
         self.right_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.right_info_bar, sticky="w")
 
-        self.right_tick = self.add_filler(self._pixel_to_char(15), self._pixel_to_char(15), 1, 0, 1, 1, self.right_info_bar, sticky = "e")
+        self.right_tick =self.add_image(os.path.join("images","blank.png"), 1, 0, 1, 1, self.right_info_bar, "w", 15, 0, 0)
 
         #navigation buttons
         self.prev_btn = self.add_button("◀", self.load_prev_image, 4, 4, 2, 0, 1, 2, self.right_info_bar, sticky="e")
