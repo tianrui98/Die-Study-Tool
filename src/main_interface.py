@@ -296,7 +296,6 @@ class MainUI(UI):
         """Change right image. Erase old image, Add the next in line image. function for "next" button
 
         """
-        t0 = time.time()
         self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
         #skip the image already compared with left image
         while self.stage.stage_number > 0 and self.right_image_index < len(self.cluster.images) and (self.right_image_index == self.left_image_index or  self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
@@ -309,8 +308,6 @@ class MainUI(UI):
                 #skip the right image
                 logger.info("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
                 self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
-
-        t1 = time.time()
 
         if self.right_image_index < len(self.cluster.images):
             new_image_path = self._get_image_address(self.right_image_index)
@@ -342,8 +339,6 @@ class MainUI(UI):
 
         #update image labels
         self._update_image_label()
-        t2 = time.time()
-        logger.debug(f"[load_next_image] Check for comparison={t1-t0}, add image = {t2-t1} ")
         #check for completion at the last image
         if self.right_image_index == len(self.cluster.images):
             self.check_completion_and_move_on()
@@ -413,8 +408,6 @@ class MainUI(UI):
         - update the image's cluster to singles
 
         """
-
-
         if self.right_image_index < len(self.cluster.images):
             self.change_tick_color ("right", checked = True)
             self.activate_button(self.no_match_btn)
@@ -473,15 +466,15 @@ class MainUI(UI):
             return None
 
         #swap attributes
-        best_image = self.right_image
+        # best_image = self.right_image
         best_image_index = self.right_image_index
 
         self.cluster.best_image = self._get_image_object(best_image_index)
 
-        self.right_image = self.left_image
+        # self.right_image = self.left_image
         self.right_image_index = self.left_image_index
 
-        self.left_image =best_image
+        # self.left_image =best_image
         self.left_image_index = best_image_index
 
         #update image info display
@@ -515,13 +508,10 @@ class MainUI(UI):
     def check_completion_and_move_on (self):
         """This function is called when user clicks "next" while at the last image
         !!! only mark cluster complete if user clicks ok"""
-        t0 = time.time()
 
         if progress.check_cluster_completion(self.cluster,self.stage):
             self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
 
-        t1 = time.time()
-        logger.debug(f"check project completion = {t1-t0}")
         if progress.check_part1_completion(self.cluster, self.stage, self.project_address):
             logger.info("_____PART 1 COMPLETED_____")
             logger.info(str(self.progress_data))
@@ -537,8 +527,6 @@ class MainUI(UI):
                 return None
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
-            t2 = time.time()
-            logger.debug(f"check part1 completion = {t2-t1}")
         else:
             if progress.check_stage_completion(self.stage):
                 message = "You have completed the current *STAGE*."
@@ -550,17 +538,12 @@ class MainUI(UI):
                     completion_status = "cluster"
                 else:
                     return None
-            t3 = time.time()
-            logger.debug(f"[check_completion_and_move_on] check stage & cluster completion = {t3-t1}")
             response = self.create_save_progress_window(message)
             if response:
-                t4 = time.time()
                 self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
-                t5 = time.time()
                 self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
-                t6 = time.time()
                 self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, completion_status)
-                t7 = time.time()
+
                 if self.cluster:
                     #if next cluster has only 1 image, skip it & recurse
                     if len(self.cluster.images) <= 1:
@@ -571,15 +554,11 @@ class MainUI(UI):
                         self.check_completion_and_move_on ()
                     else:
                         self.initialize_image_display()
-                    t7= time.time()
                 if completion_status == "stage":
                     logger.info(str(self.progress_data))
-                t8 = time.time()
-                logger.debug(f"[check_completion_and_move_on] mark_cluster_completed = {t5-t4}, save_progress_data = {t6 - t5}, create_new_objects = {t7 - t6} log progress_data = {t8-t7}")
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
 
-        logger.debug(f"cluster size: {sys.getsizeof(self.cluster)}\nstage = {sys.getsizeof(self.stage)}\nprogress_data = {sys.getsizeof(self.progress_data)}")
         self.root.after(1, lambda: self.root.focus_force())
 
     def create_UI (self):
@@ -587,8 +566,6 @@ class MainUI(UI):
         #initialize left and right images
         self.left_image = self.add_image(os.path.join("images","blank.png"), 0, 1, 1, 1, self.root, "w", self.image_height_pixel, 0, 0)
         self.right_image = self.add_image(os.path.join("images","blank.png"), 1, 1, 1, 1, self.root, "w", self.image_height_pixel, 0, 0)
-        # self.left_image = self.add_filler(self.image_height_char,self.image_height_char, 0, 1, 1, 1, self.root, sticky = "w", content = "", color = None)
-        # self.right_image = self.add_filler(self.image_height_char,self.image_height_char, 1, 1, 1, 1, self.root, sticky = "w", content = "", color = None)
 
         # menu bar
         right_menu_bar = self.add_frame(self.button_frame_height, self.button_frame_width, 1, 0, 1, 1, self.root, "e")
@@ -604,8 +581,7 @@ class MainUI(UI):
 
         # image info
         self.left_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width,0, 2, 1, 1, self.root)
-        # self.left_info_bar.grid_propagate(0)
-        # self.left_info_bar.columnconfigure(1, weight=1)
+
         self.left_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.left_info_bar, sticky= "w")
         self.left_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.left_info_bar, sticky= "w")
         _ = self.add_filler(4, 4, 2, 0, 1, 2, self.left_info_bar, "e", "", None)
