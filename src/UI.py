@@ -43,6 +43,7 @@ class UI:
         self.root.rowconfigure(2, weight=0)
         self.root.rowconfigure(3, weight=0)
 
+        self.image_height_ratio = image_height_ratio
         self.image_height_char = self._pixel_to_char(int(self.initial_height * image_height_ratio))
         self.image_height_pixel = int(self.initial_height * image_height_ratio)
         self.button_frame_width = self.root.winfo_width() * 0.45
@@ -98,6 +99,17 @@ class UI:
 #%% Visuals and Aesthetics
     def add_image(self,  path, column, row, columspan, rowspan, parent, sticky="nsew", max_height = None, padx = 0, pady = 0):
 
+        img = self.create_image_object(path, max_height)
+        img_label = tk.Label(parent, image=img)
+        img_label.image = img
+        img_label.grid(column=column,
+                       row=row,
+                       columnspan=columspan,
+                       rowspan=rowspan,
+                       sticky=sticky, padx = padx, pady = pady)
+        return img_label
+
+    def create_image_object(self, path, max_height = None):
         image = Image.open(path)
         iw, ih = int(image.width), int(image.height)
         if not max_height:
@@ -107,14 +119,8 @@ class UI:
             h = max_height
         image = image.resize((math.ceil(h/ih * iw), h), Image. ANTIALIAS)
         img = ImageTk.PhotoImage(image)
-        img_label = tk.Label(parent, image=img)
-        img_label.image = img
-        img_label.grid(column=column,
-                       row=row,
-                       columnspan=columspan,
-                       rowspan=rowspan,
-                       sticky=sticky, padx = padx, pady = pady)
-        return img_label
+
+        return img
 
     def add_image_darken(self,  path, column, row, columspan, rowspan, parent, sticky="nsew", max_height = None, padx = 0, pady = 0):
         image_raw = Image.open(path)
