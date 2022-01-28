@@ -126,7 +126,8 @@ def _change_name_in_current_cluster(old_name, new_name, progress_data, project_f
 def start_new_project(original_project_address, project_name):
     """Create a new project. This will add a new hashmap to existing progress_data with the cluster information.
     The images with valid extensions under the original project folder will be copied into a new project folder within the program.
-    All images under a cluster will be stored under "original_images"
+    All images under a cluster will be stored under "matches".
+    Matches should include all images under the cluster, including the best image (by default the first image)
 
     Args:
         original_project_address (str): the address of the chosen project folder
@@ -158,8 +159,7 @@ def start_new_project(original_project_address, project_name):
         if not cluster_name.startswith('.'):
             original_images = sorted([f for f in os.listdir(os.path.join(original_project_address, cluster_name)) if not f.startswith(".")])
             progress_data[new_project_address]["clusters"][cluster_name] = {
-                "original_images": original_images,
-                "matches": [],
+                "matches": original_images,
                 "nomatches":[],
                 "identicals":[],
                 "best_image_name": original_images[0]}
@@ -175,7 +175,6 @@ def create_new_stage_in_progress_data(progress_data, project_folder, stage):
 
 def _create_cluster_info_dict (cluster):
     return {
-    "original_images": list(cluster.images_dict.keys()),
     "identicals": _serialize_identicals(cluster.identicals),
     "matches": list(cluster.matches),
     "nomatches": list(cluster.nomatches),
@@ -194,7 +193,7 @@ def _merge_singles(cluster, clusters_data, new_cluster_name):
     Returns:
         [type]: [description]
     """
-    images_in_singles = set(clusters_data["Singles"]["matches"] + clusters_data["Singles"]["original_images"])
+    images_in_singles = set(clusters_data["Singles"]["matches"])
     for matched_single_name in cluster.matches:
         if matched_single_name in images_in_singles:
             images_in_singles.remove(matched_single_name)
@@ -205,14 +204,12 @@ def _merge_singles(cluster, clusters_data, new_cluster_name):
     if len(new_cluster_name) > 150:
         new_cluster_name = new_cluster_name[:147] + "_etc"
     clusters_data["Singles"]["matches"] = list(images_in_singles)
-    clusters_data["Singles"]["original_images"] = []
     return clusters_data, new_cluster_name
 
 def save_progress_data(project_folder, stage, cluster, progress_data):
     """
     Make changes to the progress data
     {"project_address" : {  "clusters": {cluster_name: {
-                                                        "original_images": []
                                                         "identicals": [],
                                                         "matches": [],
                                                         "nomatches": []:
@@ -284,7 +281,6 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
             #create new cluster from matched singles
             if len(cluster.matches) > 0:
                 clusters_data[new_cluster_name] = {
-                    "original_images": [],
                     "identicals": [],
                     "matches": list(cluster.matches),
                     "nomatches": [],
@@ -362,7 +358,7 @@ def load_progress(project_folder, create_next_cluster = True, data_address = "da
     if stage_number == "0":
         cluster_info = progress_data[project_folder]["clusters"][current_cluster]
         cluster = Cluster( cluster_name = current_cluster,
-            images = cluster_info["original_images"],
+            images = cluster_info["matches"],
             identicals = _deserialize_identicals(cluster_info["identicals"]),
             best_image_name = cluster_info["best_image_name"],
             matches = set(cluster_info["matches"]),
@@ -486,7 +482,7 @@ def copy_best_image_to_verified(cluster, project_folder):
 import time 
 def _create_a_cluster(stage, clusters_data, next_cluster_name):
     if stage.stage_number == 0 :
-        next_cluster = Cluster(cluster_name = next_cluster_name, images = clusters_data[next_cluster_name]["original_images"], identicals = [], best_image_name = None, matches = set(), nomatches = set())
+        next_cluster = Cluster(cluster_name = next_cluster_name, images = clusters_data[next_cluster_name]["matches"], identicals = [], best_image_name = None, matches = set(), nomatches = set())
 
     elif stage.stage_number == 1:
         best_image_cluster_dict = {v["best_image_name"]: k for k, v in clusters_data.items() if not k == "Singles"}
@@ -502,7 +498,7 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name):
         t0 = time.time()
         best_image_name = clusters_data[next_cluster_name]["best_image_name"]
         #A cluster should include all images in the Singles folder + best_image from one of the Verified. Cluster named after verified
-        images = list(set(clusters_data["Singles"]["matches"] + clusters_data["Singles"]["original_images"])) + [best_image_name]
+        images = list(set(clusters_data["Singles"]["matches"])) + [best_image_name]
         t1 = time.time()
         next_cluster = Cluster(cluster_name = next_cluster_name, images = images,identicals = [], best_image_name= best_image_name, matches = set(), nomatches = set())
         t2 = time.time()
