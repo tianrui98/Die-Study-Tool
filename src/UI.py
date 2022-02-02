@@ -1,3 +1,4 @@
+from sqlalchemy import all_
 from src.objects import *
 import src.progress as progress
 from src.root_logger import *
@@ -71,10 +72,10 @@ class UI:
         Return: Cluster object
         """
         all_clusters = [c for c in self.progress_data[self.project_address]["clusters"] if c != "Singles"]
-        cluster_name =  all_clusters[0]
+        cluster_name =  sorted(all_clusters, key= lambda s: s.split(";")[0])[0]
 
         #create cluster object
-        return Cluster(cluster_name = cluster_name, images = self.progress_data[self.project_address]["clusters"][cluster_name]["original_images"], identicals = [], best_image_name = None, matches = set(), nomatches = set())
+        return Cluster(cluster_name = cluster_name, images = self.progress_data[self.project_address]["clusters"][cluster_name]["matches"], identicals = [], best_image_name = None, matches = set(), nomatches = set())
 
     def _swap_positions(self, list, pos1, pos2):
 

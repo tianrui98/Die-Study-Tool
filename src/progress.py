@@ -370,7 +370,7 @@ def load_progress(project_folder, create_next_cluster = True, data_address = "da
             cluster = _create_a_cluster(stage, progress_data[project_folder]["clusters"],current_cluster)
         # if current cluster has already been checked. give the next cluster in line
         else:
-            next_in_line = list(stage.clusters_yet_to_check)[0]
+            next_in_line = sorted(list(stage.clusters_yet_to_check), key= lambda s: s.split(";")[0])[0]
             cluster = _create_a_cluster(stage, progress_data[project_folder]["clusters"], next_in_line)
             progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
 
@@ -479,7 +479,7 @@ def copy_best_image_to_verified(cluster, project_folder):
     logger.debug("Copied best image of {} to Verified".format(cluster.name))
     return cluster
 
-import time 
+
 def _create_a_cluster(stage, clusters_data, next_cluster_name):
     if stage.stage_number == 0 :
         next_cluster = Cluster(cluster_name = next_cluster_name, images = clusters_data[next_cluster_name]["matches"], identicals = [], best_image_name = None, matches = set(), nomatches = set())
@@ -495,20 +495,15 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name):
             next_cluster.images_dict[image_name] = image_object
 
     elif stage.stage_number == 2:
-        t0 = time.time()
         best_image_name = clusters_data[next_cluster_name]["best_image_name"]
         #A cluster should include all images in the Singles folder + best_image from one of the Verified. Cluster named after verified
         images = list(set(clusters_data["Singles"]["matches"])) + [best_image_name]
-        t1 = time.time()
         next_cluster = Cluster(cluster_name = next_cluster_name, images = images,identicals = [], best_image_name= best_image_name, matches = set(), nomatches = set())
-        t2 = time.time()
         #replace the image's cluster name with the cluster it represents
         for image_name, image_object in next_cluster.images_dict.items():
             if image_name != best_image_name:
                 image_object.cluster = "Singles"
                 next_cluster.images_dict[image_name] = image_object
-        t3 = time.time()
-        logger.debug(f"[in _create_a_cluster: list all images = {t1-t0}, create next cluster = {t2-t1}, replace cluster name = {t3-t2}")
     elif stage.stage_number == 3:
         #A cluster should include all images in the Singles folder, except those have been matched
         images = clusters_data["Singles"]["matches"]
@@ -533,13 +528,8 @@ def create_next_cluster(stage, clusters_data):
     if len(stage.clusters_yet_to_check) == 0:
         logger.debug(f"stage {stage.stage_number} clusters yet to check is zero")
         return None
-    t0 = time.time()
-    next_cluster_name = list(stage.clusters_yet_to_check)[0]
-    t1 = time.time()
-    logger.debug("Create next cluster {}".format(next_cluster_name))
+    next_cluster_name = sorted(list(stage.clusters_yet_to_check),key= lambda s: s.split(";")[0])[0]
     next_cluster = _create_a_cluster(stage, clusters_data, next_cluster_name)
-    t2 = time.time()
-    logger.debug(f"[in create_next_cluster] get next cluster name = {t1-t0}, _create_a_cluster = {t2-t1}")
     return next_cluster
 
 
@@ -694,16 +684,12 @@ def create_new_objects(cluster, stage, project_folder, progress_data, completion
         else:
             if completion_status == "cluster" or stage.stage_number == 4:
                 clusters_data = progress_data[project_folder]["clusters"]
-                t0 = time.time()
                 new_cluster = create_next_cluster(stage, clusters_data)
-                
                 #if the "Singles" cluster has no images, skip to the next
                 if len(new_cluster.images) == 0:
                     logger.debug(f"Skip cluster {new_cluster.name}")
                     stage = mark_cluster_completed(new_cluster, stage, clusters_data)
                     new_cluster, stage = create_new_objects(new_cluster, stage, project_folder, progress_data, "cluster" )
-                t1 = time.time()
-                logger.debug(f"create next cluster in create_new_objects took {t1-t0}")
                 return new_cluster, stage
 
     return cluster,stage

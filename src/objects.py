@@ -55,7 +55,7 @@ class Stage:
 
         elif stage_number == 3:
             #all images in Singles are considered one cluster
-            self.clusters_yet_to_check = {f for f in (project_data["clusters"]["Singles"]["original_images"] + project_data["clusters"]["Singles"]["matches"] )}
+            self.clusters_yet_to_check = {f for f in project_data["clusters"]["Singles"]["matches"]}
 
         else:
             self.clusters_yet_to_check = {c for c in project_data["clusters"]}
