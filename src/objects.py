@@ -45,15 +45,16 @@ class Stage:
     """track progress in a stage
     """
     def __init__(self, stage_number, project_data):
-        stages = ["Validate Clusters", "Merge Clusters", "Clusters vs Singles", "Single vs Single", "Find Identicals"]
+        stages = ["Correcting False Discovery Rate", "Correcting Sensitivity Rate", "Single vs Single", "Find Identicals"]
         self.stage_number = stage_number
         self.name = stages[self.stage_number]
 
-        if stage_number < 3 :
+        if stage_number < 2 :
             #all images in clusters (not singles)
             self.clusters_yet_to_check = {c for c in project_data["clusters"] if c != "Singles"}
 
-        elif stage_number == 3:
+            #all clusters
+        elif stage_number == 2:
             #all images in Singles are considered one cluster
             self.clusters_yet_to_check = {f for f in project_data["clusters"]["Singles"]["matches"]}
 
