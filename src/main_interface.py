@@ -3,6 +3,7 @@ import src.progress as progress
 from src.root_logger import *
 from src.UI import UI
 from src.identical_interface import IdenticalUI
+from src.test import *
 import tkinter as tk
 from tkinter.constants import CENTER, RAISED, RIDGE, VERTICAL
 from PIL import Image, ImageTk
@@ -397,6 +398,9 @@ class MainUI(UI):
                     self.deactivate_button(self.no_match_btn)
                 logger.info("Match {} to cluster {}".format(self._get_image_name(self.right_image_index),self.cluster.name))
 
+        if self.testing_mode:
+            test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "match")
+
 
     def mark_no_match (self):
         """During cluster validation stage, unmatch left and right image
@@ -424,7 +428,8 @@ class MainUI(UI):
                     # self.deactivate_button(self.identical_btn)
 
             logger.info("Unmatch {} from cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
-
+        if self.testing_mode:
+            test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "unmatch")
 
 
     def mark_identical (self):
@@ -505,6 +510,9 @@ class MainUI(UI):
         self.right_image_index = curr_left_index
         logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
 
+        if self.testing_mode:
+            test.swap_best_image(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
+
     def start_identical_UI(self):
         #start identical UI
         self.root.withdraw()
@@ -518,6 +526,8 @@ class MainUI(UI):
         if progress.check_cluster_completion(self.cluster,self.stage):
             self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
             completion_status = "cluster"
+            if self.testing_mode:
+                test.translate_actions(self.stage.stage_number)
 
         else:
             return None

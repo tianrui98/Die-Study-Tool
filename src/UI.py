@@ -14,13 +14,14 @@ import json
 from tkinter import font
 #%% UI
 class UI:
-    def __init__(self, image_height_ratio, project_name = "", project_address = "", progress_data = {},  part2 = False, root = None):
+    def __init__(self, image_height_ratio, project_name = "", project_address = "", progress_data = {},  part2 = False, root = None, testing_mode = False):
         # main interface
         if part2:
             self.root = tk.Toplevel()
             self.mainUI = root
         else:
             self.root = tk.Tk()
+            self.mainUI = None
         self.root.title("Die Study Tool")
         self.project_name = project_name
         self.project_address = project_address
@@ -50,6 +51,8 @@ class UI:
         self.button_frame_width = self.root.winfo_width() * 0.45
         self.button_frame_height = self.root.winfo_height() * 0.2
         self.identical_image_height_pixel = int(self.initial_height * 0.9 * 0.5)
+
+        self.testing_mode = testing_mode
 
 #%% Shortcuts
 
