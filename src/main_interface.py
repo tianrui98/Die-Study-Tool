@@ -105,7 +105,7 @@ class MainUI(UI):
             #mark them compared
             self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
             #skip the right image
-            logger.info("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
+            logger.info("[initialize_image_display] Skip already compared {}".format(self._get_image_name(self.right_image_index)))
             self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
 
         #skip the index of left image
@@ -306,7 +306,7 @@ class MainUI(UI):
                 #mark them compared before
                 self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
                 #skip the right image
-                logger.info("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
+                logger.info("[load_next_image] Skip already compared {}".format(self._get_image_name(self.right_image_index)))
                 self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
 
         if self.right_image_index < len(self.cluster.images):
@@ -505,57 +505,58 @@ class MainUI(UI):
         self.right_image_index = curr_left_index
         logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
 
+    def start_identical_UI(self):
+        #start identical UI
+        self.root.withdraw()
+        UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root)
+        UI.start()
+
     def check_completion_and_move_on (self):
         """This function is called when user clicks "next" while at the last image
         !!! only mark cluster complete if user clicks ok"""
 
         if progress.check_cluster_completion(self.cluster,self.stage):
             self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
+            completion_status = "cluster"
 
-        if progress.check_part1_completion(self.cluster, self.stage, self.project_address):
+        else:
+            return None
+
+        if progress.check_part1_completion(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"]):
             logger.info("_____PART 1 COMPLETED_____")
             logger.info(str(self.progress_data))
+            completion_status = "part1"
             message = "You have completed the current *STAGE*."
             response = self.create_save_progress_window(message)
             if response:
                 self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
-                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, "part1")
-                #start identical UI
-                self.root.withdraw()
-                UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root)
-                UI.start()
+                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, completion_status)
+                self.start_identical_UI()
                 return None
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
         else:
-            if progress.check_stage_completion(self.stage):
+            if progress.check_stage_completion(self.stage ):
                 message = "You have completed the current *STAGE*."
                 completion_status = "stage"
                 logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
             else:
-                if progress.check_cluster_completion(self.cluster, self.stage):
+                if completion_status == "cluster":
                     message = "You have completed the current cluster."
-                    completion_status = "cluster"
                 else:
                     return None
             response = self.create_save_progress_window(message)
             if response:
-                self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
                 self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
-                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, completion_status)
+                self.cluster, self.stage= progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, completion_status)
 
-                if self.cluster:
-                    #if next cluster has only 1 image, skip it & recurse
-                    if len(self.cluster.images) <= 1:
-                        logger.info("----SKIP {}----".format(self.cluster.name))
-                        self.stage = progress.mark_cluster_completed(self.cluster,self.stage, self.progress_data[self.project_address]["clusters"])
-                        self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
-                        self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, "cluster")
-                        self.check_completion_and_move_on ()
-                    else:
-                        self.initialize_image_display()
+                #update display
                 if completion_status == "stage":
                     logger.info(str(self.progress_data))
+                if self.stage.stage_number == 3:
+                    self.start_identical_UI()
+                else:
+                    self.initialize_image_display()
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
 

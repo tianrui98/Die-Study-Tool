@@ -142,8 +142,8 @@ class IdenticalUI (UI):
         !!! only mark cluster complete if user clicks ok"""
 
         self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
-
-        if progress.check_project_completion(self.stage):
+        print(f"left with {self.stage.clusters_yet_to_check}")
+        if progress.check_project_completion(self.stage, self.progress_data[self.project_address]["clusters"]):
             logger.info("_____PROJECT COMPLETED_____")
             logger.info(str(self.progress_data))
             exported = self.export(project_completed= True)
