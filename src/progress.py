@@ -404,7 +404,6 @@ def check_part1_completion(cluster,stage, clusters_data):
     if stage.stage_number == 1:
         size =len(set(clusters_data["Singles"]["matches"]).intersection(cluster.nomatches))
         matches = clusters_data["Singles"]["matches"]
-        print(f"size of intersection {size} singles = {matches } nomatches = {cluster.nomatches} ")
     return case1 or case2
 
 def mark_compared(left_name, right_name, stage):
@@ -664,29 +663,28 @@ def create_new_objects(cluster, stage, project_folder, progress_data, completion
     - "cluster": cluster complete
     """
     if completion_status == "project":
-        pass
+        return None, stage
     elif completion_status == "part1":
         return create_find_identical_stage(progress_data[project_folder])
     elif completion_status == "stage":
-            print(f"create next stage")
             new_cluster, new_stage = create_next_stage(stage, progress_data[project_folder])
             while ((not new_cluster) or check_stage_completion(new_stage)):
                 logger.debug(f"Skip stage {new_stage.name}")
                 new_cluster, new_stage = create_next_stage(new_stage,progress_data[project_folder])
             return new_cluster, new_stage
-    elif completion_status == "cluster":
-        print(f"create next cluster")
+    else:
         clusters_data = progress_data[project_folder]["clusters"]
         new_cluster = create_next_cluster(stage, clusters_data)
 
         #If the new cluster is already completed: skip
         while check_cluster_completion(new_cluster, stage):
-            logger.debug(f"[create_new_objects] Kkip cluster {new_cluster.name}")
+            logger.debug(f"[create_new_objects] Skip cluster {new_cluster.name}")
             stage = mark_cluster_completed(new_cluster, stage,progress_data[project_folder]["clusters"])
             if check_stage_completion(stage):
-                return create_new_objects(new_cluster, stage, project_folder, progress_data, "stage")
+                if check_project_completion(stage, progress_data[project_folder]["clusters"]):
+                    return None, stage
+                else:
+                    return create_new_objects(new_cluster, stage, project_folder, progress_data, "stage")
             else:
                 return create_new_objects(new_cluster, stage, project_folder, progress_data, "cluster")
         return new_cluster, stage
-
-    return cluster,stage

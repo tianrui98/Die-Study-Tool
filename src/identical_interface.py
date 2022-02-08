@@ -137,16 +137,19 @@ class IdenticalUI (UI):
         #reset left window
         self.refresh_image_display()
 
+    def finish_project(self):
+        logger.info("_____PROJECT COMPLETED_____")
+        logger.info(str(self.progress_data))
+        exported = self.export(project_completed= True)
+        return exported
+
     def check_completion_and_move_on(self):
         """This function is called when user clicks "next" while at the last image
         !!! only mark cluster complete if user clicks ok"""
 
         self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
-        print(f"left with {self.stage.clusters_yet_to_check}")
         if progress.check_project_completion(self.stage, self.progress_data[self.project_address]["clusters"]):
-            logger.info("_____PROJECT COMPLETED_____")
-            logger.info(str(self.progress_data))
-            exported = self.export(project_completed= True)
+            exported = self.finish_project()
             if not exported:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
         else:
@@ -154,7 +157,14 @@ class IdenticalUI (UI):
             response = self.create_save_progress_window(message)
             if response:
                 self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
+                last_cluster = self.cluster
                 self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, "cluster")
+
+                #project has been completed
+                if not self.cluster:
+                    exported = self.finish_project()
+                    if not exported:
+                        self.stage = progress.unmark_cluster_completed(last_cluster, self.stage, self.progress_data[self.project_address]["clusters"])
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
 
