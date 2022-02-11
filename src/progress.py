@@ -302,8 +302,6 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
 
     #write new clusters_data
     progress_data[project_folder]["clusters"] = clusters_data
-    del clusters_data
-    gc.collect()
 
     #delete previous stage info to reduce memory
     for i in range(stage.stage_number):
@@ -378,13 +376,15 @@ def load_progress(project_folder, create_next_cluster = True, data_address = "da
 def check_cluster_completion(cluster,stage):
     """Check if all images in the current cluster have all been processed
     """
+    if not cluster:
+        return True
     all_compared_already = all([imgObj.name in stage.past_comparisons[cluster.best_image.name] for imgObj in cluster.images if imgObj.name != cluster.best_image.name ])
     return all_compared_already or (len(cluster.matches) + len(cluster.nomatches) + len(cluster.compared_before)== len(cluster.images) - 1)
 
 
 def check_stage_completion(stage):
-    if stage.stage_number == 2:
-        return len(stage.clusters_yet_to_check) == 1
+    if stage.stage_number == 1 or stage.stage_number == 2:
+        return len(stage.clusters_yet_to_check) <= 1
     else:
         return len(stage.clusters_yet_to_check) == 0
 
@@ -677,14 +677,15 @@ def create_new_objects(cluster, stage, project_folder, progress_data, completion
         new_cluster = create_next_cluster(stage, clusters_data)
 
         #If the new cluster is already completed: skip
-        while check_cluster_completion(new_cluster, stage):
-            logger.debug(f"[create_new_objects] Skip cluster {new_cluster.name}")
-            stage = mark_cluster_completed(new_cluster, stage,progress_data[project_folder]["clusters"])
-            if check_stage_completion(stage):
-                if check_project_completion(stage, progress_data[project_folder]["clusters"]):
-                    return None, stage
+        if stage.stage_number < 3:
+            while check_cluster_completion(new_cluster, stage):
+                logger.debug(f"[create_new_objects] Skip cluster {new_cluster.name}")
+                stage = mark_cluster_completed(new_cluster, stage,progress_data[project_folder]["clusters"])
+                if check_stage_completion(stage):
+                    if check_project_completion(stage, progress_data[project_folder]["clusters"]):
+                        return None, stage
+                    else:
+                        return create_new_objects(new_cluster, stage, project_folder, progress_data, "stage")
                 else:
-                    return create_new_objects(new_cluster, stage, project_folder, progress_data, "stage")
-            else:
-                return create_new_objects(new_cluster, stage, project_folder, progress_data, "cluster")
+                    return create_new_objects(new_cluster, stage, project_folder, progress_data, "cluster")
         return new_cluster, stage

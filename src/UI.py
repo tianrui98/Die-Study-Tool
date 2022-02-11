@@ -28,6 +28,7 @@ class UI:
         self.progress_data = progress_data
         self.part2 = part2
         self.demo_mode = False
+        self.testing_mode = testing_mode
         self.quit = False
 
         self.screen_width = self.root.winfo_screenwidth()
@@ -52,7 +53,6 @@ class UI:
         self.button_frame_height = self.root.winfo_height() * 0.2
         self.identical_image_height_pixel = int(self.initial_height * 0.9 * 0.5)
 
-        self.testing_mode = testing_mode
 
 #%% Shortcuts
 
@@ -126,7 +126,7 @@ class UI:
 
         return img
 
-    def add_image_darken(self,  path, column, row, columspan, rowspan, parent, sticky="nsew", max_height = None, padx = 0, pady = 0):
+    def create_darken_image_object(self, path, max_height = None):
         image_raw = Image.open(path)
         image = image_raw.point(lambda p : p *0.6)
         iw, ih = int(image.width), int(image.height)
@@ -137,14 +137,8 @@ class UI:
             h = max_height
         image = image.resize((math.ceil(h/ih * iw), h), Image. ANTIALIAS)
         img = ImageTk.PhotoImage(image)
-        img_label = tk.Label(parent, image=img)
-        img_label.image = img
-        img_label.grid(column=column,
-                       row=row,
-                       columnspan=columspan,
-                       rowspan=rowspan,
-                       sticky=sticky, padx = padx, pady = pady)
-        return img_label
+
+        return img
 
     def add_icon(self, path, height, width,  column, row, columspan, rowspan, parent, sticky="nsew"):
 

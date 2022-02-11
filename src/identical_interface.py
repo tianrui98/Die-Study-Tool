@@ -204,22 +204,23 @@ class IdenticalUI (UI):
         self.current_cluster_label.config(text = f"Current Cluster: " + self.cluster.name)
         for i in range(self.current_page*6, (self.current_page + 1)*6):
             display_index = i % 6
-            old_image_widget = self.image_on_display[display_index][1]
-            old_image_widget.grid_forget()
             self.image_label_widgets[display_index].config(text = "")
-            image_frame = self.image_frames[display_index]
 
             if i >= len(self.cluster.images):
-                new_image_widget =self.add_image("images/blank.png", 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.49))
+                path = "images/blank.png"
+                img = self.create_image_object(path, int(self.main_frame_height * 0.49))
                 image_object = None
             else:
                 image_object = self._get_image_object(i)
                 self.image_label_widgets[display_index].config(text = image_object.name)
                 if image_object.name in self.marked_identical_coin_dict:
-                    new_image_widget =self.add_image_darken(self._get_image_address(i), 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.49))
+                    img = self.create_darken_image_object(self._get_image_address(i), int(self.main_frame_height * 0.49))
                 else:
-                    new_image_widget =self.add_image(self._get_image_address(i), 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.49))
-            self.image_on_display[display_index] = (image_object, new_image_widget)
+                    img = self.create_image_object(self._get_image_address(i),int(self.main_frame_height * 0.49))
+            self.image_on_display[display_index][1].configure(image = img )
+            self.image_on_display[display_index][1].image = img
+            image_widget = self.image_on_display[display_index][1]
+            self.image_on_display[display_index]= (image_object, image_widget)
 
     def create_UI (self):
         # menu bar

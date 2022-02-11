@@ -20,6 +20,9 @@ def test_identical():
     UI = IdenticalUI(project_name="test", project_address=test_cluster_address, progress_data= progress_data, cluster = cluster, stage = stage)
     UI.start()
 
+def test_main():
+    MainUI(testing_mode = True).start()
+
 if __name__ == "__main__":
     main()
 

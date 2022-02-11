@@ -15,8 +15,8 @@ import gc
 import time
 
 class MainUI(UI):
-    def __init__(self):
-        super().__init__(0.7)
+    def __init__(self, testing_mode = False):
+        super().__init__(image_height_ratio = 0.7, testing_mode = testing_mode)
 
 #%% Shortcuts
 
@@ -222,7 +222,8 @@ class MainUI(UI):
         self.project_name = dirname.split("/")[-1]
         self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
         self.stage = Stage(0, self.progress_data[self.project_address])
-
+        if self.testing_mode:
+            test.fill_in_singles(self.progress_data[self.project_address]["clusters"])
         #open the first cluster
         self.cluster = self._open_first_cluster()
 
@@ -246,6 +247,8 @@ class MainUI(UI):
         self.project_address = os.getcwd() + "/projects/" + self.project_name
 
         self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
+        if self.testing_mode:
+            test.fill_in_singles(self.progress_data[self.project_address]["clusters"])
 
         logger.info(f"Open project {self.project_name} at stage {self.stage.stage_number} ")
         if self.stage.stage_number < 4:
@@ -280,7 +283,8 @@ class MainUI(UI):
         self.project_name = os.path.basename(dirname)
         self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
         self.stage = Stage(0, self.progress_data[self.project_address])
-
+        if self.testing_mode:
+            test.fill_in_singles(self.progress_data[self.project_address]["clusters"])
         #open the first cluster
         self.cluster = self._open_first_cluster()
 
@@ -528,6 +532,7 @@ class MainUI(UI):
             completion_status = "cluster"
             if self.testing_mode:
                 test.translate_actions(self.stage.stage_number)
+                test.test_cluster_correctedness(self.progress_data[self.project_address]["clusters"])
 
         else:
             return None
@@ -550,11 +555,10 @@ class MainUI(UI):
                 message = "You have completed the current *STAGE*."
                 completion_status = "stage"
                 logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
+            elif completion_status == "cluster":
+                message = "You have completed the current cluster."
             else:
-                if completion_status == "cluster":
-                    message = "You have completed the current cluster."
-                else:
-                    return None
+                return None
             response = self.create_save_progress_window(message)
             if response:
                 self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
