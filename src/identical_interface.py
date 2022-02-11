@@ -12,13 +12,14 @@ from tkinter import font
 
 class IdenticalUI (UI):
 
-    def __init__(self, project_name = "", project_address = "", progress_data = {}, cluster = None, stage = None, root = None):
+    def __init__(self, project_name = "", project_address = "", progress_data = {}, cluster = None, stage = None, root = None, demo_mode = False):
         super().__init__(0.48, project_name, project_address, progress_data, True, root)
 
         #the first 6 images will be on page 0, the next 6 on page 1 etc.
         self.current_page = 0
         self.cluster = cluster
         self.stage = stage
+        self.demo_mode = demo_mode
 
 
     #functionality
@@ -36,8 +37,9 @@ class IdenticalUI (UI):
         self.identical_list_box.insert(tk.END, image_object.name)
         #display current image in the small window if it's the first on the list
         if len(self.identical_coin_dict) == 1:
-            self.right_image_window.grid_forget()
-            self.right_image_window = self.add_image(os.path.join(self.project_address, image_object.name), 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
+            img = self.create_image_object(os.path.join(self.project_address, image_object.name), int(self.right_main_frame_width_pixel * 0.7))
+            self.right_image_window.configure(image = img)
+            self.right_image_window.image = img
 
     def _add_function_0(self):
         image_object = self.image_on_display[0][0]
@@ -91,13 +93,11 @@ class IdenticalUI (UI):
         if len(self.identical_coin_dict) > 0 :
             default_image_name = self.identical_list_box.get(0)
             default_image_object = self.identical_coin_dict[default_image_name]
-            self.right_image_window.grid_forget()
-            self.right_image_window = self.add_image(os.path.join(self.project_address, default_image_object.name), 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
-
+            img = self.create_image_object(os.path.join(self.project_address, default_image_object.name), int(self.right_main_frame_width_pixel * 0.7))
         else:
-            self.right_image_window.grid_forget()
-            self.right_image_window = self.add_image("images/blank.png", 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
-
+            img = self.create_image_object(os.path.join("images","blank.png"), int(self.right_main_frame_width_pixel * 0.7))
+        self.right_image_window.configure(image = img)
+        self.right_image_window.image = img
 
     def onselect(self, evt):
         """update the display window according to the image being selected
@@ -109,8 +109,9 @@ class IdenticalUI (UI):
         index = int(w.curselection()[0])
         image_name = w.get(index)
         image_object = self.identical_coin_dict[image_name]
-        self.right_image_window.grid_forget()
-        self.right_image_window = self.add_image(os.path.join(self.project_address, image_object.name), 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
+        img = self.create_image_object(os.path.join(self.project_address, image_object.name), int(self.right_main_frame_width_pixel * 0.7))
+        self.right_image_window.configure(image = img)
+        self.right_image_window.image = img
 
     def confirm_current_list (self):
         """mark the images on the list identical and un-display their widgets.
@@ -131,9 +132,9 @@ class IdenticalUI (UI):
         self.identical_coin_dict = {}
 
         #reset right window
-        self.right_image_window.grid_forget()
-        self.right_image_window = self.add_image("images/blank.png", 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
-
+        img = self.create_image_object(os.path.join("images", "blank.png"), int(self.right_main_frame_width_pixel * 0.7))
+        self.right_image_window.configure(image = img)
+        self.right_image_window.image = img
         #reset left window
         self.refresh_image_display()
 
@@ -186,7 +187,6 @@ class IdenticalUI (UI):
             self.current_page = 0
             self.refresh_image_display()
             self.root.after(1, lambda: self.root.focus_force())
-            logger.info("Next cluster.")
 
     def load_next_page(self) -> None:
         self.current_page = min(self.current_page + 1, math.ceil(len(self.cluster.images)/6 ) - 1)

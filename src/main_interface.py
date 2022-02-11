@@ -251,12 +251,12 @@ class MainUI(UI):
             test.fill_in_singles(self.progress_data[self.project_address]["clusters"])
 
         logger.info(f"Open project {self.project_name} at stage {self.stage.stage_number} ")
-        if self.stage.stage_number < 4:
+        if self.stage.stage_number < 3:
             self.initialize_image_display()
         else:
             #start identical UI
             self.root.withdraw()
-            UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root)
+            UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root, demo_mode = self.demo_mode)
             UI.start()
 
     def browse_files(self):
@@ -520,7 +520,7 @@ class MainUI(UI):
     def start_identical_UI(self):
         #start identical UI
         self.root.withdraw()
-        UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root)
+        UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root, demo_mode= self.demo_mode)
         UI.start()
 
     def check_completion_and_move_on (self):
@@ -538,7 +538,7 @@ class MainUI(UI):
             return None
 
         if progress.check_part1_completion(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"]):
-            logger.info("_____PART 1 COMPLETED_____")
+            logger.info(f"_____STAGE {self.stage.name} COMPLETED_____")
             logger.info(str(self.progress_data))
             completion_status = "part1"
             message = "You have completed the current *STAGE*."

@@ -295,6 +295,8 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
             stage = _change_name_in_past_comparisons(old_cluster_name, new_cluster_name, stage)
             #update current cluster
             progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = new_cluster_name
+        else:
+            progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = old_cluster_name
         #update clusters_yet_to_check
         progress_data[project_folder]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
         #update past_comparisons
@@ -350,8 +352,7 @@ def load_progress(project_folder, create_next_cluster = True, data_address = "da
     stage.past_comparisons= _deserialize_past_comparisons(stage_info["past_comparisons"])
     #retrieve latest cluster
     current_cluster = stage_info["current_cluster"]
-    if not create_next_cluster:
-        return progress_data, stage, None
+
     if stage_number == "0":
         cluster_info = progress_data[project_folder]["clusters"][current_cluster]
         cluster = Cluster( cluster_name = current_cluster,
@@ -361,9 +362,9 @@ def load_progress(project_folder, create_next_cluster = True, data_address = "da
             matches = set(cluster_info["matches"]),
             nomatches = set(cluster_info["nomatches"]))
     else:
-        if len(stage.clusters_yet_to_check) == 0:
-            cluster = None
-        elif current_cluster in stage.clusters_yet_to_check:
+        # if len(stage.clusters_yet_to_check) == 0:
+        #     cluster = None
+        if current_cluster in stage.clusters_yet_to_check:
             cluster = _create_a_cluster(stage, progress_data[project_folder]["clusters"],current_cluster)
         # if current cluster has already been checked. give the next cluster in line
         else:
@@ -419,11 +420,9 @@ def unmark_compared(left_name, right_name, stage):
 
 def mark_cluster_completed(cluster, stage, clusters_data):
     """Remove current cluster name from clusters_yet_to_check. Before updating cluster name"""
-    logger.debug(f"Mark cluster {cluster.name} complete")
 
     if cluster.name in stage.clusters_yet_to_check:
         stage.clusters_yet_to_check.remove(cluster.name)
-        logger.debug(f"Removed {cluster.name} off clusters_yet_to_check. Left with {stage.clusters_yet_to_check}")
 
     #Inspect Verified Stage and the rest: move the matched clusters off the yet_to_check list
     if stage.stage_number > 0 and stage.stage_number < 3:

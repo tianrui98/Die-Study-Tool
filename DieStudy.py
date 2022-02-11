@@ -27,9 +27,6 @@ if __name__ == "__main__":
     main()
 
 #TODO
-# fix continue existing project cannot open bug
-#1. Reduce memory usage (currently increases at Step 1)
-#2. Display clusters in ascending order
-#3. Implement test mode
+#implement test_mode
 #4. Remove matches / no matches from progress data. It should only be used in objects
 #5. replace all progress_data with project_data
