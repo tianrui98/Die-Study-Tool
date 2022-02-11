@@ -12,6 +12,7 @@ import os
 import shutil
 import json
 from tkinter import font
+from src.test import *
 #%% UI
 class UI:
     def __init__(self, image_height_ratio, project_name = "", project_address = "", progress_data = {},  part2 = False, root = None, testing_mode = False):
@@ -53,6 +54,7 @@ class UI:
         self.button_frame_height = self.root.winfo_height() * 0.2
         self.identical_image_height_pixel = int(self.initial_height * 0.9 * 0.5)
 
+        self.test = Test()
 
 #%% Shortcuts
 

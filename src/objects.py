@@ -1,6 +1,4 @@
-import os
 from collections import defaultdict
-import math
 
 class ImgObj:
     """Class object for an image

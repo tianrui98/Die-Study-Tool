@@ -15,8 +15,8 @@ from src.objects import *
 from src.root_logger import *
 from datetime import datetime
 from collections import defaultdict
-import gc
 from pathlib import Path
+
 def _serialize_identicals(identicals):
     res = []
     for s in identicals:
@@ -140,10 +140,6 @@ def start_new_project(original_project_address, project_name):
     new_project_address =os.path.join(os.getcwd() ,"projects", project_name)
     os.makedirs(new_project_address)
 
-    for folder_name in ("Singles", "Verified"):
-        if not os.path.exists(os.path.join(new_project_address, folder_name)):
-            os.mkdir(os.path.join(new_project_address, "Verified"))
-
     for file_extension in ("*.jpg", "*.jpeg", "*.png"):
         for file_path in glob.glob(os.path.join(original_project_address, '**', file_extension), recursive=True):
             new_path = os.path.join(new_project_address, os.path.basename(file_path))
@@ -244,7 +240,6 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
                 best_image_name = cluster.best_image.name
                 clusters_data["Singles"]["matches"].append(best_image_name)
                 clusters_data.pop(old_cluster_name)
-                logger.debug(f"Removed cluster {cluster.name} from progress data")
             else:
                 #delete old cluster name
                 new_cluster_name = _concatenate_image_names(cluster)
@@ -435,7 +430,6 @@ def mark_cluster_completed(cluster, stage, clusters_data):
                 matched_cluster_name = image_name
             if matched_cluster_name in stage.clusters_yet_to_check:
                 stage.clusters_yet_to_check.remove(matched_cluster_name)
-                logger.debug("Removed matched cluster {} off clusters_yet_to_check".format(matched_cluster_name))
         for image_name in cluster.nomatches:
             stage = mark_compared(cluster.best_image.name, image_name,stage)
 
@@ -443,12 +437,9 @@ def mark_cluster_completed(cluster, stage, clusters_data):
 
 def unmark_cluster_completed(cluster,stage, clusters_data):
     """reverse marking cluster completed"""
-    logger.debug("Undo Mark cluster complete")
-    logger.debug(str(stage.clusters_yet_to_check))
 
     if cluster.name not in stage.clusters_yet_to_check:
         stage.clusters_yet_to_check.add(cluster.name)
-        logger.debug("Add {} back to clusters_yet_to_check".format(cluster.name))
 
     #Inspect Verified Stage and the rest: move the matched clusters off the yet_to_check list
     if stage.stage_number > 0 and stage.stage_number < 4:
@@ -461,7 +452,6 @@ def unmark_cluster_completed(cluster,stage, clusters_data):
                 matched_cluster_name = image_name
             if matched_cluster_name not in stage.clusters_yet_to_check:
                 stage.clusters_yet_to_check.add(matched_cluster_name)
-                logger.debug("Add {} back to clusters_yet_to_check".format(matched_cluster_name))
         for image_name in cluster.nomatches:
             stage = unmark_compared(cluster.best_image.name, image_name,stage)
 
@@ -473,7 +463,6 @@ def copy_best_image_to_verified(cluster, project_folder):
     old_image_address = cluster.address + "/" + cluster.best_image.name
     new_image_address = project_folder + "/Verified/" + cluster.name + ".jpg"
     shutil.copyfile(old_image_address, new_image_address)
-    logger.debug("Copied best image of {} to Verified".format(cluster.name))
     return cluster
 
 

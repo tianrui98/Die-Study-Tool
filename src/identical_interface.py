@@ -3,24 +3,21 @@ import src.progress as progress
 from src.root_logger import *
 from src.UI import UI
 import tkinter as tk
-from tkinter.constants import CENTER, RAISED, RIDGE
-from PIL import Image, ImageTk
-from tkinter import Toplevel, filedialog, messagebox
-from tkinter import font
-
-
+import math
+import os
+import tkinter as tk
+from tkinter import messagebox
 
 class IdenticalUI (UI):
 
-    def __init__(self, project_name = "", project_address = "", progress_data = {}, cluster = None, stage = None, root = None, demo_mode = False):
-        super().__init__(0.48, project_name, project_address, progress_data, True, root)
+    def __init__(self, project_name = "", project_address = "", progress_data = {}, cluster = None, stage = None, root = None, demo_mode = False, testing_mode = False):
+        super().__init__(0.48, project_name, project_address, progress_data, True, root, testing_mode)
 
         #the first 6 images will be on page 0, the next 6 on page 1 etc.
         self.current_page = 0
         self.cluster = cluster
         self.stage = stage
         self.demo_mode = demo_mode
-
 
     #functionality
     def _add_image_to_identical (self, image_object):
@@ -150,6 +147,8 @@ class IdenticalUI (UI):
 
         self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
         if progress.check_project_completion(self.stage, self.progress_data[self.project_address]["clusters"]):
+            if self.testing_mode:
+                self.test.test_image_number(self.progress_data[self.project_address]["clusters"], self.project_address)
             exported = self.finish_project()
             if not exported:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])

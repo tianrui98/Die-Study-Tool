@@ -5,19 +5,14 @@ from src.UI import UI
 from src.identical_interface import IdenticalUI
 from src.test import *
 import tkinter as tk
-from tkinter.constants import CENTER, RAISED, RIDGE, VERTICAL
 from PIL import Image, ImageTk
 import math
 from tkinter import filedialog, messagebox
 import os
-import sys
-import gc
-import time
 
 class MainUI(UI):
     def __init__(self, testing_mode = False):
         super().__init__(image_height_ratio = 0.7, testing_mode = testing_mode)
-
 #%% Shortcuts
 
     def _add_to_identicals (self, left_image_name, right_image_name):
@@ -223,7 +218,7 @@ class MainUI(UI):
         self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
         self.stage = Stage(0, self.progress_data[self.project_address])
         if self.testing_mode:
-            test.fill_in_singles(self.progress_data[self.project_address]["clusters"])
+            self.test = Test(self.progress_data[self.project_address]["clusters"]["Singles"]["matches"])
         #open the first cluster
         self.cluster = self._open_first_cluster()
 
@@ -248,16 +243,14 @@ class MainUI(UI):
 
         self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
         if self.testing_mode:
-            test.fill_in_singles(self.progress_data[self.project_address]["clusters"])
+            self.test = Test(self.progress_data[self.project_address]["clusters"]["Singles"]["matches"])
 
         logger.info(f"Open project {self.project_name} at stage {self.stage.stage_number} ")
         if self.stage.stage_number < 3:
             self.initialize_image_display()
         else:
             #start identical UI
-            self.root.withdraw()
-            UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root, demo_mode = self.demo_mode)
-            UI.start()
+            self.start_identical_UI()
 
     def browse_files(self):
         """Let user choose which new project/folder to start working on
@@ -284,7 +277,7 @@ class MainUI(UI):
         self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
         self.stage = Stage(0, self.progress_data[self.project_address])
         if self.testing_mode:
-            test.fill_in_singles(self.progress_data[self.project_address]["clusters"])
+            self.test = Test(self.progress_data[self.project_address]["clusters"]["Singles"]["matches"])
         #open the first cluster
         self.cluster = self._open_first_cluster()
 
@@ -364,12 +357,10 @@ class MainUI(UI):
                     self.right_image_index = max(0, self.right_image_index - 1)
             else:
                 self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
-                logger.debug("Skip already compared {}".format(self._get_image_name(self.right_image_index)))
                 self.right_image_index = max(0, self.right_image_index - 1)
 
         if self.right_image_index == 0 and (self.right_image_index == self.left_image_index or self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
             self.right_image_index = curr_right_image_index
-
 
         if self.right_image_index >= 0:
             new_image_path = self._get_image_address(self.right_image_index)
@@ -403,7 +394,7 @@ class MainUI(UI):
                 logger.info("Match {} to cluster {}".format(self._get_image_name(self.right_image_index),self.cluster.name))
 
         if self.testing_mode:
-            test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "match")
+            self.test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "match")
 
 
     def mark_no_match (self):
@@ -433,7 +424,7 @@ class MainUI(UI):
 
             logger.info("Unmatch {} from cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
         if self.testing_mode:
-            test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "unmatch")
+            self.test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "unmatch")
 
 
     def mark_identical (self):
@@ -515,12 +506,13 @@ class MainUI(UI):
         logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
 
         if self.testing_mode:
-            test.swap_best_image(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
+            self.test.swap_best_image(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
 
     def start_identical_UI(self):
         #start identical UI
         self.root.withdraw()
-        UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root, demo_mode= self.demo_mode)
+        UI = IdenticalUI(project_name=self.project_name, project_address=self.project_address, progress_data= self.progress_data, cluster = self.cluster, stage = self.stage, root= self.root, demo_mode= self.demo_mode, testing_mode = self.testing_mode)
+        UI.test = self.test
         UI.start()
 
     def check_completion_and_move_on (self):
@@ -531,9 +523,7 @@ class MainUI(UI):
             self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
             completion_status = "cluster"
             if self.testing_mode:
-                test.translate_actions(self.stage.stage_number)
-                test.test_cluster_correctedness(self.progress_data[self.project_address]["clusters"])
-
+                self.test.translate_actions(self.stage.stage_number)
         else:
             return None
 
@@ -546,6 +536,9 @@ class MainUI(UI):
             if response:
                 self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
                 self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, completion_status)
+                if self.testing_mode:
+                    self.test.test_cluster_correctedness(self.progress_data[self.project_address]["clusters"])
+                    self.test.test_image_number(self.progress_data[self.project_address]["clusters"],self.project_address)
                 self.start_identical_UI()
                 return None
             else:
@@ -563,6 +556,8 @@ class MainUI(UI):
             if response:
                 self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
                 self.cluster, self.stage= progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, completion_status)
+                if self.testing_mode:
+                    self.test.test_cluster_correctedness(self.progress_data[self.project_address]["clusters"])
 
                 #update display
                 if completion_status == "stage":
