@@ -270,7 +270,13 @@ class UI:
         if not save_address:
             return None
         self.progress_data, _ = progress.save_progress_data(self.project_address, self.stage, self.cluster, self.progress_data)
-        progress.export_results(self.project_address,self.progress_data, save_address, keep_progress)
+        res, destination_address = progress.export_results(self.project_address,self.progress_data, save_address, keep_progress)
+        if self.testing_mode:
+            self.test.test_export(self.progress_data[self.project_address]["clusters"], self.project_address, destination_address)
+        if not keep_progress:
+            #wipe out the records in progress data
+            progress.clear_current_project(self.project_address, self.progress_data)
+
         logger.info("====EXPORTED RESULTS====")
 
         if not keep_progress:

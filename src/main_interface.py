@@ -316,19 +316,10 @@ class MainUI(UI):
             self.update_icon_button_color ()
 
         else:
-            image = Image.open("images/end.png")
-            iw, ih = int(image.width), int(image.height)
-            h = int(self.root.winfo_height() * 0.7)
-            image = image.resize((math.ceil(h/ih * iw), h), Image. ANTIALIAS)
-            img = ImageTk.PhotoImage(image)
-            img_label = tk.Label(self.root, image=img)
-            img_label.image = img
-            img_label.grid(column=1,
-                        row=1,
-                        columnspan=1,
-                        rowspan=1,
-                        sticky="we")
-            self.right_image = img_label
+            new_image_path = os.path.join("images", "end.png")
+            new_img = self.create_image_object(new_image_path, self.image_height_pixel)
+            self.right_image.configure(image = new_img)
+            self.right_image.image = new_img
             new_cluster_label = ""
             self.change_tick_color("right", False)
             self.deactivate_button(self.match_btn)
@@ -544,10 +535,13 @@ class MainUI(UI):
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
         else:
-            if progress.check_stage_completion(self.stage ):
+            if progress.check_stage_completion(self.stage):
                 message = "You have completed the current *STAGE*."
                 completion_status = "stage"
                 logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
+                if self.testing_mode:
+                    self.test.test_comparison(self.project_address, self.stage.stage_number)
+                    self.test.clear_comparisons()
             elif completion_status == "cluster":
                 message = "You have completed the current cluster."
             else:
@@ -634,4 +628,5 @@ class MainUI(UI):
             self.root.mainloop()
         except:
             logger.error("====Error in main loop====")
+            logger.error(f"progress_data{self.progress_data}")
 # %%

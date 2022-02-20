@@ -308,7 +308,6 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
     data_file = open("data.json", "w")
     json.dump(progress_data, data_file)
     data_file.close()
-    logger.debug(f"Save progress data {progress_data}")
 
     return progress_data, stage
 
@@ -397,9 +396,6 @@ def check_part1_completion(cluster,stage, clusters_data):
     case2 = stage.stage_number == 1 and check_cluster_completion(cluster, stage) and len(stage.clusters_yet_to_check) == 1\
     and len(set(clusters_data["Singles"]["matches"]).intersection(cluster.nomatches)) == len(clusters_data["Singles"]["matches"])
 
-    if stage.stage_number == 1:
-        size =len(set(clusters_data["Singles"]["matches"]).intersection(cluster.nomatches))
-        matches = clusters_data["Singles"]["matches"]
     return case1 or case2
 
 def mark_compared(left_name, right_name, stage):
@@ -475,7 +471,6 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name):
         next_cluster = Cluster(cluster_name = next_cluster_name, images = [i for i in best_image_cluster_dict] + list(clusters_data["Singles"]["matches"]), identicals = [], best_image_name = clusters_data[next_cluster_name]["best_image_name"], matches = set(), nomatches = set())
 
         #replace the image's cluster name with the cluster it represents
-
         for image_name, image_object in next_cluster.images_dict.items():
             if image_name in best_image_cluster_dict:
                 image_object.cluster = best_image_cluster_dict[image_name]
@@ -598,6 +593,9 @@ def export_results(project_folder, progress_data, save_address, keep_progress):
             total_number += len(all_images) - number_to_deduct
             data.append(data_row)
 
+    #reorder clusters in ascending order
+    data = sorted(data)
+    # data = sorted(data, key = lambda row: (row[0], row[1]))
     #write "Singles" cluster
     all_singles =  progress_data[project_folder]["clusters"]["Singles"]["matches"]
     identicals = progress_data[project_folder]["clusters"]["Singles"]["identicals"]
@@ -632,11 +630,7 @@ def export_results(project_folder, progress_data, save_address, keep_progress):
     _create_cluster_folders(project_folder, progress_data[project_folder]["clusters"], dest_folder)
     res.to_excel( os.path.join(dest_folder, "results_" + project_folder_name + ".xlsx"), index= False)
 
-    if not keep_progress:
-        #wipe out the records in progress data
-        clear_current_project(project_folder, progress_data)
-
-    return res
+    return res, dest_folder
 
 def _create_best_image_cluster_dict (clusters_data):
     return {v["best_image_name"]: k for k, v in clusters_data.items() if not k == "Singles"}
