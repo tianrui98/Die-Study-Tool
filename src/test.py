@@ -177,7 +177,8 @@ class Test:
         for im in self.singles:
             best_image_dict[im] = im
 
-        print(best_image_dict)
+        print(f"best_image_dict {best_image_dict}")
+        print(f"comparisons {self.past_comparisons}")
         for i in range(len(original_images)):
             for j in range(i + 1, len(original_images)):
                 a = original_images[i]
@@ -187,7 +188,7 @@ class Test:
                     if stage_number == 1:
                         a_best = best_image_dict[a]
                         b_best = best_image_dict[b]
-                        assert ((a_best, b_best) in all_comparisons) or ((b_best, a_best) in all_comparisons), f"pair {(a,b)} not compared"
-
+                        if a_best != b_best:
+                            assert ((a_best, b_best) in all_comparisons) or ((b_best, a_best) in all_comparisons), f"pair {(a,b)} not compared"
 
         print("comparison test passed.")

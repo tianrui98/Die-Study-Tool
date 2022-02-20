@@ -379,8 +379,7 @@ def check_cluster_completion(cluster,stage):
 
 def check_stage_completion(stage, clusters_data):
     if stage.stage_number == 1 or stage.stage_number == 2:
-        #there's only one or zero clusters left and no more singles to be compared to it
-        return len(stage.clusters_yet_to_check) <= 1 and clusters_data["Singles"]["matches"] == 0
+        return (len(stage.clusters_yet_to_check) == 0) or (len(stage.clusters_yet_to_check) == 1 and clusters_data["Singles"]["matches"] == 0)
     else:
         return len(stage.clusters_yet_to_check) == 0
 
@@ -651,7 +650,7 @@ def create_new_objects(cluster, stage, project_folder, progress_data, completion
         return create_find_identical_stage(progress_data[project_folder])
     elif completion_status == "stage":
             new_cluster, new_stage = create_next_stage(stage, progress_data[project_folder])
-            while ((not new_cluster) or check_stage_completion(new_stage, stage,progress_data[project_folder]["clusters"])):
+            while ((not new_cluster) or check_stage_completion(new_stage, progress_data[project_folder]["clusters"])):
                 logger.debug(f"Skip stage {new_stage.name}")
                 new_cluster, new_stage = create_next_stage(new_stage,progress_data[project_folder])
             return new_cluster, new_stage
@@ -664,7 +663,7 @@ def create_new_objects(cluster, stage, project_folder, progress_data, completion
             while check_cluster_completion(new_cluster, stage):
                 logger.debug(f"[create_new_objects] Skip cluster {new_cluster.name}")
                 stage = mark_cluster_completed(new_cluster, stage,progress_data[project_folder]["clusters"])
-                if check_stage_completion(stage,stage,progress_data[project_folder]["clusters"]):
+                if check_stage_completion(stage,progress_data[project_folder]["clusters"]):
                     if check_project_completion(stage, progress_data[project_folder]["clusters"]):
                         return None, stage
                     else:
