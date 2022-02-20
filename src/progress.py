@@ -377,18 +377,19 @@ def check_cluster_completion(cluster,stage):
     return all_compared_already or (len(cluster.matches) + len(cluster.nomatches) + len(cluster.compared_before)== len(cluster.images) - 1)
 
 
-def check_stage_completion(stage):
+def check_stage_completion(stage, clusters_data):
     if stage.stage_number == 1 or stage.stage_number == 2:
-        return len(stage.clusters_yet_to_check) <= 1
+        #there's only one or zero clusters left and no more singles to be compared to it
+        return len(stage.clusters_yet_to_check) <= 1 and clusters_data["Singles"]["matches"] == 0
     else:
         return len(stage.clusters_yet_to_check) == 0
 
 def check_project_completion(stage, clusters_data):
-    return check_stage_completion(stage) and stage.stage_number == 3
+    return check_stage_completion(stage, clusters_data) and stage.stage_number == 3
 
 
 def check_part1_completion(cluster,stage, clusters_data):
-    stage_completed = check_stage_completion(stage)
+    stage_completed = check_stage_completion(stage, clusters_data)
     is_second_stage = stage.stage_number == 2
     case1 = stage_completed and is_second_stage
 
@@ -650,7 +651,7 @@ def create_new_objects(cluster, stage, project_folder, progress_data, completion
         return create_find_identical_stage(progress_data[project_folder])
     elif completion_status == "stage":
             new_cluster, new_stage = create_next_stage(stage, progress_data[project_folder])
-            while ((not new_cluster) or check_stage_completion(new_stage)):
+            while ((not new_cluster) or check_stage_completion(new_stage, stage,progress_data[project_folder]["clusters"])):
                 logger.debug(f"Skip stage {new_stage.name}")
                 new_cluster, new_stage = create_next_stage(new_stage,progress_data[project_folder])
             return new_cluster, new_stage
@@ -663,7 +664,7 @@ def create_new_objects(cluster, stage, project_folder, progress_data, completion
             while check_cluster_completion(new_cluster, stage):
                 logger.debug(f"[create_new_objects] Skip cluster {new_cluster.name}")
                 stage = mark_cluster_completed(new_cluster, stage,progress_data[project_folder]["clusters"])
-                if check_stage_completion(stage):
+                if check_stage_completion(stage,stage,progress_data[project_folder]["clusters"]):
                     if check_project_completion(stage, progress_data[project_folder]["clusters"]):
                         return None, stage
                     else:

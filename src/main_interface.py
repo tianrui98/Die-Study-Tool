@@ -535,7 +535,7 @@ class MainUI(UI):
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
         else:
-            if progress.check_stage_completion(self.stage):
+            if progress.check_stage_completion(self.stage, self.progress_data[self.project_address]["clusters"]):
                 message = "You have completed the current *STAGE*."
                 completion_status = "stage"
                 logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
