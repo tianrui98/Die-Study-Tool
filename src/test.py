@@ -105,7 +105,7 @@ class Test:
                 if best_image_name in self.data:
                     for match in clusters_data[c]["matches"]:
                         if match != best_image_name:
-                            assert (match in self.data[best_image_name]), f"{match} in clusters_data {clusters_data[c]} but not in test"
+                            assert (match in self.data[best_image_name]), f"{match} in clusters_data {clusters_data[c]} but not in test {self.data}"
                     for match in self.data[best_image_name]:
                         assert (match in clusters_data[c]["matches"]), f"{match} in test {self.data} but not in clusters_data {clusters_data[c]}"
         singles = set(clusters_data["Singles"]["matches"])
@@ -177,8 +177,8 @@ class Test:
         for im in self.singles:
             best_image_dict[im] = im
 
-        print(f"best_image_dict {best_image_dict}")
-        print(f"comparisons {self.past_comparisons}")
+        # print(f"best_image_dict {best_image_dict}")
+        # print(f"comparisons {self.past_comparisons}")
         for i in range(len(original_images)):
             for j in range(i + 1, len(original_images)):
                 a = original_images[i]

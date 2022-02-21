@@ -487,6 +487,9 @@ class MainUI(UI):
             self.change_tick_color("right", False)
             self.deactivate_button(self.match_btn)
 
+        if self.testing_mode:
+            self.test.swap_best_image(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
+
         #swap the positions of the old best image (now right image) with the old right image (now left image) in the list
         self.cluster.images = self._swap_positions(self.cluster.images, self.right_image_index, self.left_image_index)
         #update left and right images' indices
@@ -496,8 +499,6 @@ class MainUI(UI):
         self.right_image_index = curr_left_index
         logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
 
-        if self.testing_mode:
-            self.test.swap_best_image(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
 
     def start_identical_UI(self):
         #start identical UI
