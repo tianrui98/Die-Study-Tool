@@ -378,8 +378,10 @@ def check_cluster_completion(cluster,stage):
 
 
 def check_stage_completion(stage, clusters_data):
-    if stage.stage_number == 1 or stage.stage_number == 2:
+    if stage.stage_number == 1:
         return (len(stage.clusters_yet_to_check) == 0) or (len(stage.clusters_yet_to_check) == 1 and clusters_data["Singles"]["matches"] == 0)
+    elif stage.stage_number == 2:
+        return (len(stage.clusters_yet_to_check) == 0) or (clusters_data["Singles"]["matches"] <= 1)
     else:
         return len(stage.clusters_yet_to_check) == 0
 
