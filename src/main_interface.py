@@ -453,17 +453,18 @@ class MainUI(UI):
 
         #swap attributes
         self.cluster.best_image = self._get_image_object(self.right_image_index)
+        #swap pictures
+        self.add_images(self.right_image_index, self.left_image_index)
+        #swap the positions of the old best image with the old right image in the list
+        self.cluster.images = self._swap_positions(self.cluster.images, self.left_image_index, self.right_image_index)
+
+        #update image info display
+        self._update_image_label()
+        self._update_cluster_label()
 
         #if old best image has been matched to anything in the cluster before -> mark checked & match
         if len(self.cluster.matches) > 0:
-            self.change_tick_color("right", True)
-            self.activate_button(self.match_btn)
-            self.cluster.matches.add(self._get_image_name(self.left_image_index))
-            if self._get_image_name(self.right_image_index) in self.cluster.matches:
-                self.cluster.matches.remove(self._get_image_name(self.right_image_index))
-            if self.testing_mode:
-                self.test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "match")
-
+            self.mark_match()
 
         else:
             self.change_tick_color("right", False)
@@ -471,24 +472,6 @@ class MainUI(UI):
 
         if self.testing_mode:
             self.test.swap_best_image(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
-
-        #swap pictures
-        self.add_images(self.right_image_index, self.left_image_index)
-
-        #swap the positions of the old best image with the old right image in the list
-        self.cluster.images = self._swap_positions(self.cluster.images, self.left_image_index, self.right_image_index)
-
-        #update left and right images' indices
-        curr_left_index = self.left_image_index
-        curr_right_index = self.right_image_index
-        self.left_image_index = curr_right_index
-        self.right_image_index = curr_left_index
-
-        #update image info display
-        self._update_image_label()
-        self._update_cluster_label()
-
-
 
         logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.left_image_index), self.cluster.name))
 
