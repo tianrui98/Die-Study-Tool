@@ -403,43 +403,10 @@ class MainUI(UI):
                 if self._get_image_name(self.right_image_index) in self.cluster.matches:
                     self.cluster.matches.remove(self._get_image_name(self.right_image_index))
                     self.deactivate_button(self.match_btn)
-                #delist from identicals
-                if self._is_identical(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index)):
-                    self._remove_from_identicals (self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
-                    # self.deactivate_button(self.identical_btn)
 
             logger.info("Unmatch {} from cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
         if self.testing_mode:
             self.test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "unmatch")
-
-
-    def mark_identical (self):
-        """During cluster validation stage, mark left and right images identical
-        - the right tick turn green (means checked)
-        - add right image to the hashmap cluster.identical
-        - add current image to cluster.matches + activate match button
-        - if previously in cluster.nomatches, remove it & deactivate nomatch button
-
-        - if the two images are already marked identical, click this button will delist them from identicals
-        """
-        if self.right_image_index < len(self.cluster.images):
-
-            self.change_tick_color ("right", checked = True)
-            left, right = self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index)
-
-            if self._is_identical(left,right):
-                #delist form identicals
-                self._remove_from_identicals(left,right)
-                # self.deactivate_button(self.identical_btn)
-
-            else:
-                #add to identicals
-                self._add_to_identicals (left,right)
-                # self.activate_button(self.identical_btn)
-                #add to matches
-                self.mark_match()
-
-            logger.info("Mark {} identical to {}".format(self._get_image_name(self.right_image_index), self._get_image_name(self.right_image_index)))
 
     def mark_best_image (self):
         """During cluster validation, mark right image the best image of the cluster
