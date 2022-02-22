@@ -472,9 +472,12 @@ class MainUI(UI):
         if self.testing_mode:
             self.test.swap_best_image(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
 
+        #swap pictures
+        self.add_images(self.right_image_index, self.left_image_index)
+
         #swap the positions of the old best image with the old right image in the list
         self.cluster.images = self._swap_positions(self.cluster.images, self.left_image_index, self.right_image_index)
-        
+
         #update left and right images' indices
         curr_left_index = self.left_image_index
         curr_right_index = self.right_image_index
@@ -485,8 +488,7 @@ class MainUI(UI):
         self._update_image_label()
         self._update_cluster_label()
 
-        #swap pictures
-        self.add_images(self.left_image_index, self.right_image_index)
+
 
         logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.left_image_index), self.cluster.name))
 
