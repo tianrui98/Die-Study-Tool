@@ -544,10 +544,13 @@ def _concatenate_identical_set(identical_set):
         image_id = image_name.split(".")[0] #without .jpg
         curr_type, curr_name = image_id.split(";")
         if curr_type != prev_type:
-            identical_group_name += image_id
+            identical_group_name += str("_" + image_id)
         else:
             identical_group_name += str("_" + curr_name)
         prev_type = curr_type
+    
+    if identical_group_name[0] == "_":
+        identical_group_name = identical_group_name[1:]
     return "(" + identical_group_name +")"
 
 def _concatenate_identicals(identicals):

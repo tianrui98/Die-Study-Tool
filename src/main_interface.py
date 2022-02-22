@@ -193,11 +193,6 @@ class MainUI(UI):
         else:
             self.deactivate_button(self.no_match_btn)
 
-        #if the pair are identicals:
-        # if self._is_identical(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index)):
-            # self.activate_button(self.identical_btn)
-        # else:
-        #     self.deactivate_button(self.identical_btn)
 
 
     def change_button_color (self, button_widget, new_fg = "black", new_font = ("Arial", "14")):
@@ -457,31 +452,18 @@ class MainUI(UI):
             return None
 
         #swap attributes
-        # best_image = self.right_image
-        best_image_index = self.right_image_index
+        self.cluster.best_image = self._get_image_object(self.right_image_index)
 
-        self.cluster.best_image = self._get_image_object(best_image_index)
-
-        # self.right_image = self.left_image
-        self.right_image_index = self.left_image_index
-
-        # self.left_image =best_image
-        self.left_image_index = best_image_index
-
-        #update image info display
-        self._update_image_label()
-        self._update_cluster_label()
-
-        #swap pictures
-        self.add_images(self.left_image_index, self.right_image_index)
-
-        #if new right image has been matched to anything in the cluster before -> mark checked & match
+        #if old best image has been matched to anything in the cluster before -> mark checked & match
         if len(self.cluster.matches) > 0:
             self.change_tick_color("right", True)
             self.activate_button(self.match_btn)
-            self.cluster.matches.add(self._get_image_name(self.right_image_index))
-            if self._get_image_name(self.left_image_index) in self.cluster.matches:
-                self.cluster.matches.remove(self._get_image_name(self.left_image_index))
+            self.cluster.matches.add(self._get_image_name(self.left_image_index))
+            if self._get_image_name(self.right_image_index) in self.cluster.matches:
+                self.cluster.matches.remove(self._get_image_name(self.right_image_index))
+            if self.testing_mode:
+                self.test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "match")
+
 
         else:
             self.change_tick_color("right", False)
@@ -490,14 +472,23 @@ class MainUI(UI):
         if self.testing_mode:
             self.test.swap_best_image(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
 
-        #swap the positions of the old best image (now right image) with the old right image (now left image) in the list
-        self.cluster.images = self._swap_positions(self.cluster.images, self.right_image_index, self.left_image_index)
+        #swap the positions of the old best image with the old right image in the list
+        self.cluster.images = self._swap_positions(self.cluster.images, self.left_image_index, self.right_image_index)
+        
         #update left and right images' indices
         curr_left_index = self.left_image_index
         curr_right_index = self.right_image_index
         self.left_image_index = curr_right_index
         self.right_image_index = curr_left_index
-        logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
+
+        #update image info display
+        self._update_image_label()
+        self._update_cluster_label()
+
+        #swap pictures
+        self.add_images(self.left_image_index, self.right_image_index)
+
+        logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.left_image_index), self.cluster.name))
 
 
     def start_identical_UI(self):

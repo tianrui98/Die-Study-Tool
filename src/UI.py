@@ -82,17 +82,15 @@ class UI:
         #create cluster object
         return Cluster(cluster_name = cluster_name, images = self.progress_data[self.project_address]["clusters"][cluster_name]["matches"], identicals = [], best_image_name = None, matches = set(), nomatches = set())
 
-    def _swap_positions(self, list, pos1, pos2):
+    def _swap_positions(self, l, pos1, pos2):
 
         # popping both the elements from list
-        first_ele = list.pop(pos1)
-        second_ele = list.pop(pos2-1)
+        first_ele = l[pos1]
+        second_ele = l[pos2]
 
         # inserting in each others positions
-        list.insert(pos1, second_ele)
-        list.insert(pos2, first_ele)
-
-        return list
+        l[pos2], l[pos1] = first_ele, second_ele
+        return l
 
     def _pixel_to_char (self, pixel):
         f = font.Font(family = 'TkDefaultFont')
