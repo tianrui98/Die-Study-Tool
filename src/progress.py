@@ -47,10 +47,12 @@ def _collect_identicals(identicals):
             identical_name_list.append(image_id)
             curr_type, curr_name = image_id.split(";")
             if curr_type != prev_type:
-                identical_group_name += image_id
+                identical_group_name += str("_" + image_id)
             else:
                 identical_group_name += str("_" + curr_name)
             prev_type = curr_type
+        if identical_group_name[0] == "_":
+            identical_group_name = identical_group_name[1:]
         identical_group_list.append(identical_group_name)
 
     return identical_group_list, identical_name_list
@@ -362,7 +364,7 @@ def load_progress(project_folder, create_next_cluster = True, data_address = "da
             cluster = _create_a_cluster(stage, progress_data[project_folder]["clusters"],current_cluster)
         # if current cluster has already been checked. give the next cluster in line
         else:
-            next_in_line = sorted(list(stage.clusters_yet_to_check), key= lambda s: s.split(";")[0])[0]
+            next_in_line = sorted(list(stage.clusters_yet_to_check), key= lambda s: s.split("_")[0])[0]
             cluster = _create_a_cluster(stage, progress_data[project_folder]["clusters"], next_in_line)
             progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
 
@@ -379,11 +381,22 @@ def check_cluster_completion(cluster,stage):
 
 def check_stage_completion(stage, clusters_data):
     if stage.stage_number == 1:
-        return (len(stage.clusters_yet_to_check) == 0) or (len(stage.clusters_yet_to_check) == 1 and len(clusters_data["Singles"]["matches"]) == 0)
+        if (len(stage.clusters_yet_to_check) == 0) :
+            return True
+        elif (len(stage.clusters_yet_to_check) == 1 and len(clusters_data["Singles"]["matches"]) == 0):
+            logger.debug(f"Skip cluster {stage.clusters_yet_to_check[0]}")
+            return True
     elif stage.stage_number == 2:
-        return (len(stage.clusters_yet_to_check) == 0) or (len(clusters_data["Singles"]["matches"]) <= 1)
+        if (len(stage.clusters_yet_to_check) == 0):
+            return True
+        elif (len(clusters_data["Singles"]["matches"]) <= 1):
+            remaining_single = clusters_data["Singles"]["matches"]
+            logger.debug(f"Skip single {remaining_single}")
+            return True
     else:
         return len(stage.clusters_yet_to_check) == 0
+    
+    return False
 
 def check_project_completion(stage, clusters_data):
     return check_stage_completion(stage, clusters_data) and stage.stage_number == 3
@@ -504,7 +517,7 @@ def create_next_cluster(stage, clusters_data):
     if len(stage.clusters_yet_to_check) == 0:
         logger.debug(f"stage {stage.stage_number} clusters yet to check is zero")
         return None
-    next_cluster_name = sorted(list(stage.clusters_yet_to_check),key= lambda s: s.split(";")[0])[0]
+    next_cluster_name = sorted(list(stage.clusters_yet_to_check),key= lambda s: s.split("_")[0])[0]
     next_cluster = _create_a_cluster(stage, clusters_data, next_cluster_name)
     return next_cluster
 

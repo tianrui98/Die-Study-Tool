@@ -77,7 +77,7 @@ class UI:
         Return: Cluster object
         """
         all_clusters = [c for c in self.progress_data[self.project_address]["clusters"] if c != "Singles"]
-        cluster_name =  sorted(all_clusters, key= lambda s: s.split(";")[0])[0]
+        cluster_name =  sorted(all_clusters, key= lambda s: s.split("_")[0])[0]
 
         #create cluster object
         return Cluster(cluster_name = cluster_name, images = self.progress_data[self.project_address]["clusters"][cluster_name]["matches"], identicals = [], best_image_name = None, matches = set(), nomatches = set())
