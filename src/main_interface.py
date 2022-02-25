@@ -101,7 +101,7 @@ class MainUI(UI):
             #mark them compared
             self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
             #skip the right image
-            logger.info("[initialize_image_display] Skip already compared {}".format(self._get_image_name(self.right_image_index)))
+            logger.debug("[initialize_image_display] Skip already compared {}".format(self._get_image_name(self.right_image_index)))
             self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
 
         #skip the index of left image
@@ -299,7 +299,7 @@ class MainUI(UI):
                 #mark them compared before
                 self.cluster.compared_before.add(self._get_image_name(self.right_image_index))
                 #skip the right image
-                logger.info("[load_next_image] Skip already compared {}".format(self._get_image_name(self.right_image_index)))
+                logger.debug("[load_next_image] Skip already compared {}".format(self._get_image_name(self.right_image_index)))
                 self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
 
         if self.right_image_index < len(self.cluster.images):
@@ -533,9 +533,10 @@ class MainUI(UI):
         self.left_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.left_info_bar, sticky= "w")
         _ = self.add_filler(4, 4, 2, 0, 1, 2, self.left_info_bar, "e", "", None)
 
-        self.right_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 2, 1, 1, self.root)
+        self.right_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 2, 1, 1, self.root, "we")
         self.right_info_bar.grid_propagate(0)
         self.right_info_bar.columnconfigure(2, weight=1)
+
 
         self.right_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.right_info_bar, sticky="w")
         self.right_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.right_info_bar, sticky="w")
