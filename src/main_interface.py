@@ -417,6 +417,8 @@ class MainUI(UI):
         # if right image is already classified as single, no effect
         if self.stage.stage_number > 0 or self._get_image_name(self.right_image_index) in self.cluster.nomatches or self.right_image_index >= len(self.cluster.images):
             return None
+        if self.testing_mode:
+                self.test.swap_best_image(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
 
         #swap attributes
         self.cluster.best_image = self._get_image_object(self.right_image_index)
@@ -432,14 +434,11 @@ class MainUI(UI):
         #if old best image has been matched to anything in the cluster before -> mark checked & match
         if len(self.cluster.matches) > 0:
             self.mark_match()
+            self.cluster.matches.remove(self._get_image_name(self.left_image_index))
 
         else:
             self.change_tick_color("right", False)
             self.deactivate_button(self.match_btn)
-
-        if self.testing_mode:
-            self.test.swap_best_image(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
-
         logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.left_image_index), self.cluster.name))
 
 

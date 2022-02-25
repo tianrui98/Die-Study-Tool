@@ -376,7 +376,7 @@ def check_cluster_completion(cluster,stage):
     if not cluster:
         return True
     all_compared_already = all([imgObj.name in stage.past_comparisons[cluster.best_image.name] for imgObj in cluster.images if imgObj.name != cluster.best_image.name ])
-    return all_compared_already or (len(cluster.matches) + len(cluster.nomatches) + len(cluster.compared_before)== len(cluster.images) - 1)
+    return all_compared_already or (len(cluster.matches) + len(cluster.nomatches) + len(cluster.compared_before) >= len(cluster.images) - 1)
 
 
 def check_stage_completion(stage, clusters_data):
