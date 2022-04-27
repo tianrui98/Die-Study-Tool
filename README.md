@@ -18,13 +18,21 @@ To reset, execute in terminal:
 ### Keyboard Shortcuts
 
 "<-": check out the previous coin
+
 "->": check out the next coin
+
 "m": mark as a match
+
 "n": mark as a no-match
+
 "b": mark the right coin the best image of the cluster
 
 During the identical stage:
+
 "->": check out the next page
+
 "1" - "6": select images
+
 "c": confirm the list of identical coins
+
 "n": next cluster
