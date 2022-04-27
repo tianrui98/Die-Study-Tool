@@ -234,6 +234,7 @@ class IdenticalUI (UI):
         right_menu_bar = self.add_frame(int(self.initial_height * 0.1), int(self.initial_width * 0.5),1, 0, 1, 1, self.root, "e")
         self.export_btn = self.add_button("Export", self.export, 2, 3, 1, 0, 1, 1, right_menu_bar, sticky = "e")
         self.save_btn = self.add_button("Save", self.save, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
+        self.deactivate_button(self.save_btn) #TODO activate it later
         self.exit_btn = self.add_button("Exit", self.exit, 2, 3, 3, 0, 1, 1, right_menu_bar, sticky = "e")
 
         #left main frame: display coin images Height: 0.8 * window, width: 0.7 * window width

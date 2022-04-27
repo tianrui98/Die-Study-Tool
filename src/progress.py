@@ -45,7 +45,11 @@ def _collect_identicals(identicals):
         for image_name in list(identical_set):
             image_id = image_name.split(".")[0] #without .jpg
             identical_name_list.append(image_id)
-            curr_type, curr_name = image_id.split(";")
+            if ";" in image_id:
+                curr_type, curr_name = image_id.split(";")
+            else:
+                curr_type=""
+                curr_name=image_id
             if curr_type != prev_type:
                 identical_group_name += str("_" + image_id)
             else:
@@ -157,7 +161,7 @@ def start_new_project(original_project_address, project_name):
         if not cluster_name.startswith('.'):
             original_images = sorted([f for f in os.listdir(os.path.join(original_project_address, cluster_name)) if not f.startswith(".")])
             progress_data[new_project_address]["clusters"][cluster_name] = {
-                "matches": original_images,
+                "matches": original_images[1:],
                 "nomatches":[],
                 "identicals":[],
                 "best_image_name": original_images[0]}
@@ -542,7 +546,11 @@ def _concatenate_identical_set(identical_set):
 
     for image_name in sorted(identical_set):
         image_id = image_name.split(".")[0] #without .jpg
-        curr_type, curr_name = image_id.split(";")
+        if ";" in image_id:
+            curr_type, curr_name = image_id.split(";")
+        else:
+            curr_type = ""
+            curr_name = image_id
         if curr_type != prev_type:
             identical_group_name += str("_" + image_id)
         else:

@@ -282,7 +282,7 @@ class MainUI(UI):
         #close pop-up
         self.open_window.destroy()
 
-        logger.info("_____Create new project{}_____".format(self.project_name))
+        logger.info("_____Create new project {}_____".format(self.project_name))
         return None
 
     def load_next_image (self):
@@ -519,6 +519,7 @@ class MainUI(UI):
         self.open_btn = self.add_button("Open", self.create_open_window, 2, 3, 1, 0, 1, 1, right_menu_bar, sticky = "e")
         self.export_btn = self.add_button("Export", self.export, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
         self.save_btn = self.add_button("Save", self.save, 2, 3, 3, 0, 1, 1, right_menu_bar, sticky = "e")
+        self.deactivate_button(self.save_btn) #TODO activate it later
         self.exit_btn = self.add_button("Exit", self.exit, 2, 3, 4, 0, 1, 1, right_menu_bar, sticky = "e")
 
         left_menu_bar = self.add_frame(self.button_frame_height, self.button_frame_width,0, 0, 1, 1, self.root, "we")

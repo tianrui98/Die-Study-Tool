@@ -19,11 +19,16 @@ class Cluster:
     def __init__ (self, cluster_name = None, images=[], identicals = [], best_image_name = None, matches = set(), nomatches = set()):
         self.name = cluster_name
         self.images_dict = {f: ImgObj(f, cluster_name) for f in images}
-        self.images = list(self.images_dict.values())
-        self.identicals = identicals #list of sets of image names
+        #images to compare with, with best image at the first value
+        self.images = sorted(list(self.images_dict.values()), key = lambda x:x.name)
 
-        if best_image_name:
+        self.identicals = identicals #list of sets of image names
+        if best_image_name and best_image_name in self.images_dict:
             self.best_image = self.images_dict[best_image_name]
+        elif best_image_name:
+            self.images_dict[best_image_name]= ImgObj(best_image_name, cluster_name)
+            self.images = [self.images_dict[best_image_name]] + self.images
+            self.best_image = self.images[0]
         else:
             if len(self.images) > 0:
                 self.best_image = self.images[0] #default first image

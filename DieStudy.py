@@ -21,6 +21,7 @@ def test_identical():
 def test_main():
     """
     Semi-automated testing. User still has to click the buttons but the actions will be recorded and compared with progress_data
+    Must start fresh.
     """
     MainUI(testing_mode = True).start()
 

@@ -238,10 +238,13 @@ class UI:
         pass
 
     def save(self):
-        """save results
+        """save results.
+        #TODO add a "status" key in data that will help restore the current status, with identified matches and nomatches
+        #TODO pressing "Save" button should trigger a save_midway function that does not overwrite cluster_data
         """
         if len(self.progress_data) > 0:
-            _, _ = progress.save_progress_data(self.project_address, self.stage, self.cluster, self.progress_data)
+            logger.info("====SAVE====\n\n")
+        #     progress.save_progress_data(self.project_address, self.stage, self.cluster, self.progress_data)
 
     def exit(self):
         #wipe out records at exit for demo projects
