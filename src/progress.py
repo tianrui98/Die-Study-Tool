@@ -602,8 +602,9 @@ def export_results(project_folder, progress_data, save_address, keep_progress):
     clusters = progress_data[project_folder]["clusters"]
     max_length = 0
     total_number = 0
-    for _, cluster in clusters.items():
-        max_length = max(max_length, 1 + len(cluster["matches"]))
+    for cluster_name, cluster in clusters.items():
+        if cluster_name != "Singles":
+            max_length = max(max_length, 1 + len(cluster["matches"]))
 
     columns = list(range(1, max_length + 1)) + ["Identical", "Num"]
     data = []
