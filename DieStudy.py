@@ -27,3 +27,8 @@ def test_main():
 
 if __name__ == "__main__":
     main()
+
+
+#todo
+#1. add save midway
+#2. make it easier to share restored data (path issue)
