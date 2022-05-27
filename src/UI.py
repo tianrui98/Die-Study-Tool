@@ -80,7 +80,8 @@ class UI:
         cluster_name =  sorted(all_clusters, key= lambda s: s.split("_")[0])[0]
 
         #create cluster object
-        return Cluster(cluster_name = cluster_name, images = self.progress_data[self.project_address]["clusters"][cluster_name]["matches"], identicals = [], best_image_name = None, matches = set(), nomatches = set())
+        images = self.progress_data[self.project_address]["clusters"][cluster_name]["matches"] + [self.progress_data[self.project_address]["clusters"][cluster_name]["best_image_name"]]
+        return Cluster(cluster_name = cluster_name, images = images, best_image_name = None, matches = set(), nomatches = set())
 
     def _swap_positions(self, l, pos1, pos2):
 

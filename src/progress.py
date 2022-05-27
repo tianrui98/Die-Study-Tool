@@ -356,7 +356,7 @@ def load_progress(project_folder, create_next_cluster = True, data_address = "da
     if stage_number == "0":
         cluster_info = progress_data[project_folder]["clusters"][current_cluster]
         cluster = Cluster( cluster_name = current_cluster,
-            images = cluster_info["matches"],
+            images = cluster_info["matches"] + [cluster_info["best_image_name"]],
             identicals = _deserialize_identicals(cluster_info["identicals"]),
             best_image_name = cluster_info["best_image_name"],
             matches = set(cluster_info["matches"]),
@@ -483,7 +483,7 @@ def copy_best_image_to_verified(cluster, project_folder):
 
 def _create_a_cluster(stage, clusters_data, next_cluster_name):
     if stage.stage_number == 0 :
-        next_cluster = Cluster(cluster_name = next_cluster_name, images = clusters_data[next_cluster_name]["matches"], identicals = [], best_image_name = None, matches = set(), nomatches = set())
+        next_cluster = Cluster(cluster_name = next_cluster_name, images = clusters_data[next_cluster_name]["matches"] + [clusters_data[next_cluster_name]["best_image_name"]], identicals = [], best_image_name = None, matches = set(), nomatches = set())
 
     elif stage.stage_number == 1:
         best_image_cluster_dict = {v["best_image_name"]: k for k, v in clusters_data.items() if not k == "Singles"}
