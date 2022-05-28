@@ -176,12 +176,14 @@ def create_new_stage_in_progress_data(progress_data, project_folder, stage):
 
 
 def _create_cluster_info_dict (cluster):
-    return {
+    dict =  {
+    "images": [f.name for f in cluster.images],
     "identicals": _serialize_identicals(cluster.identicals),
     "matches": list(cluster.matches),
     "nomatches": list(cluster.nomatches),
     "best_image_name": cluster.best_image.name
     }
+    return dict
 
 def _merge_singles(cluster, clusters_data, old_cluster_name):
     """
@@ -210,10 +212,38 @@ def _merge_singles(cluster, clusters_data, old_cluster_name):
     clusters_data["Singles"]["matches"] = list(images_in_singles)
     return clusters_data, new_cluster_name
 
+def save_progress_data_midway(project_folder, stage,cluster, progress_data):
+    """Save progress without changing cluster names
+    """
+    if str(stage.stage_number) not in progress_data[project_folder]["stages"]:
+        progress_data = create_new_stage_in_progress_data(progress_data, project_folder, stage)
+
+    clusters_data = progress_data[project_folder]["clusters"]
+    #if Cluster is None (end of project) then do nothing
+    if not cluster:
+        return
+    clusters_data[cluster.name] = _create_cluster_info_dict(cluster)
+
+    progress_data[project_folder]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
+    #update clusters_yet_to_check
+    progress_data[project_folder]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
+    #update past_comparisons
+    progress_data[project_folder]["stages"][str(stage.stage_number)]["past_comparisons"] = _serialize_past_comparisons(stage.past_comparisons)
+
+    #write new clusters_data
+    progress_data[project_folder]["clusters"] = clusters_data
+
+    data_file = open("data.json", "w")
+    json.dump(progress_data, data_file)
+    data_file.close()
+
+    return progress_data, stage
+
 def save_progress_data(project_folder, stage, cluster, progress_data):
     """
     Make changes to the progress data
     {"project_address" : {  "clusters": {cluster_name: {
+                                                        "images": []
                                                         "identicals": [],
                                                         "matches": [],
                                                         "nomatches": []:
@@ -281,6 +311,7 @@ def save_progress_data(project_folder, stage, cluster, progress_data):
             #create new cluster from matched singles
             if len(cluster.matches) > 0:
                 clusters_data[new_cluster_name] = {
+                    "images": [],
                     "identicals": [],
                     "matches": list(cluster.matches),
                     "nomatches": [],
@@ -356,14 +387,12 @@ def load_progress(project_folder, create_next_cluster = True, data_address = "da
     if stage_number == "0":
         cluster_info = progress_data[project_folder]["clusters"][current_cluster]
         cluster = Cluster( cluster_name = current_cluster,
-            images = cluster_info["matches"] + [cluster_info["best_image_name"]],
+            images = cluster_info["images"],
             identicals = _deserialize_identicals(cluster_info["identicals"]),
             best_image_name = cluster_info["best_image_name"],
             matches = set(cluster_info["matches"]),
             nomatches = set(cluster_info["nomatches"]))
     else:
-        # if len(stage.clusters_yet_to_check) == 0:
-        #     cluster = None
         if current_cluster in stage.clusters_yet_to_check:
             cluster = _create_a_cluster(stage, progress_data[project_folder]["clusters"],current_cluster)
         # if current cluster has already been checked. give the next cluster in line

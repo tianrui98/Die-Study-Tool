@@ -245,7 +245,7 @@ class UI:
         """
         if len(self.progress_data) > 0:
             logger.info("====SAVE====\n\n")
-        #     progress.save_progress_data(self.project_address, self.stage, self.cluster, self.progress_data)
+            progress.save_progress_data_midway(self.project_address, self.stage, self.cluster, self.progress_data)
 
     def exit(self):
         #wipe out records at exit for demo projects
@@ -254,8 +254,11 @@ class UI:
         else:
             if len(self.progress_data) > 0:
                 keep_progress = messagebox.askyesno("Exit", "Save your current progress in the system ?" )
-                if not keep_progress:
+                if keep_progress:
+                    progress.save_progress_data_midway(self.project_address, self.stage, self.cluster,self.progress_data)
+                else:
                     progress.clear_current_project(self.project_address, self.progress_data)
+            
             else:
                 progress.clear_current_project(self.project_address, self.progress_data)
 

@@ -26,10 +26,12 @@ def test_main():
     MainUI(testing_mode = True).start()
 
 if __name__ == "__main__":
-    print(f"Version updated on 27 May 2022. Main branch.")
+    print(f"Version updated on 28 May 2022. Main branch.")
     main()
 
 
 #todo
-#1. add save midway
+#1. add save midway - done
 #2. make it easier to share restored data (path issue)
+#3. exit button currently stores the previous cluster. - done
+#4. when user reaches the end of cluster but skipped some images. direct them to those skipped images

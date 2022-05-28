@@ -254,6 +254,8 @@ class MainUI(UI):
         """
         dirname = filedialog.askdirectory(parent=self.root)
 
+        if not dirname:
+            return 
         #check if the folder is valid
         valid = True
         for folder in os.listdir(dirname):
@@ -291,9 +293,9 @@ class MainUI(UI):
         """
         self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
         #skip the image already compared with left image
-        while self.stage.stage_number > 0 and self.right_image_index < len(self.cluster.images) and (self.right_image_index == self.left_image_index or  self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
+        while self.right_image_index < len(self.cluster.images) and (self.right_image_index == self.left_image_index or  self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
                     #skip the index of left image
-            if self.right_image_index == self.left_image_index:
+            if self.right_image_index == self.left_image_index or self._get_image_name(self.left_image_index) == self._get_image_name(self.right_image_index):
                 self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
             else:
                 #mark them compared before
@@ -335,8 +337,8 @@ class MainUI(UI):
         """
         curr_right_image_index = self.right_image_index
         self.right_image_index = max(0, self.right_image_index - 1)
-        while self.stage.stage_number > 0 and self.right_image_index > 0 and (self.right_image_index == self.left_image_index or self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
-            if self.right_image_index == self.left_image_index:
+        while self.right_image_index > 0 and (self.right_image_index == self.left_image_index or self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
+            if self.right_image_index == self.left_image_index or self._get_image_name(self.left_image_index) == self._get_image_name(self.right_image_index):
                 if self.left_image_index == 0:
                     self.right_image_index = curr_right_image_index
                 else:
@@ -434,8 +436,9 @@ class MainUI(UI):
         #if old best image has been matched to anything in the cluster before -> mark checked & match
         if len(self.cluster.matches) > 0:
             self.mark_match()
-            self.cluster.matches.remove(self._get_image_name(self.left_image_index))
-
+            #delist current best image from matches
+            if self._get_image_name(self.left_image_index) in self.cluster.matches:
+                self.cluster.matches.remove(self._get_image_name(self.left_image_index))
         else:
             self.change_tick_color("right", False)
             self.deactivate_button(self.match_btn)
