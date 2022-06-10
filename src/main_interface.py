@@ -207,13 +207,13 @@ class MainUI(UI):
 #%% Actions
 
     def open_demo_project (self):
-        dirname = "demo"
         self.demo_mode = True
-        self.project_name = dirname.split("/")[-1]
+        dirname="demo"
+        self.project_name = "demo"
         self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
-        self.stage = Stage(0, self.progress_data[self.project_address])
+        self.stage = Stage(0, self.progress_data[self.project_name])
         if self.testing_mode:
-            self.test = Test(self.progress_data[self.project_address]["clusters"]["Singles"]["matches"])
+            self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["matches"])
         #open the first cluster
         self.cluster = self._open_first_cluster()
 
@@ -234,11 +234,11 @@ class MainUI(UI):
         if not existing_projects:
             return
         self.create_choose_project_window(existing_projects)
-        self.project_address = os.getcwd() + "/projects/" + self.project_name
+        self.project_address = os.path.join(os.getcwd(), "projects", self.project_name)
 
-        self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_address)
+        self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_name)
         if self.testing_mode:
-            self.test = Test(self.progress_data[self.project_address]["clusters"]["Singles"]["matches"])
+            self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["matches"])
 
         logger.info(f"Open project {self.project_name} at stage {self.stage.stage_number} ")
         if self.stage.stage_number < 3:
@@ -272,9 +272,9 @@ class MainUI(UI):
 
         self.project_name = os.path.basename(dirname)
         self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
-        self.stage = Stage(0, self.progress_data[self.project_address])
+        self.stage = Stage(0, self.progress_data[self.project_name])
         if self.testing_mode:
-            self.test = Test(self.progress_data[self.project_address]["clusters"]["Singles"]["matches"])
+            self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["matches"])
         #open the first cluster
         self.cluster = self._open_first_cluster()
 
@@ -457,36 +457,36 @@ class MainUI(UI):
         !!! only mark cluster complete if user clicks ok"""
 
         if progress.check_cluster_completion(self.cluster,self.stage):
-            self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
+            self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
             completion_status = "cluster"
             if self.testing_mode:
                 self.test.translate_actions(self.stage.stage_number)
         else:
             return None
 
-        if progress.check_part1_completion(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"]):
+        if progress.check_part1_completion(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"]):
             logger.info(f"_____STAGE {self.stage.name} COMPLETED_____")
             logger.info(str(self.progress_data))
             completion_status = "part1"
             message = "You have completed the current *STAGE*."
             response = self.create_save_progress_window(message)
             if response:
-                self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
-                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, completion_status)
+                self.progress_data, self.stage = progress.save_progress_data(self.project_name, self.stage,self.cluster,self.progress_data)
+                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status)
                 if self.testing_mode:
-                    self.test.test_cluster_correctedness(self.progress_data[self.project_address]["clusters"])
-                    self.test.test_image_number(self.progress_data[self.project_address]["clusters"],self.project_address)
+                    self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
+                    self.test.test_image_number(self.progress_data[self.project_name]["clusters"],self.project_name)
                 self.start_identical_UI()
                 return None
             else:
-                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
+                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
         else:
-            if progress.check_stage_completion(self.stage, self.progress_data[self.project_address]["clusters"]):
+            if progress.check_stage_completion(self.stage, self.progress_data[self.project_name]["clusters"]):
                 message = "You have completed the current *STAGE*."
                 completion_status = "stage"
                 logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
                 if self.testing_mode:
-                    self.test.test_comparison(self.project_address, self.stage.stage_number)
+                    self.test.test_comparison(self.project_name, self.stage.stage_number)
                     self.test.clear_comparisons()
             elif completion_status == "cluster":
                 message = "You have completed the current cluster."
@@ -494,10 +494,10 @@ class MainUI(UI):
                 return None
             response = self.create_save_progress_window(message)
             if response:
-                self.progress_data, self.stage = progress.save_progress_data(self.project_address, self.stage,self.cluster,self.progress_data)
-                self.cluster, self.stage= progress.create_new_objects(self.cluster, self.stage, self.project_address, self.progress_data, completion_status)
+                self.progress_data, self.stage = progress.save_progress_data(self.project_name, self.stage,self.cluster,self.progress_data)
+                self.cluster, self.stage= progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status)
                 if self.testing_mode:
-                    self.test.test_cluster_correctedness(self.progress_data[self.project_address]["clusters"])
+                    self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
 
                 #update display
                 if completion_status == "stage":
@@ -507,7 +507,7 @@ class MainUI(UI):
                 else:
                     self.initialize_image_display()
             else:
-                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_address]["clusters"])
+                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
 
         self.root.after(1, lambda: self.root.focus_force())
 

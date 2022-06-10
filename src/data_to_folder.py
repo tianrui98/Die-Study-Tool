@@ -23,7 +23,7 @@ def export_data_to_folder():
 
     create_image_folder(new_project_address)
 
-    new_progress_data = {new_project_address: progress_data[project_path]}
+    new_progress_data = {new_project_address: progress_data[project_name]}
     keep_progress = True
     export_results(new_project_address, new_progress_data, save_address, keep_progress)
 
@@ -37,7 +37,7 @@ def restore_progress():
 
     data_file = open("data.json", "r")
     existing_progress_data = json.loads(data_file.read())
-    existing_progress_data[new_project_address] = progress_data[project_path]
+    existing_progress_data[new_project_address] = progress_data[project_name]
     data_file = open("data.json", "w")
     json.dump(existing_progress_data, data_file)
     data_file.close()

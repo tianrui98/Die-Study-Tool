@@ -76,11 +76,11 @@ class UI:
 
         Return: Cluster object
         """
-        all_clusters = [c for c in self.progress_data[self.project_address]["clusters"] if c != "Singles"]
+        all_clusters = [c for c in self.progress_data[self.project_name]["clusters"] if c != "Singles"]
         cluster_name =  sorted(all_clusters, key= lambda s: s.split("_")[0])[0]
 
         #create cluster object
-        images = self.progress_data[self.project_address]["clusters"][cluster_name]["matches"] + [self.progress_data[self.project_address]["clusters"][cluster_name]["best_image_name"]]
+        images = self.progress_data[self.project_name]["clusters"][cluster_name]["matches"] + [self.progress_data[self.project_name]["clusters"][cluster_name]["best_image_name"]]
         return Cluster(cluster_name = cluster_name, images = images, best_image_name = None, matches = set(), nomatches = set())
 
     def _swap_positions(self, l, pos1, pos2):
@@ -277,7 +277,7 @@ class UI:
         self.progress_data, _ = progress.save_progress_data(self.project_address, self.stage, self.cluster, self.progress_data)
         res, destination_address = progress.export_results(self.project_address,self.progress_data, save_address, keep_progress)
         if self.testing_mode:
-            self.test.test_export(self.progress_data[self.project_address]["clusters"], self.project_address, destination_address)
+            self.test.test_export(self.progress_data[self.project_name]["clusters"], self.project_address, destination_address)
         if not keep_progress:
             #wipe out the records in progress data
             progress.clear_current_project(self.project_address, self.progress_data)

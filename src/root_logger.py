@@ -19,3 +19,6 @@ logger.addHandler(handler)
 
 # set the logger level
 logger.setLevel(logging.DEBUG)
+
+# version information
+logger.info(f"Version updated on 10 Jun 2022. Main branch.")

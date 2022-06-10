@@ -26,8 +26,7 @@ def test_main():
     MainUI(testing_mode = True).start()
 
 if __name__ == "__main__":
-    print(f"Version updated on 28 May 2022. Main branch.")
-    main()
+    test_main()
 
 
 #todo

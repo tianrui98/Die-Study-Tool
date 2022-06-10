@@ -127,8 +127,8 @@ class Test:
             number_in_test += 1 + len(matches)
         number_in_test += len(self.singles)
         number_in_folder = len(os.listdir(project_address))
-        assert number_in_clusters == number_in_test, f"number in cluster = {number_in_clusters} number in test = {number_in_test}"
-        assert number_in_clusters == number_in_folder, f"number in cluster = {number_in_clusters} number in folder = {number_in_folder}"
+        assert number_in_clusters == number_in_test, f"number in cluster = {number_in_clusters} number in test = {number_in_test}: {self.singles}"
+        assert number_in_clusters == number_in_folder, f"number in cluster = {number_in_clusters} number in folder = {number_in_folder}: {os.listdir(project_address)}"
         print("image number test passed")
 
     def test_export(self, clusters_data, project_address, destination_address):
