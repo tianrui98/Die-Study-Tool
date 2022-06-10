@@ -213,7 +213,7 @@ def _merge_singles(cluster, clusters_data, old_cluster_name):
     return clusters_data, new_cluster_name
 
 def save_progress_data_midway(project_folder, stage,cluster, progress_data):
-    """Save progress without changing cluster names
+    """Save progress without changing cluster names or creating new clusters
     """
     if str(stage.stage_number) not in progress_data[project_folder]["stages"]:
         progress_data = create_new_stage_in_progress_data(progress_data, project_folder, stage)

@@ -35,3 +35,5 @@ if __name__ == "__main__":
 #2. make it easier to share restored data (path issue)
 #3. exit button currently stores the previous cluster. - done
 #4. when user reaches the end of cluster but skipped some images. direct them to those skipped images
+#5. Reduce repetitive comparison
+#6. Add delete project button
