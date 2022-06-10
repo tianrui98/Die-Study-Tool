@@ -181,7 +181,6 @@ class Test:
             best_image_dict[left] = left
         for im in self.singles:
             best_image_dict[im] = im
-        print(f"singles : {self.singles}")
 
         for i in range(len(original_images)):
             for j in range(i + 1, len(original_images)):
@@ -190,11 +189,8 @@ class Test:
 
                 if not ((a,b) in all_comparisons or (b,a) in all_comparisons):
                     if stage_number == 1:
-                        try:
-                            a_best = best_image_dict[a]
-                            b_best = best_image_dict[b]
-                        except:
-                            print(f"best image dict: {best_image_dict}")
+                        a_best = best_image_dict[a]
+                        b_best = best_image_dict[b]
                         if (a_best != b_best) and ((a not in self.singles) and (b not in self.singles)):
                             if not (((a_best, b_best) in all_comparisons) or ((b_best, a_best) in all_comparisons)):
                                 print(f"pair {(a,b)} not compared")

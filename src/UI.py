@@ -245,22 +245,22 @@ class UI:
         """
         if len(self.progress_data) > 0:
             logger.info("====SAVE====\n\n")
-            progress.save_progress_data_midway(self.project_address, self.stage, self.cluster, self.progress_data)
+            progress.save_progress_data_midway(self.project_name, self.stage, self.cluster, self.progress_data)
 
     def exit(self):
         #wipe out records at exit for demo projects
         if self.demo_mode:
-            progress.clear_current_project(self.project_address, self.progress_data)
+            progress.clear_current_project(self.project_name, self.progress_data)
         else:
             if len(self.progress_data) > 0:
                 keep_progress = messagebox.askyesno("Exit", "Save your current progress in the system ?" )
                 if keep_progress:
-                    progress.save_progress_data_midway(self.project_address, self.stage, self.cluster,self.progress_data)
+                    progress.save_progress_data_midway(self.project_name, self.stage, self.cluster,self.progress_data)
                 else:
-                    progress.clear_current_project(self.project_address, self.progress_data)
+                    progress.clear_current_project(self.project_name, self.progress_data)
             
             else:
-                progress.clear_current_project(self.project_address, self.progress_data)
+                progress.clear_current_project(self.project_name, self.progress_data)
 
         logger.info(str(self.progress_data))
         logger.info("====EXIT====\n\n")
@@ -274,13 +274,13 @@ class UI:
         save_address = filedialog.askdirectory() # asks user to choose a directory
         if not save_address:
             return None
-        self.progress_data, _ = progress.save_progress_data(self.project_address, self.stage, self.cluster, self.progress_data)
-        res, destination_address = progress.export_results(self.project_address,self.progress_data, save_address, keep_progress)
+        self.progress_data, _ = progress.save_progress_data(self.project_name, self.stage, self.cluster, self.progress_data)
+        res, destination_address = progress.export_results(self.project_name,self.progress_data, save_address, keep_progress)
         if self.testing_mode:
-            self.test.test_export(self.progress_data[self.project_name]["clusters"], self.project_address, destination_address)
+            self.test.test_export(self.progress_data[self.project_name]["clusters"], self.project_name, destination_address)
         if not keep_progress:
             #wipe out the records in progress data
-            progress.clear_current_project(self.project_address, self.progress_data)
+            progress.clear_current_project(self.project_name, self.progress_data)
 
         logger.info("====EXPORTED RESULTS====")
 

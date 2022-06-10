@@ -160,11 +160,18 @@ def start_new_project(original_project_address, project_name):
     for cluster_name in os.listdir(original_project_address):
         if not cluster_name.startswith('.'):
             original_images = sorted([f for f in os.listdir(os.path.join(original_project_address, cluster_name)) if not f.startswith(".")])
+            if cluster_name == "Singles":
+                images = original_images
+                best_image = None
+            else:
+                images = original_images[1:]
+                best_image = original_images[0]
+            
             progress_data[project_name]["clusters"][cluster_name] = {
-                "matches": original_images[1:],
+                "matches": images,
                 "nomatches":[],
                 "identicals":[],
-                "best_image_name": original_images[0]}
+                "best_image_name": best_image}
 
     return new_project_address , progress_data
 
@@ -177,7 +184,6 @@ def create_new_stage_in_progress_data(progress_data, project_name, stage):
 
 def _create_cluster_info_dict (cluster):
     dict =  {
-    "images": [f.name for f in cluster.images],
     "identicals": _serialize_identicals(cluster.identicals),
     "matches": list(cluster.matches),
     "nomatches": list(cluster.nomatches),
@@ -198,7 +204,7 @@ def _merge_singles(cluster, clusters_data, old_cluster_name):
         [type]: [description]
     """
     new_cluster_name = old_cluster_name.split('.')[0]
-    images_in_singles = set(clusters_data["Singles"]["best_image_name"] + clusters_data["Singles"]["matches"])
+    images_in_singles = set(clusters_data["Singles"]["matches"])
     for matched_single_name in cluster.matches:
         if matched_single_name in images_in_singles:
             images_in_singles.remove(matched_single_name)
@@ -243,7 +249,6 @@ def save_progress_data(project_name, stage, cluster, progress_data):
     """
     Make changes to the progress data
     {"project_name" : {  "clusters": {cluster_name: {
-                                                        "images": []
                                                         "identicals": [],
                                                         "matches": [],
                                                         "nomatches": []:
@@ -311,7 +316,6 @@ def save_progress_data(project_name, stage, cluster, progress_data):
             #create new cluster from matched singles
             if len(cluster.matches) > 0:
                 clusters_data[new_cluster_name] = {
-                    "images": [],
                     "identicals": [],
                     "matches": list(cluster.matches),
                     "nomatches": [],
@@ -388,7 +392,6 @@ def load_progress(project_name, create_next_cluster = True, data_address = "data
     if stage_number == "0":
         cluster_info = progress_data[project_name]["clusters"][current_cluster]
         cluster = Cluster( cluster_name = current_cluster,
-            images = cluster_info["images"],
             identicals = _deserialize_identicals(cluster_info["identicals"]),
             best_image_name = cluster_info["best_image_name"],
             matches = set(cluster_info["matches"]),
@@ -513,12 +516,21 @@ def copy_best_image_to_verified(cluster, project_name):
 
 
 def _create_a_cluster(stage, clusters_data, next_cluster_name):
+    #compare within cluster
     if stage.stage_number == 0 :
         next_cluster = Cluster(cluster_name = next_cluster_name, images = clusters_data[next_cluster_name]["matches"] + [clusters_data[next_cluster_name]["best_image_name"]], identicals = [], best_image_name = None, matches = set(), nomatches = set())
 
+    #compare each cluster's best image with other cluster's best image and everything in "Singles"
     elif stage.stage_number == 1:
+        images_in_single = clusters_data["Singles"]["matches"]
         best_image_cluster_dict = {v["best_image_name"]: k for k, v in clusters_data.items() if not k == "Singles"}
-        next_cluster = Cluster(cluster_name = next_cluster_name, images = [i for i in best_image_cluster_dict] + list(clusters_data["Singles"]["best_image_name"] + clusters_data["Singles"]["matches"]), identicals = [], best_image_name = clusters_data[next_cluster_name]["best_image_name"], matches = set(), nomatches = set())
+        best_images = [i for i in best_image_cluster_dict]
+        next_cluster = Cluster(cluster_name = next_cluster_name, 
+        images =  images_in_single + best_images, 
+        identicals = [], 
+        best_image_name = clusters_data[next_cluster_name]["best_image_name"], 
+        matches = set(), 
+        nomatches = set())
 
         #replace the image's cluster name with the cluster it represents
         for image_name, image_object in next_cluster.images_dict.items():
@@ -530,17 +542,17 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name):
 
     elif stage.stage_number == 2:
         #A cluster should include all images in the Singles folder, except those have been matched
-        images = clusters_data["Singles"]["matches"]
-        next_cluster = Cluster(cluster_name = next_cluster_name, images = images, identicals = [], best_image_name = next_cluster_name, matches = set(), nomatches = set())
+        images_in_single = clusters_data["Singles"]["matches"]
+        next_cluster = Cluster(cluster_name = next_cluster_name, images = images_in_single, identicals = [], best_image_name = next_cluster_name, matches = set(), nomatches = set())
         #replace the image's cluster name with the cluster it represents
         for image_name, image_object in next_cluster.images_dict.items():
             image_object.cluster = "Singles"
             next_cluster.images_dict[image_name] = image_object
     else:
-        if next_cluster_name != "Singles":
-            images = clusters_data[next_cluster_name]["matches"] + [clusters_data[next_cluster_name]["best_image_name"]]
+        if next_cluster_name == "Singles":
+            images =  clusters_data[next_cluster_name]["matches"] 
         else:
-            images = clusters_data[next_cluster_name]["matches"]
+            images = clusters_data[next_cluster_name]["matches"] + [clusters_data[next_cluster_name]["best_image_name"]]
         next_cluster = Cluster(cluster_name = next_cluster_name, images = images,identicals = [], best_image_name = None, matches = set(), nomatches = set())
         #at stage 4, all images in the cluster folder have been marked as matches
         next_cluster.matches = {obj.name for obj in next_cluster.images[1:]}
