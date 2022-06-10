@@ -62,4 +62,4 @@ class Stage:
         else:
             self.clusters_yet_to_check = {c for c in project_data["clusters"]}
         #if A is compared with B => {A: {B}, B:{A}}
-        self.past_comparisons = defaultdict(set)
+        self.clusters_done = {}

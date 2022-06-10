@@ -64,12 +64,9 @@ class MainUI(UI):
     def _has_been_checked(self, image_name):
         return image_name in self.cluster.matches or image_name in self.cluster.nomatches
 
-    def _mark_compared(self, left_image_index, right_image_index):
-        left_image_name = self._get_image_name(self.left_image_index)
+    def _mark_compared(self):
         right_image_name = self._get_image_name(self.right_image_index)
         self.cluster.compared_before.add(right_image_name)
-        self.stage.past_comparisons[left_image_name].add(right_image_name)
-        self.stage.past_comparisons[right_image_name].add(left_image_name)
 #%% Visuals and Aesthetics
     def add_image(self,  path, column, row, columspan, rowspan, parent, sticky="nsew", max_height = None, padx = 0, pady = 0):
 
@@ -102,13 +99,10 @@ class MainUI(UI):
             self.left_image_index = best_image_index
             self.right_image_index = 0
 
-        #skip the image already compared with left image
         while self.stage.stage_number > 0 and \
-            self.right_image_index < len(self.cluster.images) and \
-            self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]:
-
+            self.right_image_index < len(self.cluster.images):
             #mark them compared
-            self._mark_compared(self.left_image_index, self.right_image_index)
+            self._mark_compared()
             #skip the right image
             logger.debug("[initialize_image_display] Skip already compared {}".format(self._get_image_name(self.right_image_index)))
             self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
@@ -301,16 +295,14 @@ class MainUI(UI):
 
         """
         self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
-        #skip the image already compared with left image
+
         while self.right_image_index < len(self.cluster.images) and\
-             (self.right_image_index == self.left_image_index or\
-                   self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
-                    #skip the index of left image
+             (self.right_image_index == self.left_image_index):
             if self.right_image_index == self.left_image_index or self._get_image_name(self.left_image_index) == self._get_image_name(self.right_image_index):
                 self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
             else:
                 #mark them compared before
-                self._mark_compared(self.left_image_index, self.right_image_index)
+                self._mark_compared()
                 #skip the right image
                 logger.debug("[load_next_image] Skip already compared {}".format(self._get_image_name(self.right_image_index)))
                 self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
@@ -349,20 +341,18 @@ class MainUI(UI):
         curr_right_image_index = self.right_image_index
         self.right_image_index = max(0, self.right_image_index - 1)
         while self.right_image_index > 0 and \
-             (self.right_image_index == self.left_image_index or \
-                self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
+             self.right_image_index == self.left_image_index:
             if self.right_image_index == self.left_image_index or self._get_image_name(self.left_image_index) == self._get_image_name(self.right_image_index):
                 if self.left_image_index == 0:
                     self.right_image_index = curr_right_image_index
                 else:
                     self.right_image_index = max(0, self.right_image_index - 1)
             else:
-                self._mark_compared(self.left_image_index, self.right_image_index)
+                self._mark_compared()
                 self.right_image_index = max(0, self.right_image_index - 1)
 
         if self.right_image_index == 0 and \
-                (self.right_image_index == self.left_image_index or \
-                self._get_image_name(self.right_image_index) in self.stage.past_comparisons[self._get_image_name(self.left_image_index)]):
+                self.right_image_index == self.left_image_index:
             self.right_image_index = curr_right_image_index
 
         if self.right_image_index >= 0:

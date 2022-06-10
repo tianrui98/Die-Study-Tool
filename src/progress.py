@@ -29,13 +29,6 @@ def _deserialize_identicals(identicals):
         res.append(set(l))
     return res
 
-def _serialize_past_comparisons(past_comparisons):
-    return {key : list(val) for key, val in past_comparisons.items() }
-
-def _deserialize_past_comparisons(past_comparisons):
-    d = {key : set(val) for key, val in past_comparisons.items() }
-    return defaultdict(set, d)
-
 def _collect_identicals(identicals):
     identical_group_list = []
     identical_name_list =[]
@@ -104,25 +97,19 @@ def _concatenate_image_names_in_data(cluster_info):
         new_cluster_name = new_cluster_name[:147] + "_etc"
     return new_cluster_name
 
-def _change_name_in_past_comparisons (old_name, new_name, stage):
-    if old_name in stage.past_comparisons:
-        #change name in its counterpart's record
-        for counterpart in stage.past_comparisons[old_name]:
-            old_set = stage.past_comparisons.pop(counterpart)
-            new_set = {e for e in old_set if e != old_name}
-            new_set.add(new_name)
-            stage.past_comparisons[counterpart] = new_set
-
-        #change its own name
-        old_set = stage.past_comparisons.pop(old_name)
-        stage.past_comparisons[new_name] = old_set
-    return stage
 
 def _change_name_in_clusters_yet_to_check (old_name, new_name, stage):
     if old_name in stage.clusters_yet_to_check:
         stage.clusters_yet_to_check = {e for e in stage.clusters_yet_to_check if e != old_name}
         stage.clusters_yet_to_check.add(new_name)
     return stage
+
+def  _change_name_in_clusters_done(old_name, new_name, stage):
+    if old_name in stage.clusters_done:
+        stage.clusters_done= {e for e in stage.clusters_done if e != old_name}
+        stage.clusters_done.add(new_name)
+    return stage
+
 
 def _change_name_in_current_cluster(old_name, new_name, progress_data, project_name, stage):
     if str(stage.stage_number) in progress_data[project_name]["stages"] and old_name == progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"]:
@@ -177,7 +164,8 @@ def start_new_project(original_project_address, project_name):
 
 def create_new_stage_in_progress_data(progress_data, project_name, stage):
     progress_data[project_name]["stages"][str(stage.stage_number)] ={
-        "clusters_yet_to_check": list(stage.clusters_yet_to_check)
+        "clusters_yet_to_check": list(stage.clusters_yet_to_check),
+        "clusters_done":[]
         }
     return progress_data
 
@@ -230,11 +218,10 @@ def save_progress_data_midway(project_name, stage,cluster, progress_data):
         return
     clusters_data[cluster.name] = _create_cluster_info_dict(cluster)
 
+    #update stage properties
     progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
-    #update clusters_yet_to_check
     progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
-    #update past_comparisons
-    progress_data[project_name]["stages"][str(stage.stage_number)]["past_comparisons"] = _serialize_past_comparisons(stage.past_comparisons)
+    progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_done"] = stage.clusters_done
 
     #write new clusters_data
     progress_data[project_name]["clusters"] = clusters_data
@@ -258,7 +245,8 @@ def save_progress_data(project_name, stage, cluster, progress_data):
                             "stages": { 0: {
                                         "current_cluster" : ,
                                         "clusters_yet_to_check": [],
-                                        "past_comparisons": {img_name : []} }}
+                                        "clusters_done":[]
+                                         }}
     }
 
     *the update on "clusters" will only happen for stage 0, 3 and 4
@@ -328,16 +316,13 @@ def save_progress_data(project_name, stage, cluster, progress_data):
 
         if new_cluster_name:
             stage = _change_name_in_clusters_yet_to_check(old_cluster_name, new_cluster_name, stage)
-            stage = _change_name_in_past_comparisons(old_cluster_name, new_cluster_name, stage)
+            stage = _change_name_in_clusters_done(old_cluster_name, new_cluster_name,stage)
             #update current cluster
             progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = new_cluster_name
         else:
             progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = old_cluster_name
-        #update clusters_yet_to_check
         progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
-        #update past_comparisons
-        progress_data[project_name]["stages"][str(stage.stage_number)]["past_comparisons"] = _serialize_past_comparisons(stage.past_comparisons)
-
+        progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_done"] = stage.clusters_done
     #write new clusters_data
     progress_data[project_name]["clusters"] = clusters_data
 
@@ -385,7 +370,7 @@ def load_progress(project_name, create_next_cluster = True, data_address = "data
     stage_info = progress_data[project_name]["stages"][stage_number]
     stage = Stage(int(stage_number), progress_data[project_name])
     stage.clusters_yet_to_check = set(stage_info["clusters_yet_to_check"])
-    stage.past_comparisons= _deserialize_past_comparisons(stage_info["past_comparisons"])
+    stage.clusters_done = set(stage_info["clusters_done"])
     #retrieve latest cluster
     current_cluster = stage_info["current_cluster"]
 
@@ -450,37 +435,25 @@ def check_part1_completion(cluster,stage, clusters_data):
 
     return case1 or case2
 
-def mark_compared(left_name, right_name, stage):
-    stage.past_comparisons[left_name].add(right_name)
-    stage.past_comparisons[right_name].add(left_name)
-
-    return stage
-
-def unmark_compared(left_name, right_name, stage):
-    stage.past_comparisons[left_name].remove(right_name)
-    stage.past_comparisons[right_name].remove(left_name)
-    return stage
-
 def mark_cluster_completed(cluster, stage, clusters_data):
     """Remove current cluster name from clusters_yet_to_check. Before updating cluster name"""
 
     if cluster.name in stage.clusters_yet_to_check:
         stage.clusters_yet_to_check.remove(cluster.name)
+        stage.clusters_done.add(cluster.name)
 
     #Inspect Verified Stage and the rest: move the matched clusters off the yet_to_check list
     if stage.stage_number > 0 and stage.stage_number < 3:
         best_image_cluster_dict = _create_best_image_cluster_dict(clusters_data)
         for image_name in cluster.matches:
-            stage = mark_compared(cluster.best_image.name, image_name,stage)
             if stage.stage_number == 1 and image_name in best_image_cluster_dict:
                     matched_cluster_name = best_image_cluster_dict[image_name]
             else:
                 matched_cluster_name = image_name
+
             if matched_cluster_name in stage.clusters_yet_to_check:
                 stage.clusters_yet_to_check.remove(matched_cluster_name)
-        for image_name in cluster.nomatches:
-            stage = mark_compared(cluster.best_image.name, image_name,stage)
-
+                stage.clusters_done.add(matched_cluster_name)
     return stage
 
 def unmark_cluster_completed(cluster,stage, clusters_data):
@@ -488,20 +461,19 @@ def unmark_cluster_completed(cluster,stage, clusters_data):
 
     if cluster.name not in stage.clusters_yet_to_check:
         stage.clusters_yet_to_check.add(cluster.name)
+        stage.clusters_done.remove(cluster.name)
 
     #Inspect Verified Stage and the rest: move the matched clusters off the yet_to_check list
     if stage.stage_number > 0 and stage.stage_number < 4:
         best_image_cluster_dict = _create_best_image_cluster_dict(clusters_data)
         for image_name in list(cluster.matches):
-            stage = unmark_compared(cluster.best_image.name, image_name,stage)
             if stage.stage_number == 1 and image_name in best_image_cluster_dict:
                 matched_cluster_name = best_image_cluster_dict[image_name]
             else:
                 matched_cluster_name = image_name
             if matched_cluster_name not in stage.clusters_yet_to_check:
                 stage.clusters_yet_to_check.add(matched_cluster_name)
-        for image_name in cluster.nomatches:
-            stage = unmark_compared(cluster.best_image.name, image_name,stage)
+                stage.clusters_done.remove(matched_cluster_name)
 
     return stage
 
@@ -524,7 +496,9 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name):
     elif stage.stage_number == 1:
         images_in_single = clusters_data["Singles"]["matches"]
         best_image_cluster_dict = {v["best_image_name"]: k for k, v in clusters_data.items() if not k == "Singles"}
-        best_images = [i for i in best_image_cluster_dict]
+        best_images = [i for i in best_image_cluster_dict if \
+            (i not in stage.clusters_done and
+            best_image_cluster_dict[i] not in stage.clusters_done )]
         next_cluster = Cluster(cluster_name = next_cluster_name, 
         images =  images_in_single + best_images, 
         identicals = [], 
