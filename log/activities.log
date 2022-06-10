@@ -72,3 +72,161 @@
 2022-06-10 15:22:33,547 - src.root_logger - INFO - ====EXIT====
 
 
+2022-06-10 15:24:14,002 - src.root_logger - INFO - Version updated on 10 Jun 2022. Main branch.
+2022-06-10 15:24:18,605 - src.root_logger - INFO - _____CREATE DEMO PROJECT_____
+2022-06-10 15:24:21,356 - src.root_logger - INFO - Make 57;004.jpg best image for cluster 57;002_57;004_57;010
+2022-06-10 15:24:21,484 - src.root_logger - INFO - Unmatch 57;002.jpg from cluster 57;002_57;004_57;010
+2022-06-10 15:24:22,420 - src.root_logger - INFO - Match 57;010.jpg to cluster 57;002_57;004_57;010
+2022-06-10 15:24:23,580 - src.root_logger - INFO - Unmatch 57;012.jpg from cluster 57;009_57;012
+2022-06-10 15:24:25,421 - src.root_logger - INFO - Match 57;048.jpg to cluster 57;018_57;048
+2022-06-10 15:24:25,729 - src.root_logger - INFO - _____STAGE Correcting False Discovery Rate COMPLETED_____
+2022-06-10 15:24:26,199 - src.root_logger - DEBUG - Next stage Correcting Sensitivity Rate. yet to check: {'57;004_57;010', '57;018_57;048'}
+2022-06-10 15:24:26,200 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;002.jpg', '57;012.jpg', '57;009.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;004_57;010': {'images': ['57;004.jpg', '57;002.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;010.jpg'], 'nomatches': ['57;002.jpg'], 'best_image_name': '57;004.jpg'}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'clusters_yet_to_check': [], 'current_cluster': '57;018_57;048', 'past_comparisons': {'57;004.jpg': [], '57;009.jpg': [], '57;018.jpg': []}}}}}
+2022-06-10 15:24:26,723 - src.root_logger - INFO - Unmatch 57;002.jpg from cluster 57;004_57;010
+2022-06-10 15:24:27,351 - src.root_logger - INFO - Unmatch 57;009.jpg from cluster 57;004_57;010
+2022-06-10 15:24:27,914 - src.root_logger - INFO - Match 57;012.jpg to cluster 57;004_57;010
+2022-06-10 15:24:28,494 - src.root_logger - INFO - Match 57;018.jpg to cluster 57;004_57;010
+2022-06-10 15:24:28,744 - src.root_logger - INFO - _____STAGE Correcting Sensitivity Rate COMPLETED_____
+2022-06-10 15:24:41,637 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;002.jpg', '57;012.jpg', '57;009.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;004_57;010': {'images': ['57;004.jpg', '57;002.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;010.jpg'], 'nomatches': ['57;002.jpg'], 'best_image_name': '57;004.jpg'}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'clusters_yet_to_check': [], 'current_cluster': '57;018_57;048', 'past_comparisons': {'57;004.jpg': [], '57;009.jpg': [], '57;018.jpg': []}}}}}
+2022-06-10 15:24:41,638 - src.root_logger - INFO - ====EXIT====
+
+
+2022-06-10 15:24:43,973 - src.root_logger - INFO - Version updated on 10 Jun 2022. Main branch.
+2022-06-10 15:24:47,703 - src.root_logger - INFO - _____CREATE DEMO PROJECT_____
+2022-06-10 15:24:49,482 - src.root_logger - INFO - Unmatch 57;004.jpg from cluster 57;002_57;004_57;010
+2022-06-10 15:24:50,114 - src.root_logger - INFO - Match 57;010.jpg to cluster 57;002_57;004_57;010
+2022-06-10 15:24:51,600 - src.root_logger - INFO - Unmatch 57;012.jpg from cluster 57;009_57;012
+2022-06-10 15:24:52,780 - src.root_logger - INFO - Match 57;048.jpg to cluster 57;018_57;048
+2022-06-10 15:24:53,072 - src.root_logger - INFO - _____STAGE Correcting False Discovery Rate COMPLETED_____
+2022-06-10 15:24:53,568 - src.root_logger - DEBUG - Next stage Correcting Sensitivity Rate. yet to check: {'57;002_57;010', '57;018_57;048'}
+2022-06-10 15:24:53,568 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;004.jpg', '57;012.jpg', '57;009.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;010': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;010.jpg'], 'nomatches': ['57;004.jpg'], 'best_image_name': '57;002.jpg'}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'clusters_yet_to_check': [], 'current_cluster': '57;018_57;048', 'past_comparisons': {'57;002.jpg': [], '57;009.jpg': [], '57;018.jpg': []}}}}}
+2022-06-10 15:24:54,272 - src.root_logger - INFO - Unmatch 57;004.jpg from cluster 57;002_57;010
+2022-06-10 15:24:55,096 - src.root_logger - INFO - Unmatch 57;009.jpg from cluster 57;002_57;010
+2022-06-10 15:24:55,918 - src.root_logger - INFO - Match 57;012.jpg to cluster 57;002_57;010
+2022-06-10 15:24:56,545 - src.root_logger - INFO - Match 57;018.jpg to cluster 57;002_57;010
+2022-06-10 15:24:56,874 - src.root_logger - INFO - _____STAGE Correcting Sensitivity Rate COMPLETED_____
+2022-06-10 15:32:21,646 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;004.jpg', '57;012.jpg', '57;009.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;010': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;010.jpg'], 'nomatches': ['57;004.jpg'], 'best_image_name': '57;002.jpg'}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'clusters_yet_to_check': [], 'current_cluster': '57;018_57;048', 'past_comparisons': {'57;002.jpg': [], '57;009.jpg': [], '57;018.jpg': []}}}}}
+2022-06-10 15:32:21,647 - src.root_logger - INFO - ====EXIT====
+
+
+2022-06-10 15:32:25,000 - src.root_logger - INFO - Version updated on 10 Jun 2022. Main branch.
+2022-06-10 15:32:28,316 - src.root_logger - INFO - _____CREATE DEMO PROJECT_____
+2022-06-10 15:32:29,983 - src.root_logger - INFO - Unmatch 57;004.jpg from cluster 57;002_57;004_57;010
+2022-06-10 15:32:30,763 - src.root_logger - INFO - Match 57;010.jpg to cluster 57;002_57;004_57;010
+2022-06-10 15:32:31,839 - src.root_logger - INFO - Unmatch 57;012.jpg from cluster 57;009_57;012
+2022-06-10 15:32:33,031 - src.root_logger - INFO - Match 57;048.jpg to cluster 57;018_57;048
+2022-06-10 15:32:33,281 - src.root_logger - INFO - _____STAGE Correcting False Discovery Rate COMPLETED_____
+2022-06-10 15:32:35,723 - src.root_logger - DEBUG - Next stage Correcting Sensitivity Rate. yet to check: {'57;002_57;010', '57;018_57;048'}
+2022-06-10 15:32:35,723 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;004.jpg', '57;012.jpg', '57;009.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;010': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;010.jpg'], 'nomatches': ['57;004.jpg'], 'best_image_name': '57;002.jpg'}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'clusters_yet_to_check': [], 'current_cluster': '57;018_57;048', 'past_comparisons': {'57;002.jpg': [], '57;009.jpg': [], '57;018.jpg': []}}}}}
+2022-06-10 15:32:36,509 - src.root_logger - INFO - Match 57;004.jpg to cluster 57;002_57;010
+2022-06-10 15:32:37,073 - src.root_logger - INFO - Match 57;009.jpg to cluster 57;002_57;010
+2022-06-10 15:32:37,677 - src.root_logger - INFO - Unmatch 57;012.jpg from cluster 57;002_57;010
+2022-06-10 15:32:38,317 - src.root_logger - INFO - Unmatch 57;018.jpg from cluster 57;002_57;010
+2022-06-10 15:32:41,027 - src.root_logger - DEBUG - [initialize_image_display] Skip already compared 57;002.jpg
+2022-06-10 15:32:41,563 - src.root_logger - INFO - Match 57;012.jpg to cluster 57;018_57;048
+2022-06-10 15:32:41,842 - src.root_logger - INFO - _____STAGE Correcting Sensitivity Rate COMPLETED_____
+2022-06-10 15:39:07,803 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;012.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}, '57;002_57;010_57;004_57;009': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;010.jpg', '57;004.jpg', '57;009.jpg'], 'nomatches': ['57;004.jpg'], 'best_image_name': '57;002.jpg'}}, 'stages': {'1': {'clusters_yet_to_check': ['57;018_57;048'], 'current_cluster': '57;002_57;010_57;004_57;009', 'past_comparisons': {'57;002.jpg': ['57;004.jpg', '57;018.jpg', '57;012.jpg', '57;009.jpg'], '57;004.jpg': ['57;002.jpg'], '57;009.jpg': ['57;002.jpg'], '57;012.jpg': ['57;002.jpg'], '57;018.jpg': ['57;002.jpg']}}}}}
+2022-06-10 15:39:07,805 - src.root_logger - INFO - ====EXIT====
+
+
+2022-06-10 15:39:32,957 - src.root_logger - INFO - Version updated on 10 Jun 2022. Main branch.
+2022-06-10 15:39:36,337 - src.root_logger - INFO - _____CREATE DEMO PROJECT_____
+2022-06-10 15:39:37,545 - src.root_logger - INFO - Match 57;004.jpg to cluster 57;002_57;004_57;010
+2022-06-10 15:39:38,425 - src.root_logger - INFO - Match 57;010.jpg to cluster 57;002_57;004_57;010
+2022-06-10 15:39:39,746 - src.root_logger - INFO - Unmatch 57;012.jpg from cluster 57;009_57;012
+2022-06-10 15:39:41,069 - src.root_logger - INFO - Match 57;048.jpg to cluster 57;018_57;048
+2022-06-10 15:39:41,286 - src.root_logger - INFO - _____STAGE Correcting False Discovery Rate COMPLETED_____
+2022-06-10 15:39:41,845 - src.root_logger - DEBUG - Next stage Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;002_57;004_57;010'}
+2022-06-10 15:39:41,845 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;012.jpg', '57;009.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;004_57;010': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;004.jpg', '57;010.jpg'], 'nomatches': [], 'best_image_name': '57;002.jpg'}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'clusters_yet_to_check': [], 'current_cluster': '57;018_57;048', 'past_comparisons': {'57;002.jpg': [], '57;009.jpg': [], '57;018.jpg': []}}}}}
+2022-06-10 15:39:42,398 - src.root_logger - INFO - Match 57;009.jpg to cluster 57;002_57;004_57;010
+2022-06-10 15:39:42,982 - src.root_logger - INFO - Unmatch 57;012.jpg from cluster 57;002_57;004_57;010
+2022-06-10 15:39:43,574 - src.root_logger - INFO - Unmatch 57;018.jpg from cluster 57;002_57;004_57;010
+2022-06-10 15:39:44,391 - src.root_logger - DEBUG - [initialize_image_display] Skip already compared 57;002.jpg
+2022-06-10 15:39:44,936 - src.root_logger - INFO - Match 57;012.jpg to cluster 57;018_57;048
+2022-06-10 15:39:45,195 - src.root_logger - INFO - _____STAGE Correcting Sensitivity Rate COMPLETED_____
+2022-06-10 15:39:45,792 - src.root_logger - DEBUG - Next stage Single vs Single. yet to check: set()
+2022-06-10 15:39:45,793 - src.root_logger - DEBUG - stage 2 clusters yet to check is zero
+2022-06-10 15:39:45,793 - src.root_logger - DEBUG - Skip stage Single vs Single
+2022-06-10 15:39:45,793 - src.root_logger - DEBUG - Next stage Find Identicals. yet to check: {'Singles', '57;002_57;004_57;010_57;009', '57;018_57;048_57;012'}
+2022-06-10 15:39:45,793 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;004_57;010_57;009': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;004.jpg', '57;010.jpg', '57;009.jpg'], 'nomatches': [], 'best_image_name': '57;002.jpg'}, '57;018_57;048_57;012': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg', '57;012.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'1': {'clusters_yet_to_check': [], 'current_cluster': '57;018_57;048_57;012', 'past_comparisons': {'57;002.jpg': ['57;009.jpg', '57;012.jpg', '57;018.jpg'], '57;009.jpg': ['57;002.jpg'], '57;018.jpg': ['57;012.jpg', '57;002.jpg'], '57;012.jpg': ['57;018.jpg', '57;002.jpg']}}}}}
+2022-06-10 15:39:48,850 - src.root_logger - INFO - Confirm identical list {'57;004.jpg': <src.objects.ImgObj object at 0x13e3f1160>, '57;009.jpg': <src.objects.ImgObj object at 0x13e3f1220>}
+2022-06-10 15:41:13,185 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;004_57;010_57;009': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [['57;004.jpg', '57;009.jpg']], 'matches': ['57;004.jpg', '57;010.jpg', '57;009.jpg'], 'nomatches': [], 'best_image_name': '57;002.jpg'}, '57;018_57;048_57;012': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg', '57;012.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'3': {'clusters_yet_to_check': ['Singles'], 'current_cluster': '57;018_57;048_57;012', 'past_comparisons': {}}}}}
+2022-06-10 15:41:13,186 - src.root_logger - INFO - ====EXIT====
+
+
+2022-06-10 15:41:16,520 - src.root_logger - INFO - Version updated on 10 Jun 2022. Main branch.
+2022-06-10 15:41:19,548 - src.root_logger - INFO - _____CREATE DEMO PROJECT_____
+2022-06-10 15:41:20,370 - src.root_logger - INFO - Unmatch 57;004.jpg from cluster 57;002_57;004_57;010
+2022-06-10 15:41:21,587 - src.root_logger - INFO - Match 57;010.jpg to cluster 57;002_57;004_57;010
+2022-06-10 15:41:23,104 - src.root_logger - INFO - Unmatch 57;012.jpg from cluster 57;009_57;012
+2022-06-10 15:41:24,586 - src.root_logger - INFO - Match 57;048.jpg to cluster 57;018_57;048
+2022-06-10 15:41:24,848 - src.root_logger - INFO - _____STAGE Correcting False Discovery Rate COMPLETED_____
+2022-06-10 15:41:25,359 - src.root_logger - DEBUG - Next stage Correcting Sensitivity Rate. yet to check: {'57;002_57;010', '57;018_57;048'}
+2022-06-10 15:41:25,359 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;004.jpg', '57;012.jpg', '57;009.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;010': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;010.jpg'], 'nomatches': ['57;004.jpg'], 'best_image_name': '57;002.jpg'}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'clusters_yet_to_check': [], 'current_cluster': '57;018_57;048', 'past_comparisons': {'57;002.jpg': [], '57;009.jpg': [], '57;018.jpg': []}}}}}
+2022-06-10 15:41:26,148 - src.root_logger - INFO - Unmatch 57;004.jpg from cluster 57;002_57;010
+2022-06-10 15:41:26,725 - src.root_logger - INFO - Unmatch 57;009.jpg from cluster 57;002_57;010
+2022-06-10 15:41:27,375 - src.root_logger - INFO - Match 57;012.jpg to cluster 57;002_57;010
+2022-06-10 15:41:27,996 - src.root_logger - INFO - Unmatch 57;018.jpg from cluster 57;002_57;010
+2022-06-10 15:41:28,767 - src.root_logger - DEBUG - [initialize_image_display] Skip already compared 57;002.jpg
+2022-06-10 15:41:29,277 - src.root_logger - INFO - Match 57;004.jpg to cluster 57;018_57;048
+2022-06-10 15:41:30,085 - src.root_logger - INFO - Match 57;009.jpg to cluster 57;018_57;048
+2022-06-10 15:41:30,327 - src.root_logger - INFO - _____STAGE Correcting Sensitivity Rate COMPLETED_____
+2022-06-10 15:41:30,963 - src.root_logger - DEBUG - Next stage Single vs Single. yet to check: set()
+2022-06-10 15:41:30,964 - src.root_logger - DEBUG - stage 2 clusters yet to check is zero
+2022-06-10 15:41:30,964 - src.root_logger - DEBUG - Skip stage Single vs Single
+2022-06-10 15:41:30,964 - src.root_logger - DEBUG - Next stage Find Identicals. yet to check: {'57;002_57;010_57;012', 'Singles', '57;018_57;048_57;004_57;009'}
+2022-06-10 15:41:30,964 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;010_57;012': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;010.jpg', '57;012.jpg'], 'nomatches': ['57;004.jpg'], 'best_image_name': '57;002.jpg'}, '57;018_57;048_57;004_57;009': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg', '57;004.jpg', '57;009.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'1': {'clusters_yet_to_check': [], 'current_cluster': '57;018_57;048_57;004_57;009', 'past_comparisons': {'57;002.jpg': ['57;012.jpg', '57;018.jpg', '57;004.jpg', '57;009.jpg'], '57;012.jpg': ['57;002.jpg'], '57;004.jpg': ['57;018.jpg', '57;002.jpg'], '57;018.jpg': ['57;004.jpg', '57;009.jpg', '57;002.jpg'], '57;009.jpg': ['57;018.jpg', '57;002.jpg']}}}}}
+2022-06-10 15:42:00,097 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;010_57;012': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;010.jpg', '57;012.jpg'], 'nomatches': ['57;004.jpg'], 'best_image_name': '57;002.jpg'}, '57;018_57;048_57;004_57;009': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg', '57;004.jpg', '57;009.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'1': {'clusters_yet_to_check': [], 'current_cluster': '57;018_57;048_57;004_57;009', 'past_comparisons': {'57;002.jpg': ['57;012.jpg', '57;018.jpg', '57;004.jpg', '57;009.jpg'], '57;012.jpg': ['57;002.jpg'], '57;004.jpg': ['57;018.jpg', '57;002.jpg'], '57;018.jpg': ['57;004.jpg', '57;009.jpg', '57;002.jpg'], '57;009.jpg': ['57;018.jpg', '57;002.jpg']}}}}}
+2022-06-10 15:42:00,102 - src.root_logger - INFO - ====EXIT====
+
+
+2022-06-10 15:42:04,339 - src.root_logger - INFO - Version updated on 10 Jun 2022. Main branch.
+2022-06-10 15:42:07,282 - src.root_logger - INFO - _____CREATE DEMO PROJECT_____
+2022-06-10 15:42:08,656 - src.root_logger - INFO - Unmatch 57;004.jpg from cluster 57;002_57;004_57;010
+2022-06-10 15:42:09,361 - src.root_logger - INFO - Match 57;010.jpg to cluster 57;002_57;004_57;010
+2022-06-10 15:42:14,414 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;009.jpg'}, 'Singles': {'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;002.jpg'}, '57;018_57;048': {'matches': ['57;048.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {}}}
+2022-06-10 15:42:14,415 - src.root_logger - INFO - ====EXIT====
+
+
+2022-06-10 15:42:18,564 - src.root_logger - INFO - Version updated on 10 Jun 2022. Main branch.
+2022-06-10 15:42:23,886 - src.root_logger - INFO - _____CREATE DEMO PROJECT_____
+2022-06-10 15:42:24,443 - src.root_logger - INFO - Unmatch 57;004.jpg from cluster 57;002_57;004_57;010
+2022-06-10 15:42:25,247 - src.root_logger - INFO - Match 57;010.jpg to cluster 57;002_57;004_57;010
+2022-06-10 15:42:26,798 - src.root_logger - INFO - Unmatch 57;012.jpg from cluster 57;009_57;012
+2022-06-10 15:42:28,323 - src.root_logger - INFO - Match 57;048.jpg to cluster 57;018_57;048
+2022-06-10 15:42:28,583 - src.root_logger - INFO - _____STAGE Correcting False Discovery Rate COMPLETED_____
+2022-06-10 15:42:29,135 - src.root_logger - DEBUG - Next stage Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;002_57;010'}
+2022-06-10 15:42:29,136 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;004.jpg', '57;012.jpg', '57;009.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;010': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;010.jpg'], 'nomatches': ['57;004.jpg'], 'best_image_name': '57;002.jpg'}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'clusters_yet_to_check': [], 'current_cluster': '57;018_57;048', 'past_comparisons': {'57;002.jpg': [], '57;009.jpg': [], '57;018.jpg': []}}}}}
+2022-06-10 15:42:34,082 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;004.jpg', '57;012.jpg', '57;009.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;010': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;010.jpg'], 'nomatches': ['57;004.jpg'], 'best_image_name': '57;002.jpg'}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'identicals': [], 'matches': ['57;048.jpg'], 'nomatches': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'clusters_yet_to_check': [], 'current_cluster': '57;018_57;048', 'past_comparisons': {'57;002.jpg': [], '57;009.jpg': [], '57;018.jpg': []}}}}}
+2022-06-10 15:42:34,082 - src.root_logger - INFO - ====EXIT====
+
+
+2022-06-10 15:42:37,284 - src.root_logger - INFO - Version updated on 10 Jun 2022. Main branch.
+2022-06-10 15:43:06,343 - src.root_logger - INFO - _____CREATE DEMO PROJECT_____
+2022-06-10 15:43:14,652 - src.root_logger - INFO - Unmatch 57;004.jpg from cluster 57;002_57;004_57;010
+2022-06-10 15:43:15,884 - src.root_logger - INFO - Match 57;010.jpg to cluster 57;002_57;004_57;010
+2022-06-10 15:43:19,740 - src.root_logger - INFO - Unmatch 57;012.jpg from cluster 57;009_57;012
+2022-06-10 15:44:37,891 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;004.jpg', '57;012.jpg', '57;009.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;018_57;048': {'matches': ['57;048.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}, '57;002_57;010': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;010.jpg'], 'nomatches': ['57;004.jpg'], 'best_image_name': '57;002.jpg'}}, 'stages': {'0': {'clusters_yet_to_check': ['57;018_57;048'], 'current_cluster': '57;009_57;012', 'past_comparisons': {'57;002.jpg': [], '57;009.jpg': []}}}}}
+2022-06-10 15:44:37,892 - src.root_logger - INFO - ====EXIT====
+
+
+2022-06-10 15:44:42,829 - src.root_logger - INFO - Version updated on 10 Jun 2022. Main branch.
+2022-06-10 15:44:47,361 - src.root_logger - INFO - _____CREATE DEMO PROJECT_____
+2022-06-10 15:44:48,853 - src.root_logger - INFO - Match 57;004.jpg to cluster 57;002_57;004_57;010
+2022-06-10 15:44:49,591 - src.root_logger - INFO - Unmatch 57;010.jpg from cluster 57;002_57;004_57;010
+2022-06-10 15:44:50,987 - src.root_logger - INFO - Match 57;012.jpg to cluster 57;009_57;012
+2022-06-10 15:44:52,652 - src.root_logger - INFO - Unmatch 57;048.jpg from cluster 57;018_57;048
+2022-06-10 15:44:52,908 - src.root_logger - INFO - _____STAGE Correcting False Discovery Rate COMPLETED_____
+2022-06-10 15:44:53,424 - src.root_logger - DEBUG - Next stage Correcting Sensitivity Rate. yet to check: {'57;009_57;012', '57;002_57;004'}
+2022-06-10 15:44:53,424 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;010.jpg', '57;048.jpg', '57;018.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;004': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;004.jpg'], 'nomatches': ['57;010.jpg'], 'best_image_name': '57;002.jpg'}, '57;009_57;012': {'images': ['57;009.jpg', '57;012.jpg'], 'identicals': [], 'matches': ['57;012.jpg'], 'nomatches': [], 'best_image_name': '57;009.jpg'}}, 'stages': {'0': {'clusters_yet_to_check': [], 'current_cluster': '57;018_57;048', 'past_comparisons': {'57;002.jpg': [], '57;009.jpg': [], '57;018.jpg': []}}}}}
+2022-06-10 15:44:54,116 - src.root_logger - INFO - Match 57;009.jpg to cluster 57;002_57;004
+2022-06-10 15:44:55,343 - src.root_logger - INFO - Match 57;010.jpg to cluster 57;002_57;004
+2022-06-10 15:44:56,098 - src.root_logger - INFO - Unmatch 57;018.jpg from cluster 57;002_57;004
+2022-06-10 15:44:56,712 - src.root_logger - INFO - Unmatch 57;048.jpg from cluster 57;002_57;004
+2022-06-10 15:44:56,969 - src.root_logger - INFO - _____STAGE Correcting Sensitivity Rate COMPLETED_____
+2022-06-10 15:45:00,427 - src.root_logger - DEBUG - Next stage Single vs Single. yet to check: {'57;018.jpg', '57;048.jpg'}
+2022-06-10 15:45:00,428 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;048.jpg', '57;018.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;004_57;009_57;012_57;010': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;004.jpg', '57;012.jpg', '57;009.jpg', '57;010.jpg'], 'nomatches': ['57;010.jpg'], 'best_image_name': '57;002.jpg'}}, 'stages': {'1': {'clusters_yet_to_check': [], 'current_cluster': '57;002_57;004_57;009_57;012_57;010', 'past_comparisons': {'57;002.jpg': ['57;018.jpg', '57;009.jpg', '57;010.jpg', '57;048.jpg'], '57;009.jpg': ['57;002.jpg'], '57;010.jpg': ['57;002.jpg'], '57;018.jpg': ['57;002.jpg'], '57;048.jpg': ['57;002.jpg']}}}}}
+2022-06-10 16:17:56,546 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'matches': ['57;048.jpg', '57;018.jpg'], 'nomatches': [], 'identicals': [], 'best_image_name': '57;053.jpg'}, '57;002_57;004_57;009_57;012_57;010': {'images': ['57;002.jpg', '57;004.jpg', '57;010.jpg'], 'identicals': [], 'matches': ['57;004.jpg', '57;012.jpg', '57;009.jpg', '57;010.jpg'], 'nomatches': ['57;010.jpg'], 'best_image_name': '57;002.jpg'}}, 'stages': {'1': {'clusters_yet_to_check': [], 'current_cluster': '57;002_57;004_57;009_57;012_57;010', 'past_comparisons': {'57;002.jpg': ['57;018.jpg', '57;009.jpg', '57;010.jpg', '57;048.jpg'], '57;009.jpg': ['57;002.jpg'], '57;010.jpg': ['57;002.jpg'], '57;018.jpg': ['57;002.jpg'], '57;048.jpg': ['57;002.jpg']}}}}}
+2022-06-10 16:17:56,547 - src.root_logger - INFO - ====EXIT====
+
+

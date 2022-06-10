@@ -112,9 +112,10 @@ class Test:
         assert singles == self.singles, f"singles in clusters_data {singles} don't share the same element with self.singles = {self.singles}"
         print("cluster correctness test passed")
 
-    def test_image_number(self, clusters_data, project_address):
+    def test_image_number(self, clusters_data, project_name):
         """test if no. of images in clusters_data is the same as in test data
         """
+        project_address = os.path.join(os.getcwd(), "projects", project_name)
         number_in_clusters = 0
         for c, cluster_info in clusters_data.items():
             if c != "Singles":
@@ -128,12 +129,15 @@ class Test:
         number_in_test += len(self.singles)
         number_in_folder = len(os.listdir(project_address))
         assert number_in_clusters == number_in_test, f"number in cluster = {number_in_clusters} number in test = {number_in_test}: {self.singles}"
-        assert number_in_clusters == number_in_folder, f"number in cluster = {number_in_clusters} number in folder = {number_in_folder}: {os.listdir(project_address)}"
+
+        items_in_folder = os.listdir(project_address)
+        assert number_in_clusters == number_in_folder, f"number in cluster = {number_in_clusters} number in folder = {number_in_folder}: {items_in_folder}"
         print("image number test passed")
 
-    def test_export(self, clusters_data, project_address, destination_address):
+    def test_export(self, clusters_data, project_name, destination_address):
         """Test if all clusters have corresponding folders and if total image number remains the same
         """
+        project_address = os.path.join(os.getcwd(), "projects", project_name)
         items_in_destination = os.listdir(destination_address)
         folders_in_destination = [i for i in items_in_destination if not (("." in i) or ("Verified" in i))   ]
 
@@ -164,9 +168,10 @@ class Test:
 
         print("export test passed.")
 
-    def test_comparison (self, project_address, stage_number):
+    def test_comparison (self, project_name, stage_number):
         """Check if every image has been compared with another/best_image
         """
+        project_address = os.path.join(os.getcwd(), "projects", project_name)
         original_images =[i for i in os.listdir(project_address) if not i.startswith('.')]
         all_comparisons = { i for i in self.past_comparisons}
         best_image_dict = {}
@@ -176,6 +181,7 @@ class Test:
             best_image_dict[left] = left
         for im in self.singles:
             best_image_dict[im] = im
+        print(f"singles : {self.singles}")
 
         for i in range(len(original_images)):
             for j in range(i + 1, len(original_images)):
@@ -184,8 +190,11 @@ class Test:
 
                 if not ((a,b) in all_comparisons or (b,a) in all_comparisons):
                     if stage_number == 1:
-                        a_best = best_image_dict[a]
-                        b_best = best_image_dict[b]
+                        try:
+                            a_best = best_image_dict[a]
+                            b_best = best_image_dict[b]
+                        except:
+                            print(f"best image dict: {best_image_dict}")
                         if (a_best != b_best) and ((a not in self.singles) and (b not in self.singles)):
                             if not (((a_best, b_best) in all_comparisons) or ((b_best, a_best) in all_comparisons)):
                                 print(f"pair {(a,b)} not compared")

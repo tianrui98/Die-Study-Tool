@@ -198,7 +198,7 @@ def _merge_singles(cluster, clusters_data, old_cluster_name):
         [type]: [description]
     """
     new_cluster_name = old_cluster_name.split('.')[0]
-    images_in_singles = set(clusters_data["Singles"]["matches"])
+    images_in_singles = set(clusters_data["Singles"]["best_image_name"] + clusters_data["Singles"]["matches"])
     for matched_single_name in cluster.matches:
         if matched_single_name in images_in_singles:
             images_in_singles.remove(matched_single_name)
@@ -518,7 +518,7 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name):
 
     elif stage.stage_number == 1:
         best_image_cluster_dict = {v["best_image_name"]: k for k, v in clusters_data.items() if not k == "Singles"}
-        next_cluster = Cluster(cluster_name = next_cluster_name, images = [i for i in best_image_cluster_dict] + list(clusters_data["Singles"]["matches"]), identicals = [], best_image_name = clusters_data[next_cluster_name]["best_image_name"], matches = set(), nomatches = set())
+        next_cluster = Cluster(cluster_name = next_cluster_name, images = [i for i in best_image_cluster_dict] + list(clusters_data["Singles"]["best_image_name"] + clusters_data["Singles"]["matches"]), identicals = [], best_image_name = clusters_data[next_cluster_name]["best_image_name"], matches = set(), nomatches = set())
 
         #replace the image's cluster name with the cluster it represents
         for image_name, image_object in next_cluster.images_dict.items():
