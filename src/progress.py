@@ -221,7 +221,7 @@ def save_progress_data_midway(project_name, stage,cluster, progress_data):
     #update stage properties
     progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
     progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
-    progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_done"] = stage.clusters_done
+    progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_done"] = list(stage.clusters_done)
 
     #write new clusters_data
     progress_data[project_name]["clusters"] = clusters_data
@@ -322,7 +322,7 @@ def save_progress_data(project_name, stage, cluster, progress_data):
         else:
             progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = old_cluster_name
         progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
-        progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_done"] = stage.clusters_done
+        progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_done"] = list(stage.clusters_done)
     #write new clusters_data
     progress_data[project_name]["clusters"] = clusters_data
 
@@ -397,8 +397,8 @@ def check_cluster_completion(cluster,stage):
     """
     if not cluster:
         return True
-    all_compared_already = all([imgObj.name in stage.past_comparisons[cluster.best_image.name] for imgObj in cluster.images if imgObj.name != cluster.best_image.name ])
-    return all_compared_already or (len(cluster.matches) + len(cluster.nomatches) + len(cluster.compared_before) >= len(cluster.images) - 1)
+    all_compared_already = all([(imgObj.name in cluster.compared_before or imgObj.name == cluster.best_image.name ) for imgObj in cluster.images ])
+    return all_compared_already
 
 
 def check_stage_completion(stage, clusters_data):

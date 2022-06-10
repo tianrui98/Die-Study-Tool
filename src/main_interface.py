@@ -99,14 +99,6 @@ class MainUI(UI):
             self.left_image_index = best_image_index
             self.right_image_index = 0
 
-        while self.stage.stage_number > 0 and \
-            self.right_image_index < len(self.cluster.images):
-            #mark them compared
-            self._mark_compared()
-            #skip the right image
-            logger.debug("[initialize_image_display] Skip already compared {}".format(self._get_image_name(self.right_image_index)))
-            self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
-
         #skip the index of left image
         if self.right_image_index == self.left_image_index:
             self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
@@ -384,6 +376,7 @@ class MainUI(UI):
                 if self._get_image_name(self.right_image_index) in self.cluster.nomatches:
                     self.cluster.nomatches.remove(self._get_image_name(self.right_image_index))
                     self.deactivate_button(self.no_match_btn)
+                self._mark_compared()
                 logger.info("Match {} to cluster {}".format(self._get_image_name(self.right_image_index),self.cluster.name))
 
         if self.testing_mode:
@@ -410,8 +403,8 @@ class MainUI(UI):
                 if self._get_image_name(self.right_image_index) in self.cluster.matches:
                     self.cluster.matches.remove(self._get_image_name(self.right_image_index))
                     self.deactivate_button(self.match_btn)
-
-            logger.info("Unmatch {} from cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
+                self._mark_compared()
+                logger.info("Unmatch {} from cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
         if self.testing_mode:
             self.test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "unmatch")
 
@@ -441,6 +434,7 @@ class MainUI(UI):
         #if old best image has been matched to anything in the cluster before -> mark checked & match
         if len(self.cluster.matches) > 0:
             self.mark_match()
+            self._mark_compared()
             #delist current best image from matches
             if self._get_image_name(self.left_image_index) in self.cluster.matches:
                 self.cluster.matches.remove(self._get_image_name(self.left_image_index))
