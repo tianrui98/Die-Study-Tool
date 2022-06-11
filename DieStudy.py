@@ -36,3 +36,5 @@ if __name__ == "__main__":
 #4. when user reaches the end of cluster but skipped some images. direct them to those skipped images
 #5. Reduce repetitive comparison
 #6. Add delete project button
+#7. when save progress, save all matches and no matches of the current cluster
+#8. If user clicked "save", don't ask them if they want to save at "exit"

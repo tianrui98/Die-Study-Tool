@@ -5,7 +5,7 @@ progress_data = {'antimachus-ii reverses (5-jun-22) prediction': {'clusters': {'
 #the path name in the progress data from activities.log
 project_name = "antimachus-ii reverses (5-jun-22) prediction"
 #original folder with AI-computed clusters
-project_folder = ""
+project_folder = "/Users/rui/DieHards Dropbox/Nero_By_Numbers_Paper/22summer_data_runs_output/antimachus_ii_output/antimachus_ii_rev"
 #where do you wish to save the exported folders
 save_address = "/Users/rui/Desktop"
 
@@ -34,9 +34,9 @@ def restore_progress():
     new_project_address = os.path.join(app_folder,"projects",f"{project_name}_recovered")
     create_image_folder(new_project_address)
 
-    data_file = open(os.path.join(save_address, "data.json"), "r")
+    data_file = open(os.path.join(app_folder, "data.json"), "r")
     existing_progress_data = json.loads(data_file.read())
-    existing_progress_data[project_name] = progress_data[project_name]
+    existing_progress_data[f"{project_name}_recovered"] = progress_data[project_name]
+    data_file = open(os.path.join(app_folder, "data.json"), "w")
     json.dump(existing_progress_data, data_file)
     data_file.close()
-
