@@ -26,7 +26,7 @@ def test_main():
     MainUI(testing_mode = True).start()
 
 if __name__ == "__main__":
-    test_main()
+    main()
 
 
 #todo
