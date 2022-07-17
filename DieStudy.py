@@ -31,10 +31,10 @@ if __name__ == "__main__":
 
 #todo
 #1. add save midway - done
-#2. make it easier to share restored data (path issue)
+#2. make it easier to share restored data (path issue) - done
 #3. exit button currently stores the previous cluster. - done
 #4. when user reaches the end of cluster but skipped some images. direct them to those skipped images
-#5. Reduce repetitive comparison
+#5. Reduce repetitive comparison - done
 #6. Add delete project button
 #7. when save progress, save all matches and no matches of the current cluster
 #8. If user clicked "save", don't ask them if they want to save at "exit"
