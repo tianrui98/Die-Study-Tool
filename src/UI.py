@@ -1,3 +1,5 @@
+from abc import abstractmethod
+from click import group
 from sqlalchemy import all_
 from src.objects import *
 import src.progress as progress
@@ -15,11 +17,14 @@ from tkinter import font
 from src.test import *
 from datetime import datetime
 from datetime import timedelta
+from UI_group import GroupDisplay
+from UI_pair import PairDisplay
+
 #%% UI
 class UI:
-    def __init__(self, image_height_ratio, project_name = "", project_address = "", progress_data = {},  part2 = False, root = None, testing_mode = False):
+    def __init__(self, image_height_ratio = 0.7, project_name = "", project_address = "", progress_data = {},  group_display = False, root = None, testing_mode = False):
         # main interface
-        if part2:
+        if group_display:
             self.root = tk.Toplevel()
             self.mainUI = root
         else:
@@ -74,19 +79,6 @@ class UI:
     def _get_image_address(self, image_index):
         if image_index < len(self.cluster.images):
             return os.path.join(self.project_address, self._get_image_name(image_index))
-
-    def _open_first_cluster(self):
-        """Open the first cluster in stage 0.
-        Create a Cluster object
-
-        Return: Cluster object
-        """
-        all_clusters = [c for c in self.progress_data[self.project_name]["clusters"] if c != "Singles"]
-        cluster_name =  sorted(all_clusters, key= lambda s: s.split("_")[0])[0]
-
-        #create cluster object
-        images = self.progress_data[self.project_name]["clusters"][cluster_name]["images"]
-        return Cluster(cluster_name = cluster_name, images = images, best_image_name = None, matches = set(), nomatches = set())
 
     def _swap_positions(self, l, pos1, pos2):
 
@@ -219,30 +211,99 @@ class UI:
 
 #%% Actions
 
-    def initialize_image_display(self) -> None:
-        pass
+    def open_first_cluster(self):
+        """Open the first cluster in stage 0.
+        Create a Cluster object
 
-    def load_next_image (self) -> None:
-        pass
+        Return: Cluster object
+        """
+        all_clusters = [c for c in self.progress_data[self.project_name]["clusters"] if c != "Singles"]
+        cluster_name =  sorted(all_clusters, key= lambda s: s.split("_")[0])[0]
 
-    def load_prev_image (self) -> None:
-        pass
+        #create cluster object
+        images = self.progress_data[self.project_name]["clusters"][cluster_name]["images"]
+        return Cluster(cluster_name = cluster_name, images = images, best_image_name = None, matches = set(), nomatches = set())
 
-    def mark_match (self):
-        pass
+    def open_demo_project (self):
+        self.demo_mode = True
+        dirname="demo"
+        self.project_name = "demo"
+        self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
+        self.stage = Stage(0, self.progress_data[self.project_name])
+        if self.testing_mode:
+            self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["images"])
+        #open the first cluster
+        self.cluster = self.open_first_cluster()
 
-    def mark_validation_no_match (self):
-        pass
+        #initialize image display
+        self.refresh_image_display()
 
-    def mark_identical (self):
-        pass
+        #close pop-up
+        self.open_window.quit()
+        self.open_window.destroy()
 
-    def mark_best_image (self):
-        pass
+        logger.info(f"_____create demo project_____")
+        return None
 
-    def check_completion_and_move_on (self):
-        pass
+    def choose_project(self):
+        self.progress_data = progress.checkout_progress()
+        existing_projects = set(self.progress_data.keys())
+        if not existing_projects:
+            return
+        self.create_choose_project_window(existing_projects)
+        self.project_address = os.path.join(os.getcwd(), "projects", self.project_name)
 
+        self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_name)
+        if self.testing_mode:
+            self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["images"])
+
+        logger.info(f"Open project {self.project_name} at stage {self.stage.stage_number} ")
+        if self.stage.stage_number < 3:
+            self.refresh_image_display()
+        else:
+            #start identical UI
+            self.start_identical_UI()
+
+    def browse_files(self):
+        """Let user choose which new project/folder to start working on
+        pass the directory name to the class
+        show images
+        """
+        dirname = filedialog.askdirectory(parent=self.root)
+
+        if not dirname:
+            return 
+        #check if the folder is valid
+        valid = True
+        for folder in os.listdir(dirname):
+            if not folder.startswith("."):
+                is_folder = os.path.isdir(dirname + "/" + folder)
+                no_dot = "." not in folder
+                valid = valid and is_folder and no_dot
+
+        valid = valid and "Singles" in os.listdir(dirname)
+
+        if not valid:
+            messagebox.askokcancel("Invalid folder", "The folder you have chosen is not valid. \nIt should contain cluster folders and a 'Singles' folder and nothing else." )
+            return None
+
+        self.project_name = os.path.basename(dirname)
+        self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
+        self.stage = Stage(0, self.progress_data[self.project_name])
+        if self.testing_mode:
+            self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["images"])
+        #open the first cluster
+        self.cluster = self.open_first_cluster()
+
+        #refresh image display
+        self.refresh_image_display()
+
+        #close pop-up
+        self.open_window.destroy()
+
+        logger.info("_____Create new project {}_____".format(self.project_name))
+        return None
+    
     def save(self):
         """save results to data.json
         """
@@ -348,10 +409,63 @@ class UI:
         ok_button.place(relx=0.5, rely=0.8, anchor=CENTER)
         self.choose_project_window.mainloop()
 
-    def start (self):
-        pass
+    def create_UI(self):
+        #initialize left and right images
+        self.left_image = self.add_image(os.path.join("images","blank.png"), 0, 1, 1, 1, self.root, "w", self.image_height_pixel, 0, 0)
+        self.right_image = self.add_image(os.path.join("images","blank.png"), 1, 1, 1, 1, self.root, "w", self.image_height_pixel, 0, 0)
 
-    def create_UI (self):
-        pass
+        # menu bar
+        right_menu_bar = self.add_frame(self.button_frame_height, self.button_frame_width, 1, 0, 1, 1, self.root, "e")
+        self.open_btn = self.add_button("Open", self.create_open_window, 2, 3, 1, 0, 1, 1, right_menu_bar, sticky = "e")
+        self.export_btn = self.add_button("Export", self.export, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
+        self.save_btn = self.add_button("Save", self.save, 2, 3, 3, 0, 1, 1, right_menu_bar, sticky = "e")
+        self.deactivate_button(self.save_btn) #TODO activate it later
+        self.exit_btn = self.add_button("Exit", self.exit, 2, 3, 4, 0, 1, 1, right_menu_bar, sticky = "e")
+
+        left_menu_bar = self.add_frame(self.button_frame_height, self.button_frame_width,0, 0, 1, 1, self.root, "we")
+        # left_menu_bar.columnconfigure(1, weight=1)
+        self.project_title_label = self.add_text("Project Title: ", 0, 0, 1, 1, left_menu_bar, sticky= "w")
+        self.stage_label = self.add_text("Current Stage: ", 0, 1, 1, 1, left_menu_bar, sticky= "w")
+
+        # image info
+        self.left_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width,0, 2, 1, 1, self.root)
+
+        # self.left_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.left_info_bar, sticky= "w")
+        # self.left_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.left_info_bar, sticky= "w")
+        # _ = self.add_filler(4, 4, 2, 0, 1, 2, self.left_info_bar, "e", "", None)
+
+        self.right_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 2, 1, 1, self.root, "we")
+        # self.right_info_bar.grid_propagate(0)
+        # self.right_info_bar.columnconfigure(2, weight=1)
+
+
+        # self.right_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.right_info_bar, sticky="w")
+        # self.right_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.right_info_bar, sticky="w")
+
+        # self.right_tick =self.add_image(os.path.join("images","blank.png"), 1, 0, 1, 1, self.right_info_bar, "w", 15, 0, 0)
+
+        #navigation buttons
+        # self.prev_btn = self.add_button("◀", self.load_prev_image, 4, 4, 2, 0, 1, 2, self.right_info_bar, sticky="e")
+        # self.next_btn = self.add_button("▶", self.load_next_image, 4, 4, 3, 0, 1, 2, self.right_info_bar, sticky="e")
+
+        # action buttons
+        action_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 3, 1, 1, self.root, "se")
+        # action_bar.rowconfigure(0, weight=1)
+        # for i in range(4):
+        #     action_bar.columnconfigure(i, weight=1)
+
+        # action_button_height = 4
+
+        # self.best_image_btn = self.add_button("Best Image", self.mark_best_image, action_button_height, 8, 0, 0, 1, 1, action_bar,"se")
+        # self.no_match_btn = self.add_button("No Match", self.mark_no_match, action_button_height, 8, 1, 0, 1, 1, action_bar, "se")
+        # self.match_btn = self.add_button("Match", self.mark_match, action_button_height, 8, 2, 0, 1, 1, action_bar, "se")
+
+    def start(self):
+        self.create_UI()
+        try:
+            self.root.mainloop()
+        except:
+            logger.error("====Error in main loop====")
+            logger.error(f"progress_data{self.progress_data}")
 
 # %%
