@@ -176,7 +176,6 @@ def _create_cluster_info_dict (cluster):
     "nomatches": list(cluster.nomatches),
     "best_image_name": cluster.best_image.name
     }
-    print(f"cluster info {cluster.name} {dict}")
     return dict
 
 def _merge_singles(cluster, clusters_data, old_cluster_name):
@@ -398,7 +397,8 @@ def check_cluster_completion(cluster,stage):
     """
     if not cluster:
         return True
-    all_compared_already = all([(imgObj.name in cluster.compared_before or imgObj.name == cluster.best_image.name ) for imgObj in cluster.images ])
+    all_compared_already = all([(imgObj.name in cluster.compared_before or imgObj.name == cluster.best_image.name ) \
+        for imgObj in cluster.images ])
     return all_compared_already
 
 
