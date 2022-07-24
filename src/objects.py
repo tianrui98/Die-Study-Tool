@@ -35,6 +35,7 @@ class Cluster:
             else:
                 self.best_image = None
 
+        print(self.images_dict)
         self.matches = matches #for adding right image name that belong to the cluster
         self.nomatches = nomatches #for adding right image name that does not belong to the cluster
         self.compared_before = set()

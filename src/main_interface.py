@@ -89,7 +89,7 @@ class MainUI(UI):
         return img_label
 
     def initialize_image_display(self):
-        """initialize left and right image display"""
+        """display left and right images"""
 
         best_image_index = self.cluster.get_best_image_index()
         if best_image_index == 0:
@@ -103,10 +103,10 @@ class MainUI(UI):
         if self.right_image_index == self.left_image_index:
             self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
 
+        self.add_images(self.left_image_index, self.right_image_index)
+
         self.project_title_label.config(text = str("Project Title: " + self.project_name))
         self.stage_label.config(text = str("Current Stage: " + self.stage.name))
-
-        self.add_images(self.left_image_index, self.right_image_index)
 
         #update image info display
         self._update_image_label()
@@ -225,7 +225,7 @@ class MainUI(UI):
 
     def choose_project(self):
         self.progress_data = progress.checkout_progress()
-        existing_projects = {d.split('/')[-1] for d in list(self.progress_data.keys())}
+        existing_projects = set(self.progress_data.keys())
         if not existing_projects:
             return
         self.create_choose_project_window(existing_projects)

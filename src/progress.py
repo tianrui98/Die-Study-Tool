@@ -119,8 +119,7 @@ def _change_name_in_current_cluster(old_name, new_name, progress_data, project_n
 def start_new_project(original_project_address, project_name):
     """Create a new project. This will add a new hashmap to existing progress_data with the cluster information.
     The images with valid extensions under the original project folder will be copied into a new project folder within the program.
-    All images under a cluster will be stored under "matches".
-    Matches should include all images under the cluster, including the best image (by default the first image)
+    All images under a cluster except the best image(by default the first image) will be stored under "matches".
 
     Args:
         original_project_address (str): the address of the chosen project folder
@@ -177,6 +176,7 @@ def _create_cluster_info_dict (cluster):
     "nomatches": list(cluster.nomatches),
     "best_image_name": cluster.best_image.name
     }
+    print(f"cluster info {cluster.name} {dict}")
     return dict
 
 def _merge_singles(cluster, clusters_data, old_cluster_name):

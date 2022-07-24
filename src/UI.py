@@ -13,6 +13,8 @@ import shutil
 import json
 from tkinter import font
 from src.test import *
+from datetime import datetime
+from datetime import timedelta
 #%% UI
 class UI:
     def __init__(self, image_height_ratio, project_name = "", project_address = "", progress_data = {},  part2 = False, root = None, testing_mode = False):
@@ -53,6 +55,9 @@ class UI:
         self.button_frame_width = self.root.winfo_width() * 0.45
         self.button_frame_height = self.root.winfo_height() * 0.2
         self.identical_image_height_pixel = int(self.initial_height * 0.9 * 0.5)
+
+        self.save_button_pressed_time = None
+        self.save_recently_benchmark = timedelta(minutes = 1)
 
         self.test = Test()
 
@@ -239,28 +244,26 @@ class UI:
         pass
 
     def save(self):
-        """save results.
-        #TODO add a "status" key in data that will help restore the current status, with identified matches and nomatches
-        #TODO pressing "Save" button should trigger a save_midway function that does not overwrite cluster_data
+        """save results to data.json
         """
         if len(self.progress_data) > 0:
             logger.info("====SAVE====\n\n")
             progress.save_progress_data_midway(self.project_name, self.stage, self.cluster, self.progress_data)
+            self.save_button_pressed_time = datetime.now()
 
     def exit(self):
         #wipe out records at exit for demo projects
         if self.demo_mode:
             progress.clear_current_project(self.project_name, self.progress_data)
         else:
-            if len(self.progress_data) > 0:
-                keep_progress = messagebox.askyesno("Exit", "Save your current progress in the system ?" )
+            if len(self.progress_data) == 0:
+                progress.clear_current_project(self.project_name, self.progress_data)
+            elif self.save_button_pressed_time and datetime.now() - self.save_button_pressed_time < self.save_recently_benchmark:
+                pass
+            else:
+                keep_progress = messagebox.askyesno("Exit", "Save your project?" )
                 if keep_progress:
                     progress.save_progress_data_midway(self.project_name, self.stage, self.cluster,self.progress_data)
-                else:
-                    progress.clear_current_project(self.project_name, self.progress_data)
-            
-            else:
-                progress.clear_current_project(self.project_name, self.progress_data)
 
         logger.info(str(self.progress_data))
         logger.info("====EXIT====\n\n")
@@ -283,7 +286,6 @@ class UI:
             progress.clear_current_project(self.project_name, self.progress_data)
 
         logger.info("====EXPORTED RESULTS====")
-
         if not keep_progress:
             self.root.destroy()
             if self.mainUI:
