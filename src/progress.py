@@ -379,6 +379,7 @@ def load_progress(project_name, create_next_cluster = True, data_address = "data
         cluster = Cluster( cluster_name = current_cluster,
             identicals = _deserialize_identicals(cluster_info["identicals"]),
             best_image_name = cluster_info["best_image_name"],
+            images = [cluster_info["best_image_name"]] + cluster_info["matches"],
             matches = set(cluster_info["matches"]),
             nomatches = set(cluster_info["nomatches"]))
     else:
