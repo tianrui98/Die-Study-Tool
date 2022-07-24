@@ -493,7 +493,7 @@ class MainUI(UI):
                 return None
             response = self.create_save_progress_window(message)
             if response:
-                self.progress_data, self.stage = progress.save_progress_data(self.project_name, self.stage,self.cluster,self.progress_data)
+                self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data)
                 self.cluster, self.stage= progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status)
                 if self.testing_mode:
                     self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])

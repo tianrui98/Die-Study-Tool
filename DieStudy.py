@@ -37,4 +37,4 @@ if __name__ == "__main__":
 #5. Reduce repetitive comparison - done
 #6. Add delete project button
 #7. when save progress, save all matches and no matches of the current cluster
-#8. If user clicked "save", don't ask them 
+#8. Only save progress (write to data.json) when the user clicks save button

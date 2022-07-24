@@ -85,7 +85,7 @@ class UI:
         cluster_name =  sorted(all_clusters, key= lambda s: s.split("_")[0])[0]
 
         #create cluster object
-        images = self.progress_data[self.project_name]["clusters"][cluster_name]["matches"] + [self.progress_data[self.project_name]["clusters"][cluster_name]["best_image_name"]]
+        images = self.progress_data[self.project_name]["clusters"][cluster_name]["images"]
         return Cluster(cluster_name = cluster_name, images = images, best_image_name = None, matches = set(), nomatches = set())
 
     def _swap_positions(self, l, pos1, pos2):
@@ -277,7 +277,7 @@ class UI:
         save_address = filedialog.askdirectory() # asks user to choose a directory
         if not save_address:
             return None
-        self.progress_data, _ = progress.save_progress_data(self.project_name, self.stage, self.cluster, self.progress_data)
+        self.progress_data, _ = progress.update_progress_data(self.project_name, self.stage, self.cluster, self.progress_data)
         res, destination_address = progress.export_results(self.project_name,self.progress_data, save_address, keep_progress)
         if self.testing_mode:
             self.test.test_export(self.progress_data[self.project_name]["clusters"], self.project_name, destination_address)
