@@ -14,7 +14,8 @@ class Test:
         self.past_comparisons = {}
 
     def fill_in_singles(self, clusters_data):
-        self.singles = clusters_data["Singles"]["matches"]
+        self.singles = clusters_data["Singles"]["images"]
+        print(f"test.py fill_in_singles: self.singles {self.singles}")
 
     def record_action(self, left, right, action):
         self.actions[(left, right)] = action
@@ -108,7 +109,7 @@ class Test:
                             assert (match in self.data[best_image_name]), f"{match} in clusters_data {clusters_data[c]} but not in test {self.data}"
                     for match in self.data[best_image_name]:
                         assert (match in clusters_data[c]["matches"]), f"{match} in test {self.data} but not in clusters_data {clusters_data[c]}"
-        singles = set(clusters_data["Singles"]["matches"])
+        singles = set(clusters_data["Singles"]["images"])
         assert singles == self.singles, f"singles in clusters_data {singles} don't share the same element with self.singles = {self.singles}"
         print("cluster correctness test passed")
 
@@ -120,15 +121,17 @@ class Test:
         for c, cluster_info in clusters_data.items():
             if c != "Singles":
                 #best image not in matches
-                number_in_clusters += 1
-            number_in_clusters += len(cluster_info["matches"])
+                number_in_clusters += len(cluster_info["matches"]) + 1
+            else:
+                number_in_clusters += len(cluster_info["images"])
 
         number_in_test = 0
         for _, matches in self.data.items():
             number_in_test += 1 + len(matches)
         number_in_test += len(self.singles)
+
         number_in_folder = len(os.listdir(project_address))
-        assert number_in_clusters == number_in_test, f"number in cluster = {number_in_clusters} number in test = {number_in_test}: {self.singles}"
+        assert number_in_clusters == number_in_test, f"number in cluster = {number_in_clusters} number in test = {number_in_test}"
 
         items_in_folder = os.listdir(project_address)
         assert number_in_clusters == number_in_folder, f"number in cluster = {number_in_clusters} number in folder = {number_in_folder}: {items_in_folder}"

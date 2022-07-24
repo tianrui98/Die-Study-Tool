@@ -264,7 +264,8 @@ class UI:
                 keep_progress = messagebox.askyesno("Exit", "Save your project?" )
                 if keep_progress:
                     progress.save_progress_data_midway(self.project_name, self.stage, self.cluster,self.progress_data)
-
+                else:
+                    progress.clear_current_project(self.project_name, self.progress_data)
         logger.info(str(self.progress_data))
         logger.info("====EXIT====\n\n")
         self.root.quit()

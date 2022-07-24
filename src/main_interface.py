@@ -208,7 +208,7 @@ class MainUI(UI):
         self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
         self.stage = Stage(0, self.progress_data[self.project_name])
         if self.testing_mode:
-            self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["matches"])
+            self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["images"])
         #open the first cluster
         self.cluster = self._open_first_cluster()
 
@@ -233,7 +233,7 @@ class MainUI(UI):
 
         self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_name)
         if self.testing_mode:
-            self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["matches"])
+            self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["images"])
 
         logger.info(f"Open project {self.project_name} at stage {self.stage.stage_number} ")
         if self.stage.stage_number < 3:
@@ -269,7 +269,7 @@ class MainUI(UI):
         self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
         self.stage = Stage(0, self.progress_data[self.project_name])
         if self.testing_mode:
-            self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["matches"])
+            self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["images"])
         #open the first cluster
         self.cluster = self._open_first_cluster()
 

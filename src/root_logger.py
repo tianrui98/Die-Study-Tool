@@ -3,7 +3,7 @@ import logging
 # import module
 from logging.handlers import TimedRotatingFileHandler
 from logging import Formatter
-
+from datetime import datetime
 # get named logger
 logger = logging.getLogger(__name__)
 
@@ -21,4 +21,5 @@ logger.addHandler(handler)
 logger.setLevel(logging.DEBUG)
 
 # version information
-logger.info(f"Version updated on 10 Jun 2022. Main branch.")
+today = datetime.today().strftime("%d/%m/%y")
+logger.info(f"Version updated on {today}. Main branch.")

@@ -16,7 +16,7 @@ class Cluster:
     name: updated upon saving
     number: updated upon saving
     """
-    def __init__ (self, cluster_name = None, images=[], identicals = [], best_image_name = None, matches = set(), nomatches = set()):
+    def __init__ (self, cluster_name = None, images=[], identicals = [], best_image_name = None, matches = set(), nomatches = set(), compared_before = set()):
         self.name = cluster_name
         self.images_dict = {f: ImgObj(f, cluster_name) for f in images}
         #images to compare with, with best image at the first value
@@ -37,7 +37,7 @@ class Cluster:
 
         self.matches = matches #for adding right image name that belong to the cluster
         self.nomatches = nomatches #for adding right image name that does not belong to the cluster
-        self.compared_before = matches.union(nomatches)
+        self.compared_before = compared_before.union(matches.union(nomatches))
 
     def get_best_image_index(self):
         best_image_name = self.best_image.name
