@@ -948,7 +948,9 @@ class UI():
 
         logger.info(f"Confirm coin list {self.added_coin_dict}")
         self.marked_added_coin_dict.update(self.added_coin_dict)
-        self.marked_coin_group_list.append([name for name, _ in self.added_coin_dict.items()])
+        added_coin_list = list(self.added_coin_dict.keys())
+        best_image_name = added_coin_list[0]
+        self.marked_coin_group_list.append((added_coin_list, best_image_name))
 
         self.group_frame_reset_identical_list_box()
 
@@ -1015,9 +1017,7 @@ class UI():
                 self.cluster.identicals.append(set(group))
         else:
             #add all identified clusters to progress data !!!TODO
-            #maybe make marked coin group list a dictionary with keys being the cluster name
-            #then we add the dictionary during update progress
-            pass
+            self.progress_data[self.project_name]["clusters"] = progress.stage0_consolidate_match_groups(self.cluster,self.marked_coin_group_list, self.progress_data[self.project_name]["clusters"])
             
         self.check_completion_and_move_on()
         if not self.quit:
@@ -1078,8 +1078,8 @@ class UI():
         self.added_coin_dict = {}
         #keep track of coins that have been confirmed
         self.marked_added_coin_dict = {}
-        #keep track of identified groups (list of list)
-        self.marked_coin_group_list = []
+        #keep track of identified groups (list of list of tuples)
+        self.marked_coin_group_list = [] #([name1, name2, name3], best_image_name)
 
         #identical coin list box displays the names of the identical coins
         self.scrollbar = tk.Scrollbar(self.right_main_frame, orient = tk.VERTICAL)
@@ -1131,7 +1131,7 @@ class UI():
         _ = self.add_button("◀", self.group_frame_load_prev_page, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
         _ = self.add_button("▶", self.group_frame_load_next_page, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
 
-        _ = self.add_button("Next Cluster", lambda event: self.group_frame_next_cluster(identical_stage), 3, 15, 1, 2, 1, 1, self.frame, "sw" )
+        _ = self.add_button("Next Cluster", lambda : self.group_frame_next_cluster(identical_stage), 3, 15, 1, 2, 1, 1, self.frame, "sw" )
         self.current_cluster_label  = self.add_text("Current cluster: ",0, 3, 1, 1, self.frame, "w" )
 
     def group_frame_start(self, identical_stage = False):
@@ -1139,7 +1139,7 @@ class UI():
         self.group_frame_refresh_image_display()
         self.root.bind('<Right>', lambda event: self.group_frame_load_next_page())
         self.root.bind('<Left>', lambda event: self.group_frame_load_prev_page())
-        self.root.bind('c', lambda event: self.group_frame_confirm_current_list(identical_stage))
+        self.root.bind('c', lambda event: self.group_frame_confirm_current_list())
         self.root.bind('r', lambda event: self.group_frame_remove_image_from_list())
         self.root.bind('n', lambda event: self.group_frame_next_cluster(identical_stage))
         self.root.bind('1', lambda event: self._add_function_0())

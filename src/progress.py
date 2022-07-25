@@ -76,6 +76,19 @@ def _concatenate_image_names(cluster):
         new_cluster_name = new_cluster_name[:147] + "_etc"
     return new_cluster_name
 
+def _concatenate_image_names_from_list(image_list):
+    matches = []
+    for image_name in sorted(image_list):
+        image_id = image_name.split(".")[0]
+        matches.append(image_id)
+    matches = [n for n in matches if not n == ""]
+    new_cluster_name = "_".join(sorted(matches))
+
+    #max file name (255)
+    if len(new_cluster_name) > 150:
+        new_cluster_name = new_cluster_name[:147] + "_etc"
+    return new_cluster_name
+
 def _concatenate_image_names_in_data(cluster_info):
     identical_group_list, identical_name_list = _collect_identicals(cluster_info["identicals"])
 
@@ -233,6 +246,47 @@ def save_progress_data_midway(project_name, stage,cluster, progress_data):
     write_progress_data_to_json(progress_data)
 
     return progress_data, stage
+
+def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_data):
+    """
+    Args:
+        marked_coin_group_list (_type_): _description_
+    """
+    original_images_set = set(cluster.images_dict.keys())
+    seen_images_set = set()
+    old_cluster_name = cluster.name
+    new_cluster_name_list = []
+
+    if len(marked_coin_group_list) <= 0:
+        for image_name in original_images_set:
+            clusters_data["Singles"]["images"].append(image_name)
+    else:
+        for (matched_coin_list, best_image_name) in marked_coin_group_list:
+            new_cluster_name = _concatenate_image_names_from_list(matched_coin_list)
+            new_cluster_name_list.append(new_cluster_name)
+            clusters_data[new_cluster_name] = {}
+
+            clusters_data[new_cluster_name]["matches"] = []
+            for image_name in matched_coin_list:
+                if image_name != best_image_name:
+                    clusters_data[new_cluster_name]["matches"].append(image_name)
+                else:
+                    clusters_data[new_cluster_name]["best_image_name"] = best_image_name
+            
+            nomatches = original_images_set - set(matched_coin_list)
+            clusters_data[new_cluster_name]["nomatches"] = list(nomatches)
+            clusters_data[new_cluster_name]["images"] = clusters_data[new_cluster_name]["matches"] + clusters_data[new_cluster_name]["nomatches"] + [clusters_data[new_cluster_name]["best_image_name"]]
+            clusters_data[new_cluster_name]["identicals"] = []
+
+            seen_images_set = seen_images_set.union(set(matched_coin_list))
+    #send the unmatched images to Singles
+    single_images_list = list(original_images_set - seen_images_set)
+    for image_name in single_images_list:
+        clusters_data["Singles"]["images"].append(image_name)
+
+    clusters_data.pop(old_cluster_name)
+        
+    return clusters_data
 
 def update_progress_data(project_name, stage, cluster, progress_data):
     """
@@ -499,19 +553,21 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name):
         matches = set(), 
         nomatches = set())
 
-    #compare each cluster's best image with other cluster's best image and everything in "Singles" that have not been compared to the next cluster in stage 0
+    #compare each cluster's best image with other cluster's best image and everything in "Singles", minus those that have been compared to the next cluster in stage 0
     elif stage.stage_number == 1:
         #filter the singles
         images_in_single = []
         for single in clusters_data["Singles"]["images"]:
-            if single not in clusters_data[next_cluster_name]["images"]:
+            if (single not in clusters_data[next_cluster_name]["images"]) and (single not in clusters_data[next_cluster_name]["nomatches"]):
                 images_in_single.append(single)
-        
-        print(f"progress.py _create_a_cluster: images in single {images_in_single}")
+
+        #filter the best images
         best_image_cluster_dict = {v["best_image_name"]: k for k, v in clusters_data.items() if not k == "Singles"}
         best_images = [i for i in best_image_cluster_dict if \
-            (i not in stage.clusters_done and
-            best_image_cluster_dict[i] not in stage.clusters_done )]
+            ((i not in stage.clusters_done) and
+            (best_image_cluster_dict[i] not in stage.clusters_done) and
+            (i not in clusters_data[next_cluster_name]["nomatches"])
+             )]
         next_cluster = Cluster(cluster_name = next_cluster_name, 
         images =  images_in_single + best_images, 
         identicals = [], 
