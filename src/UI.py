@@ -939,21 +939,16 @@ class UI():
         self.right_image_window.configure(image = img)
         self.right_image_window.image = img
 
-    def group_frame_confirm_current_list (self, identical_stage = False):
+    def group_frame_confirm_current_list (self):
         """mark the images on the list identical and un-display their widgets.
         reset the identical list and display window.
         """
         if len(self.added_coin_dict) <= 1:
             return None
 
-        if identical_stage:
-            #add confirmed coin list to identicals
-            self.cluster.identicals.append(set(list(self.added_coin_dict.keys())))
-        else:
-            #add confirmed coin list to match !!TODO
-            pass
         logger.info(f"Confirm coin list {self.added_coin_dict}")
         self.marked_added_coin_dict.update(self.added_coin_dict)
+        self.marked_coin_group_list.append([name for name, _ in self.added_coin_dict.items()])
 
         self.group_frame_reset_identical_list_box()
 
@@ -1015,10 +1010,15 @@ class UI():
         else:
             self.group_frame_reset_identical_list_box()
 
-        if not identical_stage:
+        if identical_stage:
+            for group in self.marked_coin_group_list:
+                self.cluster.identicals.append(set(group))
+        else:
             #add all identified clusters to progress data !!!TODO
+            #maybe make marked coin group list a dictionary with keys being the cluster name
+            #then we add the dictionary during update progress
             pass
-
+            
         self.check_completion_and_move_on()
         if not self.quit:
             self.current_page = 0
@@ -1078,6 +1078,8 @@ class UI():
         self.added_coin_dict = {}
         #keep track of coins that have been confirmed
         self.marked_added_coin_dict = {}
+        #keep track of identified groups (list of list)
+        self.marked_coin_group_list = []
 
         #identical coin list box displays the names of the identical coins
         self.scrollbar = tk.Scrollbar(self.right_main_frame, orient = tk.VERTICAL)
@@ -1123,7 +1125,7 @@ class UI():
         #buttons
         list_button_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 3,2,1,self.right_main_frame, "w")
         _ = self.add_button("Remove from list", self.group_frame_remove_image_from_list, 2, 13, 0, 3, 1,1, list_button_frame, "w")
-        _ = self.add_button("Confirm current list", self.group_frame_confirm_current_list(identical_stage), 2,13, 1, 3, 1,1, list_button_frame, "e")
+        _ = self.add_button("Confirm current list", self.group_frame_confirm_current_list, 2,13, 1, 3, 1,1, list_button_frame, "e")
 
         prev_next_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 4, 2,1,self.right_main_frame, "w")
         _ = self.add_button("◀", self.group_frame_load_prev_page, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
@@ -1146,3 +1148,5 @@ class UI():
         self.root.bind('4', lambda event: self._add_function_3())
         self.root.bind('5', lambda event: self._add_function_4())
         self.root.bind('6', lambda event: self._add_function_5())
+
+# %%
