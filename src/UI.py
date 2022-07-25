@@ -1129,7 +1129,7 @@ class UI():
         _ = self.add_button("◀", self.group_frame_load_prev_page, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
         _ = self.add_button("▶", self.group_frame_load_next_page, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
 
-        _ = self.add_button("Next Cluster", self.group_frame_next_cluster(identical_stage), 3, 15, 1, 2, 1, 1, self.frame, "sw" )
+        _ = self.add_button("Next Cluster", lambda event: self.group_frame_next_cluster(identical_stage), 3, 15, 1, 2, 1, 1, self.frame, "sw" )
         self.current_cluster_label  = self.add_text("Current cluster: ",0, 3, 1, 1, self.frame, "w" )
 
     def group_frame_start(self, identical_stage = False):
