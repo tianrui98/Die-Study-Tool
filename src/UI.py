@@ -319,6 +319,7 @@ class UI():
         self.root.destroy()
         self.quit = True
 
+
     def export_data(self, keep_progress = False):
         save_address = filedialog.askdirectory() # asks user to choose a directory
         if not save_address:
