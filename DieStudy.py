@@ -1,5 +1,3 @@
-from src.UI_group import GroupDisplay
-from src.UI_pair import PairDisplay
 from src.UI import UI
 from src.progress import load_progress
 import os
