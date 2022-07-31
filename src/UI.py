@@ -732,42 +732,6 @@ class UI():
         if self.testing_mode:
             self.test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "unmatch")
 
-    def pair_frame_mark_best_image (self):
-        """During cluster validation, mark right image the best image of the cluster
-        - If the two images were marked unmatched, no effect
-        - Make the right image cluster.best_image
-        - Swap the left and right images
-        """
-        # if right image is already classified as single, no effect
-        if self.stage.stage_number > 0 or self._get_image_name(self.right_image_index) in self.cluster.nomatches or self.right_image_index >= len(self.cluster.images):
-            return None
-        if self.testing_mode:
-                self.test.swap_best_image(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index))
-
-        #swap attributes
-        self.cluster.best_image = self._get_image_object(self.right_image_index)
-        #swap pictures
-        self.pair_frame_add_images(self.right_image_index, self.left_image_index)
-        #swap the positions of the old best image with the old right image in the list
-        self.cluster.images = self._swap_positions(self.cluster.images, self.left_image_index, self.right_image_index)
-
-        #update image info display
-        self.pair_frame_update_image_label()
-        self.pair_frame_update_cluster_label()
-
-        #if old best image has been matched to anything in the cluster before -> mark checked & match
-        if len(self.cluster.matches) > 0:
-            self.pair_frame_mark_match()
-            self._mark_compared()
-            #delist current best image from matches
-            if self._get_image_name(self.left_image_index) in self.cluster.matches:
-                self.cluster.matches.remove(self._get_image_name(self.left_image_index))
-        else:
-            self.pair_frame_change_tick_color("right", False)
-            self._deactivate_button(self.match_btn)
-        logger.info("Make {} best image for cluster {}".format(self._get_image_name(self.left_image_index), self.cluster.name))
-
-
     def pair_frame_check_completion_and_move_on (self):
         """This function is called when user clicks "next" while at the last image
         !!! only mark cluster complete if user clicks ok"""
@@ -860,6 +824,8 @@ class UI():
             self.right_image_window.configure(image = img)
             self.right_image_window.image = img
 
+        self.last_selected_image_name = image_object.name
+
     def _add_function_0(self):
         image_object = self.image_on_display[0][0]
         self.group_frame_add_image_to_list(image_object)
@@ -919,7 +885,18 @@ class UI():
         self.right_image_window.image = img
 
     def group_frame_mark_best_image(self):
-        image_name = self.added_coin_list_box.get(tk.ANCHOR)
+
+        if self.stage.stage_number == 3:
+            return None
+
+        if tk.ANCHOR != "anchor":
+            image_name = self.added_coin_list_box.get(tk.ANCHOR)
+        elif self.last_selected_image_name:
+            image_name = self.last_selected_image_name
+            tk.ANCHOR = self.added_coin_list_box.get(0, "end").index(image_name)
+        else:
+            return None
+
         if not image_name in self.added_coin_dict:
             return None
 
@@ -929,9 +906,12 @@ class UI():
         #move selected item to the top of the list
         self.added_coin_list_box.delete(tk.ANCHOR)
         self.added_coin_list_box.insert(0, image_name)
+        tk.ANCHOR = 0
 
         #highlight the item
         self.added_coin_list_box.itemconfig(0,{'bg':'khaki3'})
+
+        logger.info("Make {} best image for the cluster".format(image_name))
 
     def group_frame_onselect(self, evt):
         """update the display window according to the image being selected
@@ -1084,6 +1064,9 @@ class UI():
             self.image_on_display[display_index][1].image = img
             image_widget = self.image_on_display[display_index][1]
             self.image_on_display[display_index]= (image_object, image_widget)
+
+        self.last_selected_image_name = None
+        tk.ANCHOR = "anchor"
 
     def create_group_frame (self, identical_stage = False):
         #the first 6 images will be on page 0, the next 6 on page 1 etc.
