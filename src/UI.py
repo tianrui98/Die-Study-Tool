@@ -925,6 +925,21 @@ class UI():
         self.right_image_window.configure(image = img)
         self.right_image_window.image = img
 
+    def group_frame_mark_best_image(self):
+        image_name = self.added_coin_list_box.get(tk.ANCHOR)
+        if not image_name in self.added_coin_dict:
+            return None
+
+        #de-highlight old best image (first image)
+        self.added_coin_list_box.itemconfig(0,{'bg':'white'})
+
+        #move selected item to the top of the list
+        self.added_coin_list_box.delete(tk.ANCHOR)
+        self.added_coin_list_box.insert(0, image_name)
+
+        #highlight the item
+        self.added_coin_list_box.itemconfig(0,{'bg':'khaki3'})
+
     def group_frame_onselect(self, evt):
         """update the display window according to the image being selected
 
@@ -949,7 +964,7 @@ class UI():
         logger.info(f"Confirm coin list {self.added_coin_dict}")
         self.marked_added_coin_dict.update(self.added_coin_dict)
         added_coin_list = list(self.added_coin_dict.keys())
-        best_image_name = added_coin_list[0]
+        best_image_name = self.added_coin_list_box.get(0)
         self.marked_coin_group_list.append((added_coin_list, best_image_name))
 
         self.group_frame_reset_identical_list_box()
@@ -1125,7 +1140,8 @@ class UI():
         #buttons
         list_button_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 3,2,1,self.right_main_frame, "w")
         _ = self.add_button("Remove from list", self.group_frame_remove_image_from_list, 2, 13, 0, 3, 1,1, list_button_frame, "w")
-        _ = self.add_button("Confirm current list", self.group_frame_confirm_current_list, 2,13, 1, 3, 1,1, list_button_frame, "e")
+        _ = self.add_button("Mark best image", self.group_frame_mark_best_image, 2, 13, 1, 3, 1,1, list_button_frame, "e")
+        _ = self.add_button("Confirm current list", self.group_frame_confirm_current_list, 2,13, 0, 4, 1,1, list_button_frame, "w")
 
         prev_next_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 4, 2,1,self.right_main_frame, "w")
         _ = self.add_button("◀", self.group_frame_load_prev_page, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
@@ -1141,6 +1157,7 @@ class UI():
         self.root.bind('<Left>', lambda event: self.group_frame_load_prev_page())
         self.root.bind('c', lambda event: self.group_frame_confirm_current_list())
         self.root.bind('r', lambda event: self.group_frame_remove_image_from_list())
+        self.root.bind('b', lambda event: self.group_frame_mark_best_image())
         self.root.bind('n', lambda event: self.group_frame_next_cluster(identical_stage))
         self.root.bind('1', lambda event: self._add_function_0())
         self.root.bind('2', lambda event: self._add_function_1())
