@@ -36,3 +36,4 @@ if __name__ == "__main__":
 #6. Add delete project button
 #7. when save progress, save all matches and no matches of the current cluster - done
 #8. Only save progress (write to data.json) when the user clicks save button - done
+
