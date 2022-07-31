@@ -331,8 +331,6 @@ class UI():
         logger.info("====EXPORTED RESULTS====")
         if not keep_progress:
             self.root.destroy()
-            if self.mainUI:
-                self.mainUI.destroy()
             self.quit = True
 
     def export(self, project_completed = False):
@@ -396,7 +394,6 @@ class UI():
         self.open_btn = self.add_button("Open", self.create_open_window, 2, 3, 1, 0, 1, 1, right_menu_bar, sticky = "e")
         self.export_btn = self.add_button("Export", self.export, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
         self.save_btn = self.add_button("Save", self.save, 2, 3, 3, 0, 1, 1, right_menu_bar, sticky = "e")
-        self._deactivate_button(self.save_btn) #TODO activate it later
         self.exit_btn = self.add_button("Exit", self.exit, 2, 3, 4, 0, 1, 1, right_menu_bar, sticky = "e")
 
         left_menu_bar = self.add_frame(self.button_frame_height, self.button_frame_width,0, 0, 1, 1, self.root, "we")
@@ -441,7 +438,6 @@ class UI():
 
         action_button_height = 4
 
-        self.best_image_btn = self.add_button("Best Image", self.pair_frame_mark_best_image, action_button_height, 8, 0, 0, 1, 1, action_bar,"se")
         self.no_match_btn = self.add_button("No Match", self.pair_frame_mark_no_match, action_button_height, 8, 1, 0, 1, 1, action_bar, "se")
         self.match_btn = self.add_button("Match", self.pair_frame_mark_match, action_button_height, 8, 2, 0, 1, 1, action_bar, "se")
 
@@ -592,13 +588,6 @@ class UI():
     def pair_frame_update_icon_button_color (self):
         """When browsing through images, update icon and button styles based on what action has been done to the right image
         """
-        #disable best image and identical button if stage is not 0
-        if self.stage.stage_number != 0:
-            # self.identical_btn["state"] = "disabled"
-            self.best_image_btn["state"] = "disabled"
-        else:
-            # self.identical_btn["state"] = "normal"
-            self.best_image_btn["state"] = "normal"
 
         #the pair has been previously matched
         if self._get_image_name(self.right_image_index) in self.cluster.matches:
@@ -636,7 +625,7 @@ class UI():
 
         if self.right_image_index < len(self.cluster.images):
             new_image_path = self._get_image_address(self.right_image_index)
-            new_img = self.create_image_object(new_image_path, self.image_height_pixel)
+            new_img = self.create_image_object(new_image_path)
             self.right_image.configure(image = new_img)
             self.right_image.image = new_img
             self.pair_frame_update_cluster_label()
@@ -644,7 +633,7 @@ class UI():
 
         else:
             new_image_path = os.path.join("images", "end.png")
-            new_img = self.create_image_object(new_image_path, self.image_height_pixel)
+            new_img = self.create_image_object(new_image_path)
             self.right_image.configure(image = new_img)
             self.right_image.image = new_img
             new_cluster_label = ""
@@ -684,7 +673,7 @@ class UI():
 
         if self.right_image_index >= 0:
             new_image_path = self._get_image_address(self.right_image_index)
-            new_img = self.create_image_object(new_image_path, self.image_height_pixel)
+            new_img = self.create_image_object(new_image_path)
             self.right_image.configure(image = new_img)
             self.right_image.image = new_img
             self.pair_frame_update_image_label()
@@ -703,15 +692,16 @@ class UI():
         if self.right_image_index < len(self.cluster.images):
             self.pair_frame_change_tick_color ("right", checked = True)
             self._activate_button(self.match_btn)
+            self._deactivate_button(self.no_match_btn)
 
             if self._get_image_name(self.right_image_index) not in self.cluster.compared_before:
                 self.cluster.matches.add(self._get_image_name(self.right_image_index))
-                #delist from nomatches
-                if self._get_image_name(self.right_image_index) in self.cluster.nomatches:
-                    self.cluster.nomatches.remove(self._get_image_name(self.right_image_index))
-                    self._deactivate_button(self.no_match_btn)
-                self._mark_compared()
-                logger.info("Match {} to cluster {}".format(self._get_image_name(self.right_image_index),self.cluster.name))
+            #delist from nomatches
+            if self._get_image_name(self.right_image_index) in self.cluster.nomatches:
+                self.cluster.nomatches.remove(self._get_image_name(self.right_image_index))
+                
+            self._mark_compared()
+            logger.info("Match {} to cluster {}".format(self._get_image_name(self.right_image_index),self.cluster.name))
 
         if self.testing_mode:
             self.test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "match")
@@ -729,15 +719,16 @@ class UI():
         if self.right_image_index < len(self.cluster.images):
             self.pair_frame_change_tick_color ("right", checked = True)
             self._activate_button(self.no_match_btn)
+            self._deactivate_button(self.match_btn)
 
             if self._get_image_name(self.right_image_index) not in self.cluster.compared_before:
                 self.cluster.nomatches.add(self._get_image_name(self.right_image_index))
-                #delist from matches
-                if self._get_image_name(self.right_image_index) in self.cluster.matches:
-                    self.cluster.matches.remove(self._get_image_name(self.right_image_index))
-                    self._deactivate_button(self.match_btn)
-                self._mark_compared()
-                logger.info("Unmatch {} from cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
+            #delist from matches
+            if self._get_image_name(self.right_image_index) in self.cluster.matches:
+                self.cluster.matches.remove(self._get_image_name(self.right_image_index))
+                
+            self._mark_compared()
+            logger.info("Unmatch {} from cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
         if self.testing_mode:
             self.test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "unmatch")
 
@@ -801,7 +792,7 @@ class UI():
                 if self.testing_mode:
                     self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
                     self.test.test_image_number(self.progress_data[self.project_name]["clusters"],self.project_name)
-                self.start_identical_UI()
+                self.group_frame_start(identical_stage= True)
                 return None
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
@@ -828,7 +819,7 @@ class UI():
                 if completion_status == "stage":
                     logger.info(str(self.progress_data))
                 if self.stage.stage_number == 3:
-                    self.start_identical_UI()
+                    self.group_frame_start(identical_stage = True)
                 else:
                     self.pair_frame_refresh_image_display()
             else:
@@ -841,11 +832,13 @@ class UI():
         self.root.bind('<Left>', lambda event: self.pair_frame_load_prev_image())
         self.root.bind('m', lambda event: self.pair_frame_mark_match())
         self.root.bind('n', lambda event: self.pair_frame_mark_no_match())
-        self.root.bind('b', lambda event: self.pair_frame_mark_best_image())
     
     def pair_frame_start(self):
+        self.frame.grid_forget()
         self.create_pair_frame()
         self.pair_frame_bind_keys()
+        self.pair_frame_refresh_image_display()
+        self.root.after(1, lambda: self.root.focus_force())
 
 #%% Actions for the Group Display Frame
     #functionality
@@ -991,7 +984,12 @@ class UI():
         """This function is called when user clicks "next" while at the last image
         !!! only mark cluster complete if user clicks ok"""
 
+        #user confirms that the cluster is completed
         self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
+        completion_status = "cluster"
+        if self.testing_mode:
+            self.test.translate_actions(self.stage.stage_number)
+
         if progress.check_project_completion(self.stage, self.progress_data[self.project_name]["clusters"]):
             if self.testing_mode:
                 self.test.test_image_number(self.progress_data[self.project_name]["clusters"], self.project_address)
@@ -999,42 +997,55 @@ class UI():
             if not exported:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
         else:
-            message = "You have completed the current cluster."
+            if progress.check_stage_completion(self.stage, self.progress_data[self.project_name]["clusters"]):
+                message = "You have completed the current *STAGE*."
+                completion_status = "stage"
+                logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
+                if self.testing_mode:
+                    self.test.test_comparison(self.project_name, self.stage.stage_number)
+                    self.test.clear_comparisons()
+            elif completion_status == "cluster":
+                message = "You have completed the current cluster."
+            else:
+                return None
             response = self.create_save_progress_window(message)
             if response:
-                self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data)
-                last_cluster = self.cluster
-                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, "cluster")
+                self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data, self.marked_coin_group_list)
+                self.cluster, self.stage= progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status)
+                if self.testing_mode:
+                    self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
 
-                #project has been completed
-                if not self.cluster:
-                    exported = self.group_frame_finish_project()
-                    if not exported:
-                        self.stage = progress.unmark_cluster_completed(last_cluster, self.stage, self.progress_data[self.project_name]["clusters"])
+                #update display
+                if completion_status == "stage":
+                    logger.info(str(self.progress_data))
+                if self.stage.stage_number == 1:
+                    self.pair_frame_start()
+                else:
+                    self.group_frame_refresh_image_display()
+               
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
 
-    def group_frame_next_cluster(self, identical_stage = False):
+        self.root.after(1, lambda: self.root.focus_force())
+
+    def group_frame_next_cluster(self):
         """Save current progress and display next cluster
         If all clusters have been visited -> end of project
         """
         if len(self.added_coin_dict) > 1:
-            confirm_list = messagebox.askyesno("Identical coins", "Confirm current set of identical coins?")
+            confirm_list = messagebox.askyesno("Next Cluster", "Confirm current list of coins?")
             if confirm_list:
-                self.group_frame_confirm_current_list(identical_stage)
+                self.group_frame_confirm_current_list()
             else:
                 self.group_frame_reset_identical_list_box()
         else:
             self.group_frame_reset_identical_list_box()
 
-        if identical_stage:
-            for group in self.marked_coin_group_list:
+        if self.stage.stage_number == 3:
+            for group, _ in self.marked_coin_group_list:
                 self.cluster.identicals.append(set(group))
-        else:
-            #add all identified clusters to progress data !!!TODO
-            self.progress_data[self.project_name]["clusters"] = progress.stage0_consolidate_match_groups(self.cluster,self.marked_coin_group_list, self.progress_data[self.project_name]["clusters"])
-            
-        self.check_completion_and_move_on()
+
+        self.group_frame_check_completion_and_move_on()
         if not self.quit:
             self.current_page = 0
             self.group_frame_refresh_image_display()
@@ -1140,14 +1151,16 @@ class UI():
         #buttons
         list_button_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 3,2,1,self.right_main_frame, "w")
         _ = self.add_button("Remove from list", self.group_frame_remove_image_from_list, 2, 13, 0, 3, 1,1, list_button_frame, "w")
-        _ = self.add_button("Mark best image", self.group_frame_mark_best_image, 2, 13, 1, 3, 1,1, list_button_frame, "e")
+        best_image_btn = self.add_button("Mark best image", self.group_frame_mark_best_image, 2, 13, 1, 3, 1,1, list_button_frame, "e")
+        if identical_stage:
+            best_image_btn["state"] = "disabled"
         _ = self.add_button("Confirm current list", self.group_frame_confirm_current_list, 2,13, 0, 4, 1,1, list_button_frame, "w")
 
         prev_next_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 4, 2,1,self.right_main_frame, "w")
         _ = self.add_button("◀", self.group_frame_load_prev_page, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
         _ = self.add_button("▶", self.group_frame_load_next_page, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
 
-        _ = self.add_button("Next Cluster", lambda : self.group_frame_next_cluster(identical_stage), 3, 15, 1, 2, 1, 1, self.frame, "sw" )
+        _ = self.add_button("Next Cluster", self.group_frame_next_cluster, 3, 15, 1, 2, 1, 1, self.frame, "sw" )
         self.current_cluster_label  = self.add_text("Current cluster: ",0, 3, 1, 1, self.frame, "w" )
 
     def group_frame_start(self, identical_stage = False):
@@ -1158,12 +1171,13 @@ class UI():
         self.root.bind('c', lambda event: self.group_frame_confirm_current_list())
         self.root.bind('r', lambda event: self.group_frame_remove_image_from_list())
         self.root.bind('b', lambda event: self.group_frame_mark_best_image())
-        self.root.bind('n', lambda event: self.group_frame_next_cluster(identical_stage))
+        self.root.bind('n', lambda event: self.group_frame_next_cluster())
         self.root.bind('1', lambda event: self._add_function_0())
         self.root.bind('2', lambda event: self._add_function_1())
         self.root.bind('3', lambda event: self._add_function_2())
         self.root.bind('4', lambda event: self._add_function_3())
         self.root.bind('5', lambda event: self._add_function_4())
         self.root.bind('6', lambda event: self._add_function_5())
+        self.root.after(1, lambda: self.root.focus_force())
 
 # %%

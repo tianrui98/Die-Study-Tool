@@ -48,7 +48,7 @@ class Stage:
     """track progress in a stage
     """
     def __init__(self, stage_number, project_data):
-        stages = ["Correcting False Discovery Rate", "Correcting Sensitivity Rate", "Single vs Single", "Find Identicals"]
+        stages = ["1. Correcting False Discovery Rate", "2. Correcting Sensitivity Rate", "3. Single vs Single", "4. Find Identicals"]
         self.stage_number = stage_number
         self.name = stages[self.stage_number]
 

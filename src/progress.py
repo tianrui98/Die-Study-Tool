@@ -288,7 +288,7 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
         
     return clusters_data
 
-def update_progress_data(project_name, stage, cluster, progress_data):
+def update_progress_data(project_name, stage, cluster, progress_data, marked_coin_group_list = None):
     """
     Make changes to the progress data
     {"project_name" : {  "clusters": {cluster_name: {
@@ -318,19 +318,7 @@ def update_progress_data(project_name, stage, cluster, progress_data):
         old_cluster_name = cluster.name
         new_cluster_name = None
         if stage.stage_number == 0:
-            #move nomatches to singles cluster
-            for image_name in list(cluster.nomatches):
-                clusters_data["Singles"]["images"].append(image_name)
-            # if all images do not belong to the cluster -> delete the cluster
-            if len(cluster.matches) == 0 and len(cluster.nomatches) > 0:
-                best_image_name = cluster.best_image.name
-                clusters_data["Singles"]["images"].append(best_image_name)
-                clusters_data.pop(old_cluster_name)
-            else:
-                #delete old cluster name
-                new_cluster_name = _concatenate_image_names(cluster)
-                clusters_data.pop(old_cluster_name)
-                clusters_data[new_cluster_name] = _create_cluster_info_dict(cluster)
+            clusters_data = stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_data)
 
         elif stage.stage_number == 1:
             best_image_cluster_dict = _create_best_image_cluster_dict(clusters_data)
