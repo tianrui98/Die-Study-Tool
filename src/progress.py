@@ -252,6 +252,9 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
     Args:
         marked_coin_group_list (_type_): _description_
     """
+    if not marked_coin_group_list:
+        return clusters_data
+        
     original_images_set = set(cluster.images_dict.keys())
     seen_images_set = set()
     old_cluster_name = cluster.name

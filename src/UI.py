@@ -347,7 +347,7 @@ class UI():
         else:
             response = messagebox.askokcancel("Export intermediate results", "You have NOT completed the current project.\nExport the intermediate results?" )
             if response:
-                keep_progress = messagebox.askyesno("Export intermediate results", "Keep your current progress in the system ?" )
+                keep_progress = messagebox.askyesno("Export intermediate results", "Keep the project in the system ?" )
                 self.export_data(keep_progress)
         return response
 
