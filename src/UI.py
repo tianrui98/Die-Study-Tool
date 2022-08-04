@@ -244,7 +244,6 @@ class UI():
             self.group_frame_start()
             self.group_frame_refresh_image_display()
         else:
-            #start identical UI
             self.pair_frame_start()
             self.pair_frame_refresh_image_display()
 
@@ -279,8 +278,13 @@ class UI():
         #open the first cluster
         self.cluster = self.open_first_cluster()
 
-        #refresh image display
-        self.pair_frame_refresh_image_display()
+        #create frames based on the stage
+        if self.stage.stage_number == 0 or self.stage.stage_number == 3:
+            self.group_frame_start()
+            self.group_frame_refresh_image_display()
+        else:
+            self.pair_frame_start()
+            self.pair_frame_refresh_image_display()
 
         #close pop-up
         self.open_window.destroy()
@@ -440,8 +444,8 @@ class UI():
 
         action_button_height = 4
 
-        self.no_match_btn = self.add_button("No Match", self.pair_frame_mark_no_match, action_button_height, 8, 1, 0, 1, 1, action_bar, "se")
-        self.match_btn = self.add_button("Match", self.pair_frame_mark_match, action_button_height, 8, 2, 0, 1, 1, action_bar, "se")
+        self.no_match_btn = self.add_button("No Match (N)", self.pair_frame_mark_no_match, action_button_height, 12, 1, 0, 1, 1, action_bar, "se")
+        self.match_btn = self.add_button("Match (M)", self.pair_frame_mark_match, action_button_height, 12, 2, 0, 1, 1, action_bar, "se")
 
     def start(self):
         self.create_UI()
@@ -753,7 +757,7 @@ class UI():
             message = "You have completed the current *STAGE*."
             response = self.create_save_progress_window(message)
             if response:
-                self.progress_data, self.stage = progress.save_progress_data(self.project_name, self.stage,self.cluster,self.progress_data)
+                self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data)
                 self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status)
                 if self.testing_mode:
                     self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
@@ -825,8 +829,10 @@ class UI():
             img = self.create_image_object(os.path.join(self.project_address, image_object.name), int(self.right_main_frame_width_pixel * 0.7))
             self.right_image_window.configure(image = img)
             self.right_image_window.image = img
+            if self.stage.stage_number == 0:
+                self.added_coin_list_box.itemconfig(0,{'bg':'khaki3'})
 
-        self.last_selected_image_name = image_object.name
+        self.added_coin_list_box.select_anchor(tk.END) 
 
     def _add_function_0(self):
         image_object = self.image_on_display[0][0]
@@ -890,13 +896,9 @@ class UI():
 
         if self.stage.stage_number == 3:
             return None
-
-        if tk.ANCHOR != "anchor":
-            image_name = self.added_coin_list_box.get(tk.ANCHOR)
-        elif self.last_selected_image_name:
-            image_name = self.last_selected_image_name
-            tk.ANCHOR = self.added_coin_list_box.get(0, "end").index(image_name)
-        else:
+        
+        image_name = self.added_coin_list_box.get(tk.ANCHOR)
+        if image_name == self.added_coin_list_box.get(0):
             return None
 
         if not image_name in self.added_coin_dict:
@@ -908,7 +910,6 @@ class UI():
         #move selected item to the top of the list
         self.added_coin_list_box.delete(tk.ANCHOR)
         self.added_coin_list_box.insert(0, image_name)
-        tk.ANCHOR = 0
 
         #highlight the item
         self.added_coin_list_box.itemconfig(0,{'bg':'khaki3'})
@@ -928,6 +929,7 @@ class UI():
         img = self.create_image_object(os.path.join(self.project_address, image_object.name), int(self.right_main_frame_width_pixel * 0.7))
         self.right_image_window.configure(image = img)
         self.right_image_window.image = img
+
 
     def group_frame_confirm_current_list (self):
         """mark the images on the list identical and un-display their widgets.
@@ -1031,6 +1033,7 @@ class UI():
         if not self.quit:
             self.current_page = 0
             self.group_frame_refresh_image_display()
+            self.initialize_stack()
             self.root.after(1, lambda: self.root.focus_force())
 
     def group_frame_load_next_page(self) -> None:
@@ -1067,8 +1070,13 @@ class UI():
             image_widget = self.image_on_display[display_index][1]
             self.image_on_display[display_index]= (image_object, image_widget)
 
-        self.last_selected_image_name = None
-        tk.ANCHOR = "anchor"
+    def initialize_stack(self):
+        # a dictionary of image objects currently on the stack. Key: image name. Value: image object
+        self.added_coin_dict = {}
+        #keep track of coins that have been confirmed
+        self.marked_added_coin_dict = {}
+        #keep track of identified groups (list of list of tuples)
+        self.marked_coin_group_list = [] #([name1, name2, name3], best_image_name)
 
     def create_group_frame (self, identical_stage = False):
         #the first 6 images will be on page 0, the next 6 on page 1 etc.
@@ -1085,12 +1093,7 @@ class UI():
         #right main frame: display current identical groups
         self.right_main_frame = self.add_frame(self.main_frame_height, self.right_main_frame_width_pixel, 1, 1, 1, 2, self.frame, "nsew")
 
-        # a dictionary of image objects currently on the stack. Key: image name. Value: image object
-        self.added_coin_dict = {}
-        #keep track of coins that have been confirmed
-        self.marked_added_coin_dict = {}
-        #keep track of identified groups (list of list of tuples)
-        self.marked_coin_group_list = [] #([name1, name2, name3], best_image_name)
+        self.initialize_stack()
 
         #identical coin list box displays the names of the identical coins
         self.scrollbar = tk.Scrollbar(self.right_main_frame, orient = tk.VERTICAL)
@@ -1121,7 +1124,7 @@ class UI():
             self.image_on_display[i] = (None, image_filler)
             image_label = self.add_text("", 0,1,1,1, image_frame, "se")
             add_function = self._add_function_n(i)
-            _ = self.add_button("Add", add_function , self._pixel_to_char(int(self.main_frame_height * 0.01)), 5, 1,1,1,1, image_frame, "se")
+            _ = self.add_button(f"Add ({i + 1})", add_function , self._pixel_to_char(int(self.main_frame_height * 0.01)), 5, 1,1,1,1, image_frame, "se")
             self.image_label_widgets.append(image_label)
 
         #a small image for easy comparison
@@ -1135,17 +1138,17 @@ class UI():
 
         #buttons
         list_button_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 3,2,1,self.right_main_frame, "w")
-        _ = self.add_button("Remove from list", self.group_frame_remove_image_from_list, 2, 13, 0, 3, 1,1, list_button_frame, "w")
-        best_image_btn = self.add_button("Mark best image", self.group_frame_mark_best_image, 2, 13, 1, 3, 1,1, list_button_frame, "e")
+        _ = self.add_button("Remove from list (R)", self.group_frame_remove_image_from_list, 2, 17, 0, 3, 1,1, list_button_frame, "w")
+        best_image_btn = self.add_button("Mark best image (B)", self.group_frame_mark_best_image, 2, 17, 1, 3, 1,1, list_button_frame, "e")
         if identical_stage:
             best_image_btn["state"] = "disabled"
-        _ = self.add_button("Confirm current list", self.group_frame_confirm_current_list, 2,13, 0, 4, 1,1, list_button_frame, "w")
+        _ = self.add_button("Confirm current list (C)", self.group_frame_confirm_current_list, 2,17, 0, 4, 1,1, list_button_frame, "w")
 
         prev_next_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 4, 2,1,self.right_main_frame, "w")
         _ = self.add_button("◀", self.group_frame_load_prev_page, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
         _ = self.add_button("▶", self.group_frame_load_next_page, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
 
-        _ = self.add_button("Next Cluster", self.group_frame_next_cluster, 3, 15, 1, 2, 1, 1, self.frame, "sw" )
+        _ = self.add_button("Next Cluster (N)", self.group_frame_next_cluster, 3, 19, 1, 2, 1, 1, self.frame, "sw" )
         self.current_cluster_label  = self.add_text("Current cluster: ",0, 3, 1, 1, self.frame, "w" )
 
     def group_frame_start(self, identical_stage = False):

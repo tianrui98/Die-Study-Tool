@@ -255,11 +255,14 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
     original_images_set = set(cluster.images_dict.keys())
     seen_images_set = set()
     old_cluster_name = cluster.name
+    new_cluster_name = old_cluster_name
     new_cluster_name_list = []
 
     if len(marked_coin_group_list) <= 0:
         for image_name in original_images_set:
             clusters_data["Singles"]["images"].append(image_name)
+        clusters_data.pop(old_cluster_name)
+        return clusters_data
     else:
         for (matched_coin_list, best_image_name) in marked_coin_group_list:
             new_cluster_name = _concatenate_image_names_from_list(matched_coin_list)
@@ -279,13 +282,14 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
             clusters_data[new_cluster_name]["identicals"] = []
 
             seen_images_set = seen_images_set.union(set(matched_coin_list))
+
+            if old_cluster_name != new_cluster_name:
+                clusters_data.pop(old_cluster_name)
     #send the unmatched images to Singles
     single_images_list = list(original_images_set - seen_images_set)
     for image_name in single_images_list:
         clusters_data["Singles"]["images"].append(image_name)
 
-    clusters_data.pop(old_cluster_name)
-        
     return clusters_data
 
 def update_progress_data(project_name, stage, cluster, progress_data, marked_coin_group_list = None):
@@ -546,7 +550,7 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name):
         #filter the singles
         images_in_single = []
         for single in clusters_data["Singles"]["images"]:
-            if (single not in clusters_data[next_cluster_name]["images"]) and (single not in clusters_data[next_cluster_name]["nomatches"]):
+            if single not in clusters_data[next_cluster_name]["nomatches"]:
                 images_in_single.append(single)
 
         #filter the best images
