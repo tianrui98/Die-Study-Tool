@@ -240,11 +240,13 @@ class UI():
             self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["images"])
 
         logger.info(f"Open project {self.project_name} at stage {self.stage.stage_number} ")
-        if self.stage.stage_number < 3:
-            self.pair_frame_refresh_image_display()
+        if self.stage.stage_number == 0 or self.stage.stage_number == 3:
+            self.group_frame_start()
+            self.group_frame_refresh_image_display()
         else:
             #start identical UI
-            self.start_identical_UI()
+            self.pair_frame_start()
+            self.pair_frame_refresh_image_display()
 
     def browse_files(self):
         """Let user choose which new project/folder to start working on
@@ -1147,6 +1149,7 @@ class UI():
         self.current_cluster_label  = self.add_text("Current cluster: ",0, 3, 1, 1, self.frame, "w" )
 
     def group_frame_start(self, identical_stage = False):
+        self.frame.grid_forget()
         self.create_group_frame(identical_stage)
         self.group_frame_refresh_image_display()
         self.root.bind('<Right>', lambda event: self.group_frame_load_next_page())
