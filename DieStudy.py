@@ -25,15 +25,4 @@ def test_main():
     UI(testing_mode = True).start()
 
 if __name__ == "__main__":
-    test_main()
-
-#todo
-#1. add save midway - done
-#2. make it easier to share restored data (path issue) - done
-#3. exit button currently stores the previous cluster. - done
-#4. when user reaches the end of cluster but skipped some images. direct them to those skipped images
-#5. Reduce repetitive comparison - done
-#6. Add delete project button
-#7. when save progress, save all matches and no matches of the current cluster - done
-#8. Only save progress (write to data.json) when the user clicks save button - done
-
+    main()
