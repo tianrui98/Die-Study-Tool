@@ -1057,6 +1057,7 @@ class UI():
         self.project_title_label.config(text = str("Project Title: " + self.project_name))
         self.stage_label.config(text = str("Current Stage: " + self.stage.name))
         self.current_cluster_label.config(text = f"Current Cluster: " + self.cluster.name)
+
         for i in range(self.current_page*6, (self.current_page + 1)*6):
             display_index = i % 6
             self.image_label_widgets[display_index].config(text = "")
@@ -1076,6 +1077,18 @@ class UI():
             self.image_on_display[display_index][1].image = img
             image_widget = self.image_on_display[display_index][1]
             self.image_on_display[display_index]= (image_object, image_widget)
+        
+        #disable next page button if there's not more next pages (aka last index displayed is the last index in cluster.images)
+        if (self.current_page + 1)*6 >= len(self.cluster.images) - 1:
+            self.next_btn["state"] = "disabled"
+        else:
+            self.next_btn["state"] = "normal"
+        
+        #disable prev page button if there's no more prev pages
+        if self.current_page == 0:
+            self.prev_btn["state"] = "disabled"
+        else:
+            self.prev_btn["state"] = "normal"
 
     def initialize_stack(self):
         # a dictionary of image objects currently on the stack. Key: image name. Value: image object
@@ -1152,8 +1165,8 @@ class UI():
         _ = self.add_button("Confirm current list (C)", self.group_frame_confirm_current_list, 2,17, 0, 4, 1,1, list_button_frame, "w")
 
         prev_next_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 4, 2,1,self.right_main_frame, "w")
-        _ = self.add_button("◀", self.group_frame_load_prev_page, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
-        _ = self.add_button("▶", self.group_frame_load_next_page, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
+        self.prev_btn = self.add_button("◀", self.group_frame_load_prev_page, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
+        self.next_btn= self.add_button("▶", self.group_frame_load_next_page, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
 
         _ = self.add_button("Next Cluster (N)", self.group_frame_next_cluster, 3, 19, 1, 2, 1, 1, self.frame, "sw" )
         self.current_cluster_label  = self.add_text("Current cluster: ",0, 3, 1, 1, self.frame, "w" )
