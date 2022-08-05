@@ -1079,7 +1079,7 @@ class UI():
             self.image_on_display[display_index]= (image_object, image_widget)
         
         #disable next page button if there's not more next pages (aka last index displayed is the last index in cluster.images)
-        if (self.current_page + 1)*6 >= len(self.cluster.images) - 1:
+        if (self.current_page + 1)*6 >= len(self.cluster.images) :
             self.next_btn["state"] = "disabled"
         else:
             self.next_btn["state"] = "normal"
@@ -1131,7 +1131,6 @@ class UI():
 
         #Left main frame can display max 6 pictures.
         self.image_on_display = {} #key: element index (0-5), value: (image object, image widget)
-        #0:(None,None),1:(None,None),2:(None,None), 3:(None,None),4:(None,None),5:(None,None)
         self.image_label_widgets = []
         self.image_frames = []
 

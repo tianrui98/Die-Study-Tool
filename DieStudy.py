@@ -13,5 +13,8 @@ def test_main():
     """
     UI(testing_mode = True).start()
 
+def restore():
+    restore_progress()
+
 if __name__ == "__main__":
-    test_main()
+    main()

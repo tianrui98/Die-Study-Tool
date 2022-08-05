@@ -161,7 +161,7 @@ def start_new_project(original_project_address, project_name):
         if not cluster_name.startswith('.'):
             original_images = sorted([f for f in os.listdir(os.path.join(original_project_address, cluster_name)) if not f.startswith(".")])
             if cluster_name == "Singles":
-                best_image = None
+                best_image = ""
             else:
                 best_image = original_images[0]
             
@@ -541,7 +541,7 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name):
         next_cluster = Cluster(cluster_name = next_cluster_name, 
         images = clusters_data[next_cluster_name]["images"], 
         identicals = [], 
-        best_image_name = None, 
+        best_image_name = "", 
         matches = set(), 
         nomatches = set())
 
@@ -595,7 +595,7 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name):
         next_cluster = Cluster(cluster_name = next_cluster_name, 
         images = images,
         identicals = [], 
-        best_image_name = None, 
+        best_image_name = "", 
         matches = set(images), #at stage 4, all images in the cluster folder have been marked as matches in the previous stages
         nomatches = set())
         
