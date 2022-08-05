@@ -14,4 +14,4 @@ def test_main():
     UI(testing_mode = True).start()
 
 if __name__ == "__main__":
-    main()
+    test_main()

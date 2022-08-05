@@ -916,6 +916,11 @@ class UI():
         #highlight the item
         self.added_coin_list_box.itemconfig(0,{'bg':'khaki3'})
 
+        #update preview window
+        img = self.create_image_object(os.path.join(self.project_address, image_name), int(self.right_main_frame_width_pixel * 0.7))
+        self.right_image_window.configure(image = img)
+        self.right_image_window.image = img
+
         logger.info("Make {} best image for the cluster".format(image_name))
 
     def group_frame_onselect(self, evt):
