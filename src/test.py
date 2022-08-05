@@ -36,7 +36,18 @@ class Test:
 
         self.move_singleton_to_singles()
         self.clear_actions()
-
+    
+    def update_test_data_stage0(self, marked_coin_group_list, images_in_cluster):
+        
+        unmatched_coins = images_in_cluster
+        for matched_coin_list, best_image_name in marked_coin_group_list:
+            for coin in matched_coin_list:
+                self.match(best_image_name, coin, 0)
+                unmatched_coins.remove(coin)
+        
+        for coin in unmatched_coins:
+            self.singles.add(coin)
+        
     def move_singleton_to_singles(self):
         to_pop = []
         for left, matches in self.data.items():

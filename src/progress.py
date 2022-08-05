@@ -11,6 +11,7 @@ import os
 import shutil
 import glob
 import pandas as pd
+from sklearn.cluster import cluster_optics_dbscan
 from src.objects import *
 from src.root_logger import *
 from datetime import datetime
@@ -252,9 +253,8 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
     Args:
         marked_coin_group_list (_type_): _description_
     """
-    if not marked_coin_group_list:
+    if marked_coin_group_list == None:
         return clusters_data
-        
     original_images_set = set(cluster.images_dict.keys())
     seen_images_set = set()
     old_cluster_name = cluster.name
@@ -286,8 +286,8 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
 
             seen_images_set = seen_images_set.union(set(matched_coin_list))
 
-            if old_cluster_name != new_cluster_name:
-                clusters_data.pop(old_cluster_name)
+    if old_cluster_name != new_cluster_name:
+        clusters_data.pop(old_cluster_name)
     #send the unmatched images to Singles
     single_images_list = list(original_images_set - seen_images_set)
     for image_name in single_images_list:

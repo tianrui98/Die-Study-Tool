@@ -932,13 +932,13 @@ class UI():
 
 
     def group_frame_confirm_current_list (self):
-        """mark the images on the list identical and un-display their widgets.
+        """mark the images on the list matches and un-display their widgets.
         reset the identical list and display window.
         """
         if len(self.added_coin_dict) <= 1:
             return None
 
-        logger.info(f"Confirm coin list {self.added_coin_dict}")
+        logger.info(f"Confirm coin list {self.added_coin_dict.keys()}")
         self.marked_added_coin_dict.update(self.added_coin_dict)
         added_coin_list = list(self.added_coin_dict.keys())
         best_image_name = self.added_coin_list_box.get(0)
@@ -971,9 +971,8 @@ class UI():
         #user confirms that the cluster is completed
         self.stage = progress.mark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
         completion_status = "cluster"
-        if self.testing_mode:
-            self.test.translate_actions(self.stage.stage_number)
-
+        if self.testing_mode and self.stage.stage_number == 0:
+            self.test.update_test_data_stage0(self.marked_coin_group_list, set(self.cluster.images_dict.keys()))
         if progress.check_project_completion(self.stage, self.progress_data[self.project_name]["clusters"]):
             if self.testing_mode:
                 self.test.test_image_number(self.progress_data[self.project_name]["clusters"], self.project_address)
@@ -984,7 +983,8 @@ class UI():
             if progress.check_stage_completion(self.stage, self.progress_data[self.project_name]["clusters"]):
                 message = "You have completed the current *STAGE*."
                 completion_status = "stage"
-                logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
+                logger.info(f"_____STAGE {self.stage.name} COMPLETED_____")
+                logger.info(f"{self.progress_data}")
                 if self.testing_mode:
                     self.test.test_comparison(self.project_name, self.stage.stage_number)
                     self.test.clear_comparisons()
