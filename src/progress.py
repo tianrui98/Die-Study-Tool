@@ -194,12 +194,10 @@ def _create_cluster_info_dict (cluster):
 
 def _merge_singles(cluster, clusters_data, old_cluster_name):
     """
-    In stage 2, the Singles that are matched to the current cluster will be taken out of the Singles cluster
-
     Args:
         cluster ([type]): [description]
         clusters_data ([type]): [description]
-        new_cluster_name ([type]): [description]
+        old_cluster_name ([type]): name of the single being compared to other singles
 
     Returns:
         [type]: [description]
@@ -213,7 +211,6 @@ def _merge_singles(cluster, clusters_data, old_cluster_name):
     #remove the left image from "Singles" if it has been matched to another single
     if len(cluster.matches) >0 and cluster.name in images_in_singles:
         images_in_singles.remove(cluster.name)
-        new_cluster_name += "_" + cluster.name.split(".")[0]
     if len(new_cluster_name) > 150:
         new_cluster_name = new_cluster_name[:147] + "_etc"
     clusters_data["Singles"]["images"] = list(images_in_singles)
