@@ -752,6 +752,7 @@ class UI():
 
         if progress.check_part1_completion(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"]):
             logger.info(f"_____STAGE {self.stage.name} COMPLETED_____")
+            logger.debug(f"Part 1 completed")
             logger.info(str(self.progress_data))
             completion_status = "part1"
             message = "You have completed the current *STAGE*."
@@ -761,6 +762,7 @@ class UI():
                 self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status)
                 if self.testing_mode:
                     self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
+                    self.test.test_comparison(self.project_name, self.stage.stage_number, self.progress_data[self.project_name]["clusters"])
                     self.test.test_image_number(self.progress_data[self.project_name]["clusters"],self.project_name)
                 self.group_frame_start(identical_stage= True)
                 return None
@@ -772,7 +774,7 @@ class UI():
                 completion_status = "stage"
                 logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
                 if self.testing_mode:
-                    self.test.test_comparison(self.project_name, self.stage.stage_number)
+                    self.test.test_comparison(self.project_name, self.stage.stage_number, self.progress_data[self.project_name]["clusters"])
                     self.test.clear_comparisons()
             elif completion_status == "cluster":
                 message = "You have completed the current cluster."
@@ -986,7 +988,7 @@ class UI():
                 logger.info(f"_____STAGE {self.stage.name} COMPLETED_____")
                 logger.info(f"{self.progress_data}")
                 if self.testing_mode:
-                    self.test.test_comparison(self.project_name, self.stage.stage_number)
+                    self.test.test_comparison(self.project_name, self.stage.stage_number,self.progress_data[self.project_name]["clusters"])
                     self.test.clear_comparisons()
             elif completion_status == "cluster":
                 message = "You have completed the current cluster."

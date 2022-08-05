@@ -482,7 +482,7 @@ def check_part1_completion(cluster,stage, clusters_data):
 
     #we are at stage 1 and we don't have any Single or cluster to compare with the last cluster
     case2 = stage.stage_number == 1 and check_cluster_completion(cluster, stage) and len(stage.clusters_yet_to_check) == 1\
-    and len(set(clusters_data["Singles"]["images"]).intersection(cluster.nomatches)) == len(clusters_data["Singles"]["images"])
+    and len(set(clusters_data["Singles"]["images"]).intersection(clusters_data[list(stage.clusters_yet_to_check)[0]]['nomatches'])) == len(clusters_data["Singles"]["images"])
 
     return case1 or case2
 
@@ -607,7 +607,7 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name):
 def create_next_cluster(stage, clusters_data):
     """If the new cluster has only 1 image. the interface will take care of it"""
     if len(stage.clusters_yet_to_check) == 0:
-        logger.debug(f"stage {stage.stage_number} clusters yet to check is zero")
+        logger.debug(f"stage {stage.name} clusters yet to check is zero")
         return None
     next_cluster_name = sorted(list(stage.clusters_yet_to_check),key= lambda s: s.split("_")[0])[0]
     next_cluster = _create_a_cluster(stage, clusters_data, next_cluster_name)

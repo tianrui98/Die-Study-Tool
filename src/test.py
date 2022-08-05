@@ -182,13 +182,21 @@ class Test:
 
         print("export test passed.")
 
-    def test_comparison (self, project_name, stage_number):
+    def _get_cluster_name(self, best_image, best_image_cluster_name_dict):
+        if best_image in best_image_cluster_name_dict:
+            return best_image_cluster_name_dict[best_image]
+        else:
+            return "Singles"
+
+    def test_comparison (self, project_name, stage_number, clusters_data):
         """Check if every image has been compared with another/best_image
         """
         project_address = os.path.join(os.getcwd(), "projects", project_name)
         original_images =[i for i in os.listdir(project_address) if not i.startswith('.')]
         all_comparisons = { i for i in self.past_comparisons}
         best_image_dict = {}
+        best_image_cluster_name_dict = progress._create_best_image_cluster_dict(clusters_data)
+        
         for left, matches in self.data.items():
             for im in matches:
                 best_image_dict[im] = left
@@ -205,14 +213,21 @@ class Test:
                     if stage_number == 1:
                         a_best = best_image_dict[a]
                         b_best = best_image_dict[b]
-                        if (a_best != b_best) and ((a not in self.singles) and (b not in self.singles)):
-                            if not (((a_best, b_best) in all_comparisons) or ((b_best, a_best) in all_comparisons)):
-                                print(f"pair {(a,b)} not compared")
+                        a_cluster = self._get_cluster_name(a_best, best_image_cluster_name_dict)
+                        b_cluster =  self._get_cluster_name(b_best, best_image_cluster_name_dict)
+                        if (a_best != b_best) \
+                            and (a not in clusters_data[b_cluster]["nomatches"])\
+                                and (b not in clusters_data[a_cluster]["nomatches"])\
+                                    and (a_best not in clusters_data[b_cluster]["nomatches"])\
+                                        and (b_best not in clusters_data[a_cluster]["nomatches"])\
+                                            and (not (a in self.singles and b in self.singles))\
+                                            and (not (((a_best, b_best) in all_comparisons) or ((b_best, a_best) in all_comparisons))):
+                                print(f"stage {stage_number}: pair {(a,b)} not compared")
 
                     elif stage_number == 2:
                         if a in self.singles and b in self.singles:
                             if not (((a,b) in all_comparisons or (b,a) in all_comparisons)):
-                                print(f"pair {(a,b)} not compared")
+                                print(f"stage {stage_number}: pair {(a,b)} not compared")
                     else:
                         return None
         print("comparison test passed.")
