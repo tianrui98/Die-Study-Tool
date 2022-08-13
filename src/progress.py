@@ -788,3 +788,32 @@ def create_new_objects(cluster, stage, project_name, progress_data, completion_s
                 else:
                     return create_new_objects(new_cluster, stage, project_name, progress_data, "cluster")
         return new_cluster, stage
+
+def create_image_folder(old_project_address, new_project_address):
+    """Create a folder under /project by copying images from project_folder
+    """
+    if not os.path.exists(new_project_address):
+        os.makedirs(new_project_address)
+    for file_extension in ("*.jpg", "*.jpeg", "*.png"):
+        for file_path in glob.glob(os.path.join(old_project_address, '**', file_extension), recursive=True):
+            new_path = os.path.join(new_project_address, os.path.basename(file_path))
+            shutil.copy(file_path, new_path)
+
+def import_progress_data(image_folder_address, imported_project_name, imported_project_data):
+    """Import function for restoring progress data from another project
+
+    Args:
+        image_folder (_type_): _description_
+        project_data (dict): 
+    """
+    app_folder = str(Path(__file__).resolve().parent.parent)
+    new_project_address = os.path.join(app_folder,"projects",f"{imported_project_name}_imported")
+    create_image_folder(image_folder_address, new_project_address)
+
+    data_file = open(os.path.join(app_folder, "data.json"), "r")
+    existing_progress_data = json.loads(data_file.read())
+    existing_progress_data[f"{imported_project_name}_imported"] = imported_project_data
+    data_file = open(os.path.join(app_folder, "data.json"), "w")
+    json.dump(existing_progress_data, data_file)
+    data_file.close()
+    

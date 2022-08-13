@@ -1,3 +1,4 @@
+from tabnanny import filename_only
 from sqlalchemy import all_
 from src.objects import *
 import src.progress as progress
@@ -13,6 +14,7 @@ from tkinter import font
 from src.test import *
 from datetime import datetime
 from datetime import timedelta
+import json
 
 #%% UI
 class UI():
@@ -351,10 +353,72 @@ class UI():
                 self.export_data(keep_progress)
         return response
 
+    def browse_directory_for_import(self):
+        dirname = filedialog.askdirectory(parent=self.import_window)
+        if not dirname:
+            return 
+        elif not os.path.isdir(dirname):
+            return
+        else:
+            self.imported_image_folder_address_text_box.insert("end", dirname)
+            self.imported_image_folder_address_var.set(dirname)
+            print(f"dirname selected: {dirname}")
+            return 
+
+    def browse_file_for_import(self):
+        filename = filedialog.askopenfilename(parent = self.import_window)
+        if not filename:
+            return
+        elif ".json" not in filename:
+            return
+        else:
+            self.imported_data_file_address_text_box.insert("end", filename)
+            data_file = open(filename, "r")
+            self.imported_data_var.set(data_file.read())
+            data_file.close()
+            print(f"file name selected: {filename}")
+            return 
+
+    def create_import_window(self):
+        self.import_window = Toplevel(self.root)
+        self.import_window.title("Import a project")
+        self.import_window.geometry("200x300")
+
+        self.imported_data_var = tk.StringVar().set("")
+        self.imported_image_folder_address_var = tk.StringVar().set("")
+        self.imported_project_name = tk.StringVar().set("")
+        relx_base = 0.2
+        rely_base = 0.2
+
+        data_file_address_text = tk.Label(self.import_window, text="Data file (.json) address:")
+        data_file_address_text.place(relx = relx_base, rely = rely_base, anchor = "w")
+        self.imported_data_file_address_text_box = tk.Text(self.import_window)
+        self.imported_data_file_address_text_box.place(relx=relx_base, rely=rely_base + 0.5, anchor= "w")
+        data_file_open_button = tk.Button(self.import_window, text="Browse", command = self.browse_directory_for_import)
+        data_file_open_button.place(relx = relx_base * 4, rely = rely_base + 0.5)
+
+        imported_project_name_text = tk.Label(self.import_window, text="Project name:")
+        imported_project_name_text.place(relx = relx_base, rely = rely_base *2, anchor = "w")
+        imported_project_name_option_box = tk.OptionMenu(self.import_window, name = self.imported_project_name_var, value = self.imported_data.keys())
+        imported_project_name_option_box.place(relx=relx_base, rely=rely_base *2 + 0.5, anchor= "w")
+        
+        imported_image_folder_address_text = tk.Label(self.import_window, text="Image folder address:")
+        imported_image_folder_address_text.place(relx = relx_base, rely = rely_base *3 , anchor = "w")
+        self.imported_image_folder_address_text_box = tk.Text(self.import_window)
+        self.imported_image_folder_address_text.place(relx=relx_base, rely=rely_base * 3 + 0.5, anchor= "w")
+        data_file_open_button = tk.Button(self.import_window, text="Browse", command = self.browse_directory_for_import)
+        data_file_open_button.place(relx = relx_base * 4, rely = rely_base *3 + 0.5, anchor = "w")
+
+        import_button = tk.Button(self.import_window, text = "Import", command = progress.import_progress_data(image_folder_address = self.imported_image_folder_address_var.get(), imported_project_name = self.imported_project_name.get(), imported_project_data = eval(self.imported_data.get())))
+        import_button.place(relx = relx_base * 5, rely = rely_base, anchor = CENTER)
     def import_function(self):
         """import data.json and images from another project
         """
-        
+        """read progress data and create objects"""
+        self.create_import_window()
+
+        if self.imported_data
+
         return
     def create_export_results_window(self):
         response = messagebox.askokcancel("Export results", "You have completed the current project.\nExport the results?" )
