@@ -411,13 +411,12 @@ class UI():
 
         import_button = tk.Button(self.import_window, text = "Import", command = progress.import_progress_data(image_folder_address = self.imported_image_folder_address_var.get(), imported_project_name = self.imported_project_name.get(), imported_project_data = eval(self.imported_data.get())))
         import_button.place(relx = relx_base * 5, rely = rely_base, anchor = CENTER)
+
     def import_function(self):
         """import data.json and images from another project
         """
         """read progress data and create objects"""
         self.create_import_window()
-
-        if self.imported_data
 
         return
     def create_export_results_window(self):
