@@ -351,6 +351,11 @@ class UI():
                 self.export_data(keep_progress)
         return response
 
+    def import_function(self):
+        """import data.json and images from another project
+        """
+        
+        return
     def create_export_results_window(self):
         response = messagebox.askokcancel("Export results", "You have completed the current project.\nExport the results?" )
         return response
