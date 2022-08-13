@@ -789,8 +789,8 @@ class UI():
             self._activate_button(self.match_btn)
             self._deactivate_button(self.no_match_btn)
 
-            if self._get_image_name(self.right_image_index) not in self.cluster.compared_before:
-                self.cluster.matches.add(self._get_image_name(self.right_image_index))
+            #add to match
+            self.cluster.matches.add(self._get_image_name(self.right_image_index))
             #delist from nomatches
             if self._get_image_name(self.right_image_index) in self.cluster.nomatches:
                 self.cluster.nomatches.remove(self._get_image_name(self.right_image_index))
@@ -816,8 +816,8 @@ class UI():
             self._activate_button(self.no_match_btn)
             self._deactivate_button(self.match_btn)
 
-            if self._get_image_name(self.right_image_index) not in self.cluster.compared_before:
-                self.cluster.nomatches.add(self._get_image_name(self.right_image_index))
+            #add to nomatch
+            self.cluster.nomatches.add(self._get_image_name(self.right_image_index))
             #delist from matches
             if self._get_image_name(self.right_image_index) in self.cluster.matches:
                 self.cluster.matches.remove(self._get_image_name(self.right_image_index))
