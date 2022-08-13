@@ -386,6 +386,8 @@ def update_progress_data(project_name, stage, cluster, progress_data, marked_coi
 def clear_current_project(project_name, progress_data):
     """remove current project from progress data & delete project folder
     """
+    if len(project_name) == 0:
+        return
     if project_name in progress_data:
         _ = progress_data.pop(project_name)
     data_file = open("data.json", "w")
@@ -806,14 +808,19 @@ def import_progress_data(image_folder_address, imported_project_name, imported_p
         image_folder (_type_): _description_
         project_data (dict): 
     """
-    app_folder = str(Path(__file__).resolve().parent.parent)
-    new_project_address = os.path.join(app_folder,"projects",f"{imported_project_name}_imported")
-    create_image_folder(image_folder_address, new_project_address)
+    if len(imported_project_name) == 0 or len(imported_project_data) == 0:
+        return
 
-    data_file = open(os.path.join(app_folder, "data.json"), "r")
+    data_file = open(os.path.join(os.getcwd(), "data.json"), "r")
     existing_progress_data = json.loads(data_file.read())
-    existing_progress_data[f"{imported_project_name}_imported"] = imported_project_data
-    data_file = open(os.path.join(app_folder, "data.json"), "w")
+    existing_project_names = existing_progress_data.keys()
+    project_name = imported_project_name
+    while project_name in existing_project_names:
+        project_name += "_"
+    existing_progress_data[project_name] = imported_project_data[imported_project_name]
+    data_file = open(os.path.join(os.getcwd(), "data.json"), "w")
     json.dump(existing_progress_data, data_file)
     data_file.close()
     
+    new_project_address = os.path.join(os.getcwd(),"projects",project_name)
+    create_image_folder(image_folder_address, new_project_address)

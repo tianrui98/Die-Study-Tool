@@ -1,5 +1,3 @@
-from tabnanny import filename_only
-from sqlalchemy import all_
 from src.objects import *
 import src.progress as progress
 from src.root_logger import *
@@ -9,12 +7,10 @@ from PIL import Image, ImageTk
 import math
 from tkinter import Toplevel, filedialog, messagebox
 import os
-import shutil
 from tkinter import font
 from src.test import *
 from datetime import datetime
 from datetime import timedelta
-import json
 
 #%% UI
 class UI():
@@ -235,8 +231,10 @@ class UI():
         if not existing_projects:
             return
         self.create_choose_project_window(existing_projects)
-        self.project_address = os.path.join(os.getcwd(), "projects", self.project_name)
+        self.open_chosen_project()
 
+    def open_chosen_project(self):
+        self.project_address = os.path.join(os.getcwd(), "projects", self.project_name)
         self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_name)
         if self.testing_mode:
             self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["images"])
@@ -304,7 +302,9 @@ class UI():
 
     def exit(self):
         #wipe out records at exit for demo projects
-        if self.demo_mode:
+        if len(self.project_name) == 0:
+            pass
+        elif self.demo_mode:
             progress.clear_current_project(self.project_name, self.progress_data)
         else:
             if len(self.progress_data) == 0:
@@ -315,8 +315,6 @@ class UI():
                 keep_progress = messagebox.askyesno("Exit", "Save your project?" )
                 if keep_progress:
                     progress.save_progress_data_midway(self.project_name, self.stage, self.cluster,self.progress_data)
-                else:
-                    progress.clear_current_project(self.project_name, self.progress_data)
         logger.info(str(self.progress_data))
         logger.info("====EXIT====\n\n")
         self.root.quit()
@@ -362,7 +360,6 @@ class UI():
         else:
             self.imported_image_folder_address_text_box.insert("end", dirname)
             self.imported_image_folder_address_var.set(dirname)
-            print(f"dirname selected: {dirname}")
             return 
 
     def browse_file_for_import(self):
@@ -376,49 +373,71 @@ class UI():
             data_file = open(filename, "r")
             self.imported_data_var.set(data_file.read())
             data_file.close()
-            print(f"file name selected: {filename}")
+            
+            #add project names to the optionmenu
+            imported_project_names = eval(self.imported_data_var.get()).keys()
+            
+            if len(imported_project_names) > 0:
+                for project_name in imported_project_names:
+                    self.imported_project_name_option_box["menu"].add_command(label = project_name, command = tk._setit(self.imported_project_name_var, project_name))
+            if len(imported_project_names) == 1:
+                self.imported_project_name_var.set(list(imported_project_names)[0])
             return 
 
     def create_import_window(self):
         self.import_window = Toplevel(self.root)
         self.import_window.title("Import a project")
-        self.import_window.geometry("200x300")
+        self.import_window.geometry(f"{self.initial_width // 2}x{self.initial_height // 2}")
 
-        self.imported_data_var = tk.StringVar().set("")
-        self.imported_image_folder_address_var = tk.StringVar().set("")
-        self.imported_project_name = tk.StringVar().set("")
+        self.imported_data_var = tk.StringVar()
+        self.imported_data_var.set("{}")
+        self.imported_image_folder_address_var = tk.StringVar()
+        self.imported_image_folder_address_var.set("")
+        self.imported_project_name_var = tk.StringVar()
+        self.imported_project_name_var.set("")
         relx_base = 0.2
         rely_base = 0.2
 
         data_file_address_text = tk.Label(self.import_window, text="Data file (.json) address:")
         data_file_address_text.place(relx = relx_base, rely = rely_base, anchor = "w")
-        self.imported_data_file_address_text_box = tk.Text(self.import_window)
-        self.imported_data_file_address_text_box.place(relx=relx_base, rely=rely_base + 0.5, anchor= "w")
-        data_file_open_button = tk.Button(self.import_window, text="Browse", command = self.browse_directory_for_import)
-        data_file_open_button.place(relx = relx_base * 4, rely = rely_base + 0.5)
+        self.imported_data_file_address_text_box = tk.Text(self.import_window, width = self._pixel_to_char(int((self.initial_width // 2) * 0.8)), height = 2)
+        self.imported_data_file_address_text_box.place(relx=relx_base, rely=rely_base + 0.1, anchor= "w")
+        data_file_open_button = tk.Button(self.import_window, text="Browse", command = self.browse_file_for_import)
+        data_file_open_button.place(relx = relx_base * 4, rely = rely_base + 0.1, anchor = "w")
 
         imported_project_name_text = tk.Label(self.import_window, text="Project name:")
         imported_project_name_text.place(relx = relx_base, rely = rely_base *2, anchor = "w")
-        imported_project_name_option_box = tk.OptionMenu(self.import_window, name = self.imported_project_name_var, value = self.imported_data.keys())
-        imported_project_name_option_box.place(relx=relx_base, rely=rely_base *2 + 0.5, anchor= "w")
+
+        self.imported_project_name_option_box = tk.OptionMenu(self.import_window, self.imported_project_name_var, None)
+        self.imported_project_name_option_box.configure(width = 20)
+        self.imported_project_name_option_box.place(relx=relx_base, rely=rely_base *2 + 0.1, anchor = "w")
         
         imported_image_folder_address_text = tk.Label(self.import_window, text="Image folder address:")
         imported_image_folder_address_text.place(relx = relx_base, rely = rely_base *3 , anchor = "w")
-        self.imported_image_folder_address_text_box = tk.Text(self.import_window)
-        self.imported_image_folder_address_text.place(relx=relx_base, rely=rely_base * 3 + 0.5, anchor= "w")
+        self.imported_image_folder_address_text_box = tk.Text(self.import_window, width = self._pixel_to_char(int((self.initial_width // 2) * 0.8)), height = 2)
+        self.imported_image_folder_address_text_box.place(relx=relx_base, rely=rely_base * 3 + 0.1, anchor= "w")
         data_file_open_button = tk.Button(self.import_window, text="Browse", command = self.browse_directory_for_import)
-        data_file_open_button.place(relx = relx_base * 4, rely = rely_base *3 + 0.5, anchor = "w")
+        data_file_open_button.place(relx = relx_base * 4, rely = rely_base *3 + 0.1, anchor = "w")
 
-        import_button = tk.Button(self.import_window, text = "Import", command = progress.import_progress_data(image_folder_address = self.imported_image_folder_address_var.get(), imported_project_name = self.imported_project_name.get(), imported_project_data = eval(self.imported_data.get())))
-        import_button.place(relx = relx_base * 5, rely = rely_base, anchor = CENTER)
+        importFont = font.Font(size=20)
+        import_button = tk.Button(self.import_window, text = "Import", fg='#0052cc', command = self.import_data)
+        import_button["font"] = importFont
+        import_button.place(relx = 0.5, rely = rely_base * 4, anchor = "w")
 
-    def import_function(self):
-        """import data.json and images from another project
-        """
-        """read progress data and create objects"""
-        self.create_import_window()
+        self.import_window.mainloop()
+    
+    def import_data(self):
+        image_folder_address = self.imported_image_folder_address_var.get()
+        imported_project_name = self.imported_project_name_var.get()
+        imported_project_data = eval(self.imported_data_var.get())
+        if all([image_folder_address, imported_project_name, imported_project_data]):
+            progress.import_progress_data(image_folder_address, imported_project_name, imported_project_data)
+            self.import_window.quit()
+            self.import_window.destroy()
+        
+        self.project_name = imported_project_name
+        self.open_chosen_project()
 
-        return
     def create_export_results_window(self):
         response = messagebox.askokcancel("Export results", "You have completed the current project.\nExport the results?" )
         return response
@@ -430,7 +449,7 @@ class UI():
     def create_open_window(self):
         self.open_window = Toplevel(self.root)
         self.open_window.title("Open")
-        self.open_window.geometry("300x200")
+        self.open_window.geometry(f"{self.initial_width // 2}x{self.initial_height // 2}")
         self.demo_project_button = tk.Button(self.open_window, text="   Start demo project   ", command = self.open_demo_project)
         self.demo_project_button.place(relx=0.5, rely=0.2, anchor=CENTER)
         self.new_project_button = tk.Button(self.open_window, text="   Start a new project   ", command = self.browse_files)
@@ -442,7 +461,7 @@ class UI():
     def create_choose_project_window(self, choices):
         self.choose_project_window = Toplevel(self.root)
         self.choose_project_window.title("Choose a project")
-        self.choose_project_window.geometry("200x300")
+        self.choose_project_window.geometry(f"{self.initial_width // 2}x{self.initial_height // 2}")
 
         name = tk.StringVar()
         default_project_name = list(choices)[0]
@@ -465,7 +484,9 @@ class UI():
     def create_UI(self):
         # menu bar
         right_menu_bar = self.add_frame(self.button_frame_height, self.button_frame_width, 1, 0, 1, 1, self.root, "e")
-        self.open_btn = self.add_button("Open", self.create_open_window, 2, 3, 1, 0, 1, 1, right_menu_bar, sticky = "e")
+        
+        self.open_btn = self.add_button("Open", self.create_open_window, 2, 3, 0, 0, 1, 1, right_menu_bar, sticky = "e")
+        self.import_btn = self.add_button("Import", self.create_import_window, 2, 3, 1, 0, 1, 1, right_menu_bar, sticky = "e")
         self.export_btn = self.add_button("Export", self.export, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
         self.save_btn = self.add_button("Save", self.save, 2, 3, 3, 0, 1, 1, right_menu_bar, sticky = "e")
         self.exit_btn = self.add_button("Exit", self.exit, 2, 3, 4, 0, 1, 1, right_menu_bar, sticky = "e")
@@ -476,7 +497,7 @@ class UI():
         self.stage_label = self.add_text("Current Stage: ", 0, 1, 1, 1, left_menu_bar, sticky= "w")
 
         self.frame = self.add_frame(self.display_frame_height, self.display_frame_width, 0, 1, 2, 1, self.root)
-    
+
     def create_pair_frame(self):
         self.frame.grid_forget()
         self.frame = self.add_frame(self.display_frame_height, self.display_frame_width, 0, 1, 2, 1, self.root)
