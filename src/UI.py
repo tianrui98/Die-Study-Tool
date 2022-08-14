@@ -475,8 +475,8 @@ class UI():
             self.choose_project_window.destroy()
             self.open_window.quit()
             self.open_window.destroy()
+            self.project_name = name.get()
 
-        self.project_name = name.get()
         ok_button = tk.Button(self.choose_project_window, text = "OK", command = exit)
         ok_button.place(relx=0.5, rely=0.8, anchor=CENTER)
         self.choose_project_window.mainloop()

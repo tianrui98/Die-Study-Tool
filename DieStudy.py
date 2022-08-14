@@ -1,7 +1,4 @@
 from src.UI import UI
-from src.progress import load_progress
-import os
-from src.data_to_folder import *
 
 def main():
     UI().start()
