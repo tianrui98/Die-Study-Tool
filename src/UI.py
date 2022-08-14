@@ -641,6 +641,8 @@ class UI():
         self.pair_frame_update_cluster_label()
         self.pair_frame_update_icon_button_color()
 
+        self.prev_btn["state"] = "disabled"
+        self.next_btn["state"] = "normal"
 
     def pair_frame_add_images (self, left_image_number, right_image_number):
         """Add left and right images at once. Assume self.left_image and self.right_image have been created prior.
@@ -715,18 +717,6 @@ class UI():
 
         """
         self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
-
-        while self.right_image_index < len(self.cluster.images) and\
-             (self.right_image_index == self.left_image_index):
-            if self.right_image_index == self.left_image_index or self._get_image_name(self.left_image_index) == self._get_image_name(self.right_image_index):
-                self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
-            else:
-                #mark them compared before
-                self._mark_compared()
-                #skip the right image
-                logger.debug("[load_next_image] Skip already compared {}".format(self._get_image_name(self.right_image_index)))
-                self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
-
         if self.right_image_index < len(self.cluster.images):
             new_image_path = self._get_image_address(self.right_image_index)
             new_img = self.create_image_object(new_image_path)
@@ -734,7 +724,7 @@ class UI():
             self.right_image.image = new_img
             self.pair_frame_update_cluster_label()
             self.pair_frame_update_icon_button_color ()
-
+            self.next_btn["state"] = "normal"
         else:
             new_image_path = os.path.join("images", "end.png")
             new_img = self.create_image_object(new_image_path)
@@ -745,7 +735,13 @@ class UI():
             self._deactivate_button(self.match_btn)
             self._deactivate_button(self.no_match_btn)
             self.right_cluster_label.config(text = "Cluster: " + new_cluster_label)
-
+            self.next_btn["state"] = "disabled"
+        
+        if self.right_image_index > 1:
+            self.prev_btn["state"] = "normal"
+        else:
+            self.prev_btn["state"] = "disabled"
+        
         #update image labels
         self.pair_frame_update_image_label()
         #check for completion at the last image
@@ -760,17 +756,6 @@ class UI():
         """
         curr_right_image_index = self.right_image_index
         self.right_image_index = max(0, self.right_image_index - 1)
-        while self.right_image_index > 0 and \
-             self.right_image_index == self.left_image_index:
-            if self.right_image_index == self.left_image_index or self._get_image_name(self.left_image_index) == self._get_image_name(self.right_image_index):
-                if self.left_image_index == 0:
-                    self.right_image_index = curr_right_image_index
-                else:
-                    self.right_image_index = max(0, self.right_image_index - 1)
-            else:
-                self._mark_compared()
-                self.right_image_index = max(0, self.right_image_index - 1)
-
         if self.right_image_index == 0 and \
                 self.right_image_index == self.left_image_index:
             self.right_image_index = curr_right_image_index
@@ -783,6 +768,16 @@ class UI():
             self.pair_frame_update_image_label()
             self.pair_frame_update_cluster_label()
             self.pair_frame_update_icon_button_color ()
+
+        if self.right_image_index > 1:
+            self.prev_btn["state"] = "normal"
+        else:
+            self.prev_btn["state"] = "disabled"
+
+        if self.right_image_index < len(self.cluster.images):
+            self.next_btn["state"] = "normal"
+        else:
+            self.next_btn["state"] = "disabled"
         return None
 
     def pair_frame_mark_match (self):
@@ -1154,7 +1149,11 @@ class UI():
         """show current cluster's coin images. Add the image widgets to the image_widgets dictionary"""
         self.project_title_label.config(text = str("Project Title: " + self.project_name))
         self.stage_label.config(text = str("Current Stage: " + self.stage.name))
-        self.current_cluster_label.config(text = f"Current Cluster: " + self.cluster.name)
+
+        cluster_label = self.cluster.name
+        if len(cluster_label) > 40:
+            cluster_label = cluster_label[:40] + "..."
+        self.current_cluster_label.config(text = f"Current Cluster: " + cluster_label)
 
         for i in range(self.current_page*6, (self.current_page + 1)*6):
             display_index = i % 6
@@ -1207,9 +1206,9 @@ class UI():
         self.main_frame_height = int(self.initial_height * 0.9)
 
         #left main frame: display coin images Height: 0.8 * window, width: 0.7 * window width
-        self.left_main_frame = self.add_frame(self.main_frame_height, self.left_main_frame_width_pixel, 0, 1, 1, 2, self.frame, "nsew")
+        self.left_main_frame = self.add_frame(self.main_frame_height, self.left_main_frame_width_pixel, 0, 1, 1, 2, self.frame, "nw")
         #right main frame: display current identical groups
-        self.right_main_frame = self.add_frame(self.main_frame_height, self.right_main_frame_width_pixel, 1, 1, 1, 2, self.frame, "nsew")
+        self.right_main_frame = self.add_frame(self.main_frame_height, self.right_main_frame_width_pixel, 1, 1, 1, 2, self.frame, "ne")
 
         self.initialize_stack()
 
@@ -1251,7 +1250,7 @@ class UI():
             image_list_label = "Identical coins: "
         else:
             image_list_label = "Matched coins: "
-        identical_header = self.add_text(image_list_label, 0, 1, 1, 1, self.right_main_frame, "w")
+        _ = self.add_text(image_list_label, 0, 1, 1, 1, self.right_main_frame, "w")
 
         #buttons
         list_button_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 3,2,1,self.right_main_frame, "w")
