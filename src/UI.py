@@ -507,28 +507,25 @@ class UI():
         self.frame.rowconfigure(0, weight = 1)
         self.frame.columnconfigure(0, weight = 1)
         self.left_image = self.add_image(os.path.join("images","blank.png"), 0, 1, 1, 1, self.frame, "w", self.image_height_pixel, 0, 0)
-        self.right_image = self.add_image(os.path.join("images","blank.png"), 1, 1, 1, 1, self.frame, "w", self.image_height_pixel, 0, 0)
+        self.right_image = self.add_image(os.path.join("images","blank.png"), 1, 1, 2, 1, self.frame, "w", self.image_height_pixel, 0, 0)
 
         self.left_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width,0, 2, 1, 1, self.frame)
         self.left_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.left_info_bar, sticky= "w")
         self.left_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.left_info_bar, sticky= "w")
-        _ = self.add_filler(4, 4, 2, 0, 1, 2, self.left_info_bar, "e", "", None)
 
-        self.right_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 2, 1, 1, self.frame, "we")
+        self.right_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width // 2,1, 2, 1, 1, self.frame, "w")
         self.right_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.right_info_bar, sticky="w")
         self.right_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.right_info_bar, sticky="w")
 
         self.right_tick =self.add_image(os.path.join("images","blank.png"), 1, 0, 1, 1, self.right_info_bar, "w", 15, 0, 0)
 
+        right_navigation_bar = self.add_frame(self.button_frame_height, self.button_frame_width //2,2, 2, 1, 1, self.frame, "e")
         #navigation buttons
-        self.prev_btn = self.add_button("◀", self.pair_frame_load_prev_image, 4, 4, 2, 0, 1, 2, self.right_info_bar, sticky="e")
-        self.next_btn = self.add_button("▶", self.pair_frame_load_next_image, 4, 4, 3, 0, 1, 2, self.right_info_bar, sticky="e")
-
-
-        self.right_info_bar.columnconfigure(1, weight= 1)
+        self.prev_btn = self.add_button("◀", self.pair_frame_load_prev_image, 4, 4, 0, 0, 1, 2, right_navigation_bar, sticky="e")
+        self.next_btn = self.add_button("▶", self.pair_frame_load_next_image, 4, 4, 1, 0, 1, 2, right_navigation_bar, sticky="e")
 
         #action buttons
-        action_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 3, 1, 1, self.frame, "se")
+        action_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 3, 2, 1, self.frame, "se")
         action_bar.rowconfigure(0, weight=1)
         for i in range(4):
             action_bar.columnconfigure(i, weight=1)
@@ -1105,7 +1102,7 @@ class UI():
                 #update display
                 if completion_status == "stage":
                     logger.info(str(self.progress_data))
-                if self.stage.stage_number == 1:
+                if self.stage.stage_number == 1 or self.stage.stage_number == 2:
                     self.pair_frame_start()
                 else:
                     self.group_frame_refresh_image_display()
@@ -1152,7 +1149,7 @@ class UI():
         """show current cluster's coin images. Add the image widgets to the image_widgets dictionary"""
         self.project_title_label.config(text = str("Project Title: " + self.project_name))
         self.stage_label.config(text = str("Current Stage: " + self.stage.name))
-
+        self.main_frame_height = int(self.root.winfo_height() * 0.8)
         cluster_label = self.cluster.name
         if len(cluster_label) > 40:
             cluster_label = cluster_label[:40] + "..."
@@ -1206,7 +1203,7 @@ class UI():
         # menu bar
         self.left_main_frame_width_pixel = int(self.initial_width * 0.68)
         self.right_main_frame_width_pixel = int(self.initial_width * 0.28)
-        self.main_frame_height = int(self.initial_height * 0.9)
+        self.main_frame_height = int(self.root.winfo_height() * 0.8)
 
         #left main frame: display coin images Height: 0.8 * window, width: 0.7 * window width
         self.left_main_frame = self.add_frame(self.main_frame_height, self.left_main_frame_width_pixel, 0, 1, 1, 2, self.frame, "nw")
@@ -1237,9 +1234,9 @@ class UI():
         for i in range(6):
             col = i % 3
             row = i // 3
-            image_frame = self.add_frame(int(self.main_frame_height * 0.5),int(self.main_frame_height * 0.5), col, row, 1, 1, self.left_main_frame, "nsew")
+            image_frame = self.add_frame(int(self.main_frame_height * 0.45),int(self.main_frame_height * 0.45), col, row, 1, 1, self.left_main_frame, "nsew")
             self.image_frames.append(image_frame)
-            image_filler = self.add_image("images/blank.png", 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.49))
+            image_filler = self.add_image("images/blank.png", 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.45))
             self.image_on_display[i] = (None, image_filler)
             image_label = self.add_text("", 0,1,1,1, image_frame, "se")
             add_function = self._add_function_n(i)
