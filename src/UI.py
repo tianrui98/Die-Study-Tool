@@ -178,7 +178,7 @@ class UI():
 
         return frame
 
-    def add_filler(self, height, width, column, row, columspan, rowspan, parent, sticky="nsew", content = "", color = None):
+    def add_filler(self, height, width, column, row, columspan, rowspan, parent, sticky="nsew", content = "", color = "red"):
         filler = tk.Label(parent, width=width, height=height, text = content, bg = color)
         filler.grid(column=column,
                     row=row,
@@ -512,10 +512,6 @@ class UI():
         _ = self.add_filler(4, 4, 2, 0, 1, 2, self.left_info_bar, "e", "", None)
 
         self.right_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 2, 1, 1, self.frame, "we")
-        self.right_info_bar.grid_propagate(0)
-        self.right_info_bar.columnconfigure(2, weight=1)
-
-
         self.right_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.right_info_bar, sticky="w")
         self.right_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.right_info_bar, sticky="w")
 
@@ -524,6 +520,9 @@ class UI():
         #navigation buttons
         self.prev_btn = self.add_button("◀", self.pair_frame_load_prev_image, 4, 4, 2, 0, 1, 2, self.right_info_bar, sticky="e")
         self.next_btn = self.add_button("▶", self.pair_frame_load_next_image, 4, 4, 3, 0, 1, 2, self.right_info_bar, sticky="e")
+
+        for i in range(3):
+            self.right_info_bar.columnconfigure(i, weight=1)
 
         #action buttons
         action_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 3, 1, 1, self.frame, "se")
@@ -566,25 +565,35 @@ class UI():
         right_cluster_label = self._get_image_object(self.right_image_index).cluster
         if len(right_cluster_label) > 40:
             right_cluster_label = right_cluster_label[:40] + "..."
+        else:
+            right_cluster_label = right_cluster_label + " " * (43 - len(right_cluster_label))
         self.right_cluster_label.config(text = "Cluster : " + right_cluster_label)
 
         left_cluster_label = self._get_image_object(self.left_image_index).cluster
         if len(left_cluster_label) > 40:
             left_cluster_label = left_cluster_label[:40] + "..."
+        else:
+            left_cluster_label = left_cluster_label + " " * (43 - len(left_cluster_label))
         self.left_cluster_label.config(text = "Cluster : " + left_cluster_label)
 
     def pair_frame_update_image_label(self):
+
         if self._get_image_object(self.right_image_index):
             right_image_label = self._get_image_object(self.right_image_index).name
         else:
             right_image_label = ""
+
         if len(right_image_label ) > 40:
             right_image_label  = right_image_label [:40] + "..."
+        else:
+            right_image_label = right_image_label + " " * (43 - len(right_image_label))
         self.right_image_name_label .config(text = "Name : " + right_image_label )
 
         left_image_label = self._get_image_object(self.left_image_index).name
         if len(left_image_label) > 40:
             left_image_label = left_image_label[:40] + "..."
+        else:
+            left_image_label = left_image_label + " " * (43 - len(left_image_label))
         self.left_image_name_label.config(text = "Name : " + left_image_label)
 
     def add_image(self,  path, column, row, columspan, rowspan, parent, sticky="nsew", max_height = None, padx = 0, pady = 0):
@@ -894,7 +903,7 @@ class UI():
         self.root.bind('m', lambda event: self.pair_frame_mark_match())
         self.root.bind('n', lambda event: self.pair_frame_mark_no_match())
     
-    def pair_frame_start(self):
+    def pair_frame_start(self): 
         self.frame.grid_forget()
         self.create_pair_frame()
         self.pair_frame_bind_keys()
