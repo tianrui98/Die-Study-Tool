@@ -560,7 +560,8 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name):
         best_images = [i for i in best_image_cluster_dict if \
             ((i not in stage.clusters_done) and
             (best_image_cluster_dict[i] not in stage.clusters_done) and
-            (i not in clusters_data[next_cluster_name]["nomatches"])
+            (i not in clusters_data[next_cluster_name]["nomatches"]) and
+            (best_image_cluster_dict[i] != next_cluster_name)
              )]
         next_cluster = Cluster(cluster_name = next_cluster_name, 
         images =  images_in_single + best_images, 
@@ -824,3 +825,10 @@ def import_progress_data(image_folder_address, imported_project_name, imported_p
     
     new_project_address = os.path.join(os.getcwd(),"projects",project_name)
     create_image_folder(image_folder_address, new_project_address)
+
+def get_existing_project_names():
+    data_file = open(os.path.join(os.getcwd(), "data.json"), "r")
+    existing_progress_data = json.loads(data_file.read())
+    existing_project_names = existing_progress_data.keys()
+    data_file.close()
+    return set(existing_project_names)

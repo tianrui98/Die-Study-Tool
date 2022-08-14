@@ -128,24 +128,31 @@ class Test:
         """test if no. of images in clusters_data is the same as in test data
         """
         project_address = os.path.join(os.getcwd(), "projects", project_name)
-        number_in_clusters = 0
+        items_in_clusters = set()
         for c, cluster_info in clusters_data.items():
             if c != "Singles":
                 #best image not in matches
-                number_in_clusters += len(cluster_info["matches"]) + 1
+                items_in_clusters = items_in_clusters.union(cluster_info["matches"])
+                items_in_clusters.add(cluster_info["best_image_name"])
             else:
-                number_in_clusters += len(cluster_info["images"])
+                items_in_clusters = items_in_clusters.union(cluster_info["images"])
 
-        number_in_test = 0
-        for _, matches in self.data.items():
-            number_in_test += 1 + len(matches)
-        number_in_test += len(self.singles)
+        number_in_clusters = len(items_in_clusters)
 
-        number_in_folder = len(os.listdir(project_address))
-        assert number_in_clusters == number_in_test, f"number in cluster = {number_in_clusters} number in test = {number_in_test}"
+        items_in_test = set()
+        for best_image_name, matches in self.data.items():
+            items_in_test = items_in_test.union(matches)
+            items_in_test.add(best_image_name)
 
-        items_in_folder = os.listdir(project_address)
-        assert number_in_clusters == number_in_folder, f"number in cluster = {number_in_clusters} number in folder = {number_in_folder}: {items_in_folder}"
+        items_in_test = items_in_test.union(self.singles)
+        number_in_test = len(items_in_test)
+
+        items_in_folder = [i for i in os.listdir(project_address) if not i.startswith('.')]
+        number_in_folder = len(items_in_folder)
+
+        assert number_in_clusters == number_in_test, f"number in cluster = {number_in_clusters} number in test = {number_in_test}. Difference {items_in_clusters - items_in_test}"
+
+        assert number_in_clusters == number_in_folder, f"number in cluster = {number_in_clusters} number in folder = {number_in_folder}. Difference {items_in_folder - items_in_clusters}"
         print("image number test passed")
 
     def test_export(self, clusters_data, project_name, destination_address):

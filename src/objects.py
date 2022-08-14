@@ -25,6 +25,9 @@ class Cluster:
         self.identicals = identicals #list of sets of image names
         if best_image_name and best_image_name in self.images_dict:
             self.best_image = self.images_dict[best_image_name]
+            self.images = [i for i in self.images if i.name != best_image_name]
+            self.images.insert(0, self.best_image)
+
         elif best_image_name:
             self.images_dict[best_image_name]= ImgObj(best_image_name, cluster_name)
             self.images = [self.images_dict[best_image_name]] + self.images

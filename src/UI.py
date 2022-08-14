@@ -25,6 +25,7 @@ class UI():
         self.demo_mode = False
         self.testing_mode = testing_mode
         self.quit = False
+        self.existing_project_names = progress.get_existing_project_names()
 
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
@@ -315,6 +316,8 @@ class UI():
                 keep_progress = messagebox.askyesno("Exit", "Save your project?" )
                 if keep_progress:
                     progress.save_progress_data_midway(self.project_name, self.stage, self.cluster,self.progress_data)
+                elif self.project_name not in self.existing_project_names:
+                        progress.clear_current_project(self.project_name, self.progress_data)
         logger.info(str(self.progress_data))
         logger.info("====EXIT====\n\n")
         self.root.quit()
@@ -521,8 +524,8 @@ class UI():
         self.prev_btn = self.add_button("◀", self.pair_frame_load_prev_image, 4, 4, 2, 0, 1, 2, self.right_info_bar, sticky="e")
         self.next_btn = self.add_button("▶", self.pair_frame_load_next_image, 4, 4, 3, 0, 1, 2, self.right_info_bar, sticky="e")
 
-        for i in range(3):
-            self.right_info_bar.columnconfigure(i, weight=1)
+
+        self.right_info_bar.columnconfigure(1, weight= 1)
 
         #action buttons
         action_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 3, 1, 1, self.frame, "se")
@@ -1247,9 +1250,9 @@ class UI():
         self.right_image_window = self.add_image("images/blank.png", 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
         
         if identical_stage:
-            image_list_label = "Identical coins: "
+            image_list_label = "Add images of identical coins: "
         else:
-            image_list_label = "Matched coins: "
+            image_list_label = "Add images of matched coins: "
         _ = self.add_text(image_list_label, 0, 1, 1, 1, self.right_main_frame, "w")
 
         #buttons
