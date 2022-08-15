@@ -539,8 +539,9 @@ class UI():
         self.create_UI()
         try:
             self.root.mainloop()
-        except:
+        except Exception as e:
             logger.error("====Error in main loop====")
+            logger.error(e.with_traceback)
             logger.error(f"progress_data{self.progress_data}")
 
 #%% Methods for both Pair and Group display frame
