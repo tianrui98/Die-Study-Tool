@@ -21,4 +21,5 @@ logger.addHandler(handler)
 logger.setLevel(logging.DEBUG)
 
 # version information
-logger.info(f"Version updated on 13 Aug. Group branch.")
+today = datetime.today().strftime("%Y%m%d")
+logger.info(f"Version downloaded on {today}. Group branch.")
