@@ -231,7 +231,10 @@ def save_progress_data_midway(project_name, stage,cluster, progress_data):
     #if Cluster is None (end of project) then do nothing
     if not cluster:
         return
-    clusters_data[cluster.name] = _create_cluster_info_dict(cluster)
+    
+    #do not update cluster for single vs single because cluster name is single name
+    if stage.stage_number != 2:
+        clusters_data[cluster.name] = _create_cluster_info_dict(cluster)
 
     #update stage properties
     progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
@@ -349,9 +352,9 @@ def update_progress_data(project_name, stage, cluster, progress_data, marked_coi
             clusters_data[new_cluster_name] = clusters_data.pop(old_cluster_name)
 
         elif stage.stage_number == 2:
-            clusters_data, new_cluster_name = _merge_singles(cluster, clusters_data, old_cluster_name)
-            #create new cluster from matched singles
             if len(cluster.matches) > 0:
+                clusters_data, new_cluster_name = _merge_singles(cluster, clusters_data, old_cluster_name)
+                #create new cluster from matched singles
                 clusters_data[new_cluster_name] = {
                     "identicals": [],
                     "matches": list(cluster.matches),
@@ -580,8 +583,9 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name):
 
     elif stage.stage_number == 2:
         #A cluster should include all images in the Singles folder, except those have been matched
+        images = [i for i in clusters_data["Singles"]["images"] if i not in stage.clusters_done]
         next_cluster = Cluster(cluster_name = next_cluster_name, 
-        images = clusters_data["Singles"]["images"], 
+        images = images, 
         identicals = [], 
         best_image_name = next_cluster_name, 
         matches = set(), 
