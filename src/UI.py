@@ -206,7 +206,7 @@ class UI():
 
     def open_demo_project (self):
         self.demo_mode = True
-        dirname="demo"
+        dirname="images/demo"
         self.project_name = "demo"
         self.project_address, self.progress_data = progress.start_new_project(dirname, self.project_name)
         self.stage = Stage(0, self.progress_data[self.project_name])

@@ -11,11 +11,9 @@ import os
 import shutil
 import glob
 import pandas as pd
-from sklearn.cluster import cluster_optics_dbscan
 from src.objects import *
 from src.root_logger import *
 from datetime import datetime
-from collections import defaultdict
 from pathlib import Path
 
 def _serialize_identicals(identicals):

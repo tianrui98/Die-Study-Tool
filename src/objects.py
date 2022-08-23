@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 class ImgObj:
     """Class object for an image
     Updated as changes happen

@@ -1,8 +1,6 @@
 """Test the correctedness of the program"""
 from collections import defaultdict
 import os
-
-from sqlalchemy import all_
 import src.progress as progress
 
 class Test:
