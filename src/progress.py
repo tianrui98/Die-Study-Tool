@@ -1,10 +1,6 @@
 """
 progress_data follows json format. Only has strings, dictionaries, and lists.
 """
-#todo First compare image 1 against all others. Second, remove all matched images from the pool of comparisons. Third, move to the next (remaining) coin and repeat
-#todo Discovered a flaw in step 2: All coins are compared to each other more than once. It should rather work like this: Step1: A is compared to B, C, and D. Step2: B is compared to  C and D. Step 3: C is compared to D. This simple model assumes that they are no matches. If, however, B is merged with C, the comparisons would be over.
-
-#todo if A is compared with B (regardless of match), A should not be compared with B again.
 
 import json
 import os
@@ -231,8 +227,13 @@ def save_progress_data_midway(project_name, stage,cluster, progress_data):
         return
     
     #do not update cluster for single vs single because cluster name is single name
-    if stage.stage_number != 2:
+    if stage.stage_number == 0 or stage.stage_number == 3:
         clusters_data[cluster.name] = _create_cluster_info_dict(cluster)
+    elif stage.stage_number == 1:
+        pass
+    else:
+        pass
+    #TODO!!!!
 
     #update stage properties
     progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
@@ -414,6 +415,7 @@ def load_progress(project_name, create_next_cluster = True, data_address = "data
 
     data_file = open(data_address_full, "r")
     progress_data = json.loads(data_file.read())
+    data_file.close()
     #retrieve latest stage
     stage_number= max(progress_data[project_name]["stages"].keys())
     stage_info = progress_data[project_name]["stages"][stage_number]

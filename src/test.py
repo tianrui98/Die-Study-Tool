@@ -11,9 +11,20 @@ class Test:
         self.actions = {}
         self.past_comparisons = {}
 
+    def load_project_into_test(self, clusters_data):
+        """only when continuing a project
+
+        Args:
+            clusters_data (_type_): _description_
+        """
+        for cluster in clusters_data.keys():
+            if cluster == "Singles":
+                self.singles = set(clusters_data["Singles"]["images"])
+            else:
+                self.data[clusters_data[cluster]["best_image_name"]] = set(clusters_data[cluster]["matches"])
+    
     def fill_in_singles(self, clusters_data):
         self.singles = clusters_data["Singles"]["images"]
-        print(f"test.py fill_in_singles: self.singles {self.singles}")
 
     def record_action(self, left, right, action):
         self.actions[(left, right)] = action

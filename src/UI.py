@@ -239,7 +239,7 @@ class UI():
         self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_name)
         if self.testing_mode:
             self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["images"])
-
+            self.test.load_project_into_test(self.progress_data[self.project_name]["clusters"])
         logger.info(f"Open project {self.project_name} at stage {self.stage.stage_number} ")
         if self.stage.stage_number == 0 or self.stage.stage_number == 3:
             self.group_frame_start()
@@ -300,6 +300,7 @@ class UI():
             logger.info("====SAVE====\n\n")
             progress.save_progress_data_midway(self.project_name, self.stage, self.cluster, self.progress_data)
             self.save_button_pressed_time = datetime.now()
+            self.existing_project_names.add(self.project_name)
 
     def exit(self):
         #wipe out records at exit for demo projects
@@ -316,8 +317,9 @@ class UI():
                 keep_progress = messagebox.askyesno("Exit", "Save your project?" )
                 if keep_progress:
                     progress.save_progress_data_midway(self.project_name, self.stage, self.cluster,self.progress_data)
+                    logger.info("====SAVE====\n\n")
                 elif self.project_name not in self.existing_project_names:
-                        progress.clear_current_project(self.project_name, self.progress_data)
+                    progress.clear_current_project(self.project_name, self.progress_data)
         logger.info(str(self.progress_data))
         logger.info("====EXIT====\n\n")
         self.root.quit()
@@ -890,7 +892,7 @@ class UI():
                     self.pair_frame_refresh_image_display()
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
-
+                #todo update test
         self.root.after(1, lambda: self.root.focus_force())
 
     def pair_frame_bind_keys(self):
@@ -1110,7 +1112,7 @@ class UI():
                
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
-
+                #todo update test
         self.root.after(1, lambda: self.root.focus_force())
 
     def group_frame_next_cluster(self):

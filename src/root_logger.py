@@ -22,4 +22,3 @@ logger.setLevel(logging.DEBUG)
 
 # version information
 today = datetime.today().strftime("%Y%m%d")
-logger.info(f"Version downloaded on {today}. Group branch.")
