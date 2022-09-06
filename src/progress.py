@@ -382,7 +382,10 @@ def update_progress_data(project_name, stage, cluster, progress_data, marked_coi
     for i in range(stage.stage_number):
         if str(i) in progress_data[project_name]["stages"]:
             _ = progress_data[project_name]["stages"].pop(str(i))
+    stages = progress_data[project_name]["stages"]
+    print(f"[progress] update progress data - stages {stages}")
 
+    write_progress_data_to_json(progress_data)
     return progress_data, stage
 
 def clear_current_project(project_name, progress_data):
@@ -424,7 +427,6 @@ def load_progress(project_name, create_next_cluster = True, data_address = "data
     stage.clusters_done = set(stage_info["clusters_done"])
     #retrieve latest cluster
     current_cluster = stage_info["current_cluster"]
-
     if stage_number == "0":
         cluster_info = progress_data[project_name]["clusters"][current_cluster]
         cluster = Cluster( cluster_name = current_cluster,
@@ -496,11 +498,11 @@ def mark_cluster_completed(cluster, stage, clusters_data):
         stage.clusters_done.add(cluster.name)
 
     #Inspect Verified Stage and the rest: move the matched clusters off the yet_to_check list
-    if stage.stage_number > 0 and stage.stage_number < 3:
+    if stage.stage_number > 0 and stage.stage_number <3:
         best_image_cluster_dict = _create_best_image_cluster_dict(clusters_data)
         for image_name in cluster.matches:
             if stage.stage_number == 1 and image_name in best_image_cluster_dict:
-                    matched_cluster_name = best_image_cluster_dict[image_name]
+                matched_cluster_name = best_image_cluster_dict[image_name]
             else:
                 matched_cluster_name = image_name
 
@@ -517,7 +519,7 @@ def unmark_cluster_completed(cluster,stage, clusters_data):
         stage.clusters_done.remove(cluster.name)
 
     #Inspect Verified Stage and the rest: move the matched clusters off the yet_to_check list
-    if stage.stage_number > 0 and stage.stage_number < 4:
+    if stage.stage_number > 0 and stage.stage_number < 3:
         best_image_cluster_dict = _create_best_image_cluster_dict(clusters_data)
         for image_name in list(cluster.matches):
             if stage.stage_number == 1 and image_name in best_image_cluster_dict:

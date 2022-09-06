@@ -293,12 +293,22 @@ class UI():
         logger.info("_____Create new project {}_____".format(self.project_name))
         return None
     
+    def save_progress(self):
+        if self.stage.stage_number == 0 or self.stage.stage_number == 3:
+            marked_coin_group_list = self.marked_coin_group_list
+        else:
+            marked_coin_group_list = None
+        self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage, self.cluster, self.progress_data, marked_coin_group_list)
+    
     def save(self):
         """save results to data.json
         """
         if len(self.progress_data) > 0:
             logger.info("====SAVE====\n\n")
-            progress.save_progress_data_midway(self.project_name, self.stage, self.cluster, self.progress_data)
+            # progress.save_progress_data_midway(self.project_name, self.stage, self.cluster, self.progress_data)
+            self.save_progress()
+            stages = self.progress_data[self.project_name]["stages"]
+            print(f"[UI] save data {stages}")
             self.save_button_pressed_time = datetime.now()
             self.existing_project_names.add(self.project_name)
 
@@ -316,7 +326,8 @@ class UI():
             else:
                 keep_progress = messagebox.askyesno("Exit", "Save your project?" )
                 if keep_progress:
-                    progress.save_progress_data_midway(self.project_name, self.stage, self.cluster,self.progress_data)
+                    # progress.save_progress_data_midway(self.project_name, self.stage, self.cluster,self.progress_data)
+                    self.save_progress()
                     logger.info("====SAVE====\n\n")
                 elif self.project_name not in self.existing_project_names:
                     progress.clear_current_project(self.project_name, self.progress_data)
@@ -869,6 +880,7 @@ class UI():
                 message = "You have completed the current *STAGE*."
                 completion_status = "stage"
                 logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
+                logger.info(f"{self.progress_data}")
                 if self.testing_mode:
                     self.test.test_comparison(self.project_name, self.stage.stage_number, self.progress_data[self.project_name]["clusters"])
                     self.test.clear_comparisons()
@@ -884,8 +896,6 @@ class UI():
                     self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
 
                 #update display
-                if completion_status == "stage":
-                    logger.info(str(self.progress_data))
                 if self.stage.stage_number == 3:
                     self.group_frame_start(identical_stage = True)
                 else:
@@ -1103,8 +1113,6 @@ class UI():
                     self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
 
                 #update display
-                if completion_status == "stage":
-                    logger.info(str(self.progress_data))
                 if self.stage.stage_number == 1 or self.stage.stage_number == 2:
                     self.pair_frame_start()
                 else:
