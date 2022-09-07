@@ -69,6 +69,9 @@ class UI():
         if image_index < len(self.cluster.images):
             return os.path.join(self.project_address, self._get_image_name(image_index))
 
+    def _image_name_to_address(self, image_name):
+        return os.path.join(self.project_address, image_name)
+
     def _swap_positions(self, l, pos1, pos2):
 
         # popping both the elements from list
@@ -236,13 +239,18 @@ class UI():
 
     def open_chosen_project(self):
         self.project_address = os.path.join(os.getcwd(), "projects", self.project_name)
-        self.progress_data, self.stage, self.cluster = progress.load_progress(self.project_name)
+        self.progress_data, self.stage, self.cluster, unprocessed_marked_coin_group_list = progress.load_progress(self.project_name)
         if self.testing_mode:
             self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["images"])
             self.test.load_project_into_test(self.progress_data[self.project_name]["clusters"])
-        logger.info(f"Open project {self.project_name} at stage {self.stage.stage_number} ")
+        logger.info(f"Open project {self.project_name} at stage {self.stage.name} ")
         if self.stage.stage_number == 0 or self.stage.stage_number == 3:
             self.group_frame_start()
+            self.marked_coin_group_list = unprocessed_marked_coin_group_list
+            for coin_list, _ in unprocessed_marked_coin_group_list:
+                for coin in coin_list:
+                    self.marked_added_coin_dict[coin] = self.create_image_object(self._image_name_to_address(coin))
+                    self.added_coin_dict[coin] = self.create_image_object(self._image_name_to_address(coin))
             self.group_frame_refresh_image_display()
         else:
             self.pair_frame_start()
@@ -293,22 +301,20 @@ class UI():
         logger.info("_____Create new project {}_____".format(self.project_name))
         return None
     
-    def save_progress(self):
+    def save_progress_midway(self):
         if self.stage.stage_number == 0 or self.stage.stage_number == 3:
             marked_coin_group_list = self.marked_coin_group_list
         else:
             marked_coin_group_list = None
-        self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage, self.cluster, self.progress_data, marked_coin_group_list)
+        self.progress_data, self.stage = progress.save_progress_data_midway(self.project_name, self.stage, self.cluster, self.progress_data, marked_coin_group_list)
     
     def save(self):
         """save results to data.json
         """
         if len(self.progress_data) > 0:
             logger.info("====SAVE====\n\n")
-            # progress.save_progress_data_midway(self.project_name, self.stage, self.cluster, self.progress_data)
-            self.save_progress()
+            self.save_progress_midway()
             stages = self.progress_data[self.project_name]["stages"]
-            print(f"[UI] save data {stages}")
             self.save_button_pressed_time = datetime.now()
             self.existing_project_names.add(self.project_name)
 
@@ -326,8 +332,7 @@ class UI():
             else:
                 keep_progress = messagebox.askyesno("Exit", "Save your project?" )
                 if keep_progress:
-                    # progress.save_progress_data_midway(self.project_name, self.stage, self.cluster,self.progress_data)
-                    self.save_progress()
+                    self.save_progress_midway()
                     logger.info("====SAVE====\n\n")
                 elif self.project_name not in self.existing_project_names:
                     progress.clear_current_project(self.project_name, self.progress_data)
@@ -1201,7 +1206,7 @@ class UI():
     def initialize_stack(self):
         # a dictionary of image objects currently on the stack. Key: image name. Value: image object
         self.added_coin_dict = {}
-        #keep track of coins that have been confirmed
+        #keep track of coins that have been confirmed Key: image name. Value: image object
         self.marked_added_coin_dict = {}
         #keep track of identified groups (list of list of tuples)
         self.marked_coin_group_list = [] #([name1, name2, name3], best_image_name)

@@ -170,6 +170,12 @@ def start_new_project(original_project_address, project_name):
 
 def create_new_stage_in_progress_data(progress_data, project_name, stage):
     progress_data[project_name]["stages"][str(stage.stage_number)] ={
+        "current_cluster" :{
+                                                                        "name":"",
+                                                                        "unprocessed_matches":[],
+                                                                        "unprocessed_nomatches":[],
+                                                                        "unprocessed_marked_coin_group_list": []
+                                                                        },
         "clusters_yet_to_check": list(stage.clusters_yet_to_check),
         "clusters_done":[]
         }
@@ -215,33 +221,41 @@ def write_progress_data_to_json(progress_data):
     json.dump(progress_data, data_file)
     data_file.close()
 
-def save_progress_data_midway(project_name, stage,cluster, progress_data):
-    """Save progress without changing cluster names or creating new clusters
+def save_progress_data_midway(project_name, stage,cluster, progress_data, marked_coin_group_list):
+    """Save progress without touching clusters_data
     """
     if str(stage.stage_number) not in progress_data[project_name]["stages"]:
         progress_data = create_new_stage_in_progress_data(progress_data, project_name, stage)
 
-    clusters_data = progress_data[project_name]["clusters"]
     #if Cluster is None (end of project) then do nothing
     if not cluster:
         return
     
+    if marked_coin_group_list:
+        unprocessed_marked_coin_group_list = marked_coin_group_list
+    else:
+        unprocessed_marked_coin_group_list = []
     #do not update cluster for single vs single because cluster name is single name
     if stage.stage_number == 0 or stage.stage_number == 3:
-        clusters_data[cluster.name] = _create_cluster_info_dict(cluster)
-    elif stage.stage_number == 1:
-        pass
+        progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = {
+                                                                        "name":cluster.name,
+                                                                        "unprocessed_matches":[],
+                                                                        "unprocessed_nomatches":[],
+                                                                        "unprocessed_marked_coin_group_list": unprocessed_marked_coin_group_list
+                                                                        }
     else:
-        pass
-    #TODO!!!!
+        progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = {
+                                                                        "name":cluster.name,
+                                                                        "unprocessed_matches":list(cluster.matches),
+                                                                        "unprocessed_nomatches":list(cluster.nomatches),
+                                                                        "unprocessed_marked_coin_group_list": unprocessed_marked_coin_group_list
+                                                                        }
 
     #update stage properties
-    progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
     progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
     progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_done"] = list(stage.clusters_done)
 
     #write new clusters_data
-    progress_data[project_name]["clusters"] = clusters_data
 
     write_progress_data_to_json(progress_data)
 
@@ -279,6 +293,8 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
                     clusters_data[new_cluster_name]["best_image_name"] = best_image_name
             
             nomatches = original_images_set - set(matched_coin_list)
+
+            print(f"consolidate {clusters_data[new_cluster_name]}")
             clusters_data[new_cluster_name]["nomatches"] = list(nomatches)
             clusters_data[new_cluster_name]["images"] = clusters_data[new_cluster_name]["matches"] + clusters_data[new_cluster_name]["nomatches"] + [clusters_data[new_cluster_name]["best_image_name"]]
             clusters_data[new_cluster_name]["identicals"] = []
@@ -305,8 +321,12 @@ def update_progress_data(project_name, stage, cluster, progress_data, marked_coi
                                                         "images": []
                                                     }
                                             }
-                            "stages": { 0: {
-                                        "current_cluster" : ,
+                            "stages": { "0": {
+                                        "current_cluster" {"name":,
+                                                            "unprocessed_matches":[],
+                                                            "unprocessed_nomatches":[],
+                                                            "unprocessed_marked_coin_group_list": []
+                                                            }: ,
                                         "clusters_yet_to_check": [],
                                         "clusters_done":[]
                                          }}
@@ -370,11 +390,22 @@ def update_progress_data(project_name, stage, cluster, progress_data, marked_coi
             stage = _change_name_in_clusters_yet_to_check(old_cluster_name, new_cluster_name, stage)
             stage = _change_name_in_clusters_done(old_cluster_name, new_cluster_name,stage)
             #update current cluster
-            progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = new_cluster_name
+            progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = {
+                                                            "name":new_cluster_name,
+                                                            "unprocessed_matches":[],
+                                                            "unprocessed_nomatches":[],
+                                                            "unprocessed_marked_coin_group_list": []
+                                                            }
         else:
-            progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = old_cluster_name
+            progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = {
+                                                                        "name":old_cluster_name,
+                                                                        "unprocessed_matches":[],
+                                                                        "unprocessed_nomatches":[],
+                                                                        "unprocessed_marked_coin_group_list": []
+                                                                        }
         progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
         progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_done"] = list(stage.clusters_done)
+    
     #write new clusters_data
     progress_data[project_name]["clusters"] = clusters_data
 
@@ -383,7 +414,6 @@ def update_progress_data(project_name, stage, cluster, progress_data, marked_coi
         if str(i) in progress_data[project_name]["stages"]:
             _ = progress_data[project_name]["stages"].pop(str(i))
     stages = progress_data[project_name]["stages"]
-    print(f"[progress] update progress data - stages {stages}")
 
     write_progress_data_to_json(progress_data)
     return progress_data, stage
@@ -426,25 +456,30 @@ def load_progress(project_name, create_next_cluster = True, data_address = "data
     stage.clusters_yet_to_check = set(stage_info["clusters_yet_to_check"])
     stage.clusters_done = set(stage_info["clusters_done"])
     #retrieve latest cluster
-    current_cluster = stage_info["current_cluster"]
+    current_cluster_name = stage_info["current_cluster"]["name"]
     if stage_number == "0":
-        cluster_info = progress_data[project_name]["clusters"][current_cluster]
-        cluster = Cluster( cluster_name = current_cluster,
+        cluster_info = progress_data[project_name]["clusters"][current_cluster_name]
+        cluster = Cluster( cluster_name = current_cluster_name,
             identicals = _deserialize_identicals(cluster_info["identicals"]),
             best_image_name = cluster_info["best_image_name"],
             images = cluster_info["images"],
-            matches = set(cluster_info["matches"]),
-            nomatches = set(cluster_info["nomatches"]))
+            matches = set(cluster_info["matches"]).union(set(stage_info["current_cluster"]["unprocessed_matches"])),
+            nomatches = set(cluster_info["nomatches"]).union(set(stage_info["current_cluster"]["unprocessed_nomatches"]))
+        )
     else:
-        if current_cluster in stage.clusters_yet_to_check:
-            cluster = _create_a_cluster(stage, progress_data[project_name]["clusters"],current_cluster)
+        # current cluster hasn't been completed yet. restore unprocessed info
+        if current_cluster_name in stage.clusters_yet_to_check:
+            cluster = _create_a_cluster(stage, progress_data[project_name]["clusters"],current_cluster_name)
+            cluster.matches += set(stage_info["current_cluster"]["unprocessed_matches"])
+            cluster.nomatches += set(stage_info["current_cluster"]["unprocessed_nomatches"])
         # if current cluster has already been checked. give the next cluster in line
         else:
             next_in_line = sorted(list(stage.clusters_yet_to_check), key= lambda s: s.split("_")[0])[0]
             cluster = _create_a_cluster(stage, progress_data[project_name]["clusters"], next_in_line)
-            progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = cluster.name
+            progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"]["name"] = cluster.name
 
-    return progress_data, stage, cluster
+    unprocessed_marked_coin_group_list = [(item[0], item[1]) for item in stage_info["current_cluster"]["unprocessed_marked_coin_group_list"]]
+    return progress_data, stage, cluster, unprocessed_marked_coin_group_list
 
 def check_cluster_completion(cluster,stage):
     """Check if all images in the current cluster have all been processed
@@ -542,7 +577,7 @@ def copy_best_image_to_verified(cluster, project_name):
     return cluster
 
 
-def _create_a_cluster(stage, clusters_data, next_cluster_name):
+def _create_a_cluster(stage, clusters_data, next_cluster_name, recover_mode =False):
     #compare within cluster
     if stage.stage_number == 0 :
         next_cluster = Cluster(cluster_name = next_cluster_name, 
