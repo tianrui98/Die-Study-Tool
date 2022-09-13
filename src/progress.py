@@ -266,6 +266,7 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
     Args:
         marked_coin_group_list (_type_): _description_
     """
+    
     if marked_coin_group_list == None:
         return clusters_data
     original_images_set = set(cluster.images_dict.keys())
@@ -308,6 +309,7 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
     for image_name in single_images_list:
         clusters_data["Singles"]["images"].append(image_name)
 
+    print(f"[progress] consolidate match groups. clusters data {clusters_data}")
     return clusters_data
 
 def update_progress_data(project_name, stage, cluster, progress_data, marked_coin_group_list = None):
