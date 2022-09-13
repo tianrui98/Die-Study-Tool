@@ -247,14 +247,22 @@ class UI():
         if self.stage.stage_number == 0 or self.stage.stage_number == 3:
             self.group_frame_start()
             self.marked_coin_group_list = unprocessed_marked_coin_group_list
+            
             for coin_list, _ in unprocessed_marked_coin_group_list:
+                #process coin list
                 for coin in coin_list:
                     self.marked_added_coin_dict[coin] = self.create_image_object(self._image_name_to_address(coin))
-                    self.added_coin_dict[coin] = self.create_image_object(self._image_name_to_address(coin))
             self.group_frame_refresh_image_display()
         else:
             self.pair_frame_start()
             self.pair_frame_refresh_image_display()
+            if self.testing_mode:
+                current_cluster = self.progress_data[self.project_name]["stages"][str(self.stage.stage_number)]["current_cluster"]["name"]
+                current_cluster_best_image_name = current_cluster
+                for coin in self.progress_data[self.project_name]["stages"][str(self.stage.stage_number)]["current_cluster"]["unprocessed_matches"]:
+                    self.test.match(current_cluster_best_image_name, coin, self.stage.stage_number)
+                for coin in self.progress_data[self.project_name]["stages"][str(self.stage.stage_number)]["current_cluster"]["unprocessed_nomatches"]:
+                    self.test.unmatch(current_cluster_best_image_name, coin, self.stage.stage_number)        
 
     def browse_files(self):
         """Let user choose which new project/folder to start working on

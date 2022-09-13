@@ -295,7 +295,6 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
             
             nomatches = original_images_set - set(matched_coin_list)
 
-            print(f"consolidate {clusters_data[new_cluster_name]}")
             clusters_data[new_cluster_name]["nomatches"] = list(nomatches)
             clusters_data[new_cluster_name]["images"] = clusters_data[new_cluster_name]["matches"] + clusters_data[new_cluster_name]["nomatches"] + [clusters_data[new_cluster_name]["best_image_name"]]
             clusters_data[new_cluster_name]["identicals"] = []
@@ -308,8 +307,6 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
     single_images_list = list(original_images_set - seen_images_set)
     for image_name in single_images_list:
         clusters_data["Singles"]["images"].append(image_name)
-
-    print(f"[progress] consolidate match groups. clusters data {clusters_data}")
     return clusters_data
 
 def update_progress_data(project_name, stage, cluster, progress_data, marked_coin_group_list = None):
@@ -472,8 +469,9 @@ def load_progress(project_name, create_next_cluster = True, data_address = "data
         # current cluster hasn't been completed yet. restore unprocessed info
         if current_cluster_name in stage.clusters_yet_to_check:
             cluster = _create_a_cluster(stage, progress_data[project_name]["clusters"],current_cluster_name)
-            cluster.matches += set(stage_info["current_cluster"]["unprocessed_matches"])
-            cluster.nomatches += set(stage_info["current_cluster"]["unprocessed_nomatches"])
+            cluster.matches = cluster.matches.union(set(stage_info["current_cluster"]["unprocessed_matches"]))
+            cluster.nomatches = cluster.nomatches.union(set(stage_info["current_cluster"]["unprocessed_nomatches"]))
+            cluster.compared_before = (cluster.matches).union(cluster.nomatches)
         # if current cluster has already been checked. give the next cluster in line
         else:
             next_in_line = sorted(list(stage.clusters_yet_to_check), key= lambda s: s.split("_")[0])[0]
