@@ -12,7 +12,7 @@ class Test:
         self.past_comparisons = {}
 
     def load_project_into_test(self, clusters_data):
-        """only when continuing a project
+        """only when continuing a project. Create test data from clusters data
 
         Args:
             clusters_data (_type_): _description_

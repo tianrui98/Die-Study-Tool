@@ -4,8 +4,8 @@ import argparse
 from reset import *
 
 parser = argparse.ArgumentParser()
-parser.add_argument('test', metavar = "test", nargs='?', help='test mode.')
-parser.add_argument('reset', metavar = "reset", nargs='?', help='clear all data.')
+parser.add_argument('-t', "--test" , action= "store_true", help='test mode.')
+parser.add_argument('-r', "--reset", action= "store_true", help='clear all data.')
 args = parser.parse_args()
 
 def main():
@@ -20,10 +20,10 @@ def test_main():
 
 
 if __name__ == "__main__":
-    if args.reset == "reset":
+    if args.reset:
         print("Reset.")
         reset()
-    if args.test == "test":
+    if args.test:
         print("Test mode.")
         test_main()
     else:
