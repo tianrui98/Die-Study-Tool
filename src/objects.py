@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 class ImgObj:
     """Class object for an image
     Updated as changes happen
@@ -25,6 +23,9 @@ class Cluster:
         self.identicals = identicals #list of sets of image names
         if best_image_name and best_image_name in self.images_dict:
             self.best_image = self.images_dict[best_image_name]
+            self.images = [i for i in self.images if i.name != best_image_name]
+            self.images.insert(0, self.best_image)
+
         elif best_image_name:
             self.images_dict[best_image_name]= ImgObj(best_image_name, cluster_name)
             self.images = [self.images_dict[best_image_name]] + self.images
@@ -48,7 +49,7 @@ class Stage:
     """track progress in a stage
     """
     def __init__(self, stage_number, project_data):
-        stages = ["Correcting False Discovery Rate", "Correcting Sensitivity Rate", "Single vs Single", "Find Identicals"]
+        stages = ["1. Correcting False Discovery Rate", "2. Correcting Sensitivity Rate", "3. Single vs Single", "4. Find Identicals"]
         self.stage_number = stage_number
         self.name = stages[self.stage_number]
 
@@ -58,7 +59,7 @@ class Stage:
 
         elif stage_number == 2:
             #all images in Singles are considered one cluster
-            self.clusters_yet_to_check = {f for f in project_data["clusters"]["Singles"]["matches"]}
+            self.clusters_yet_to_check = {f for f in project_data["clusters"]["Singles"]["images"]}
 
         else:
             self.clusters_yet_to_check = {c for c in project_data["clusters"]}
