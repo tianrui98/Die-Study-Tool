@@ -1191,11 +1191,16 @@ class UI():
                 image_object = None
             else:
                 image_object = self._get_image_object(i)
-                self.image_label_widgets[display_index].config(text = image_object.name)
+                image_display_name = image_object.name
+                if len(image_object.name)> 20:
+                    image_display_name = image_object.name[:20]+"..."
+                self.image_label_widgets[display_index].config(text = image_display_name)
+
                 if image_object.name in self.marked_added_coin_dict:
                     img = self.create_darken_image_object(self._get_image_address(i), int(self.main_frame_height * 0.49))
                 else:
                     img = self.create_image_object(self._get_image_address(i),int(self.main_frame_height * 0.49))
+
             self.image_on_display[display_index][1].configure(image = img )
             self.image_on_display[display_index][1].image = img
             image_widget = self.image_on_display[display_index][1]
