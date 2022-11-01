@@ -3,7 +3,7 @@ import src.progress as progress
 from src.root_logger import *
 import tkinter as tk
 from tkinter.constants import CENTER, RAISED, RIDGE, VERTICAL
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageEnhance
 import math
 from tkinter import Toplevel, filedialog, messagebox
 import os
@@ -119,6 +119,8 @@ class UI():
     def create_darken_image_object(self, path, max_height = None):
         image_raw = Image.open(path)
         image = image_raw.point(lambda p : p *0.6)
+        filter = ImageEnhance.Brightness(image_raw)
+        image = filter.enhance(0.6)
         iw, ih = int(image.width), int(image.height)
         if not max_height:
             h = int(self.root.winfo_height() * self.image_height_ratio)
