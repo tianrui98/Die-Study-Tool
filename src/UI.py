@@ -118,7 +118,6 @@ class UI():
 
     def create_darken_image_object(self, path, max_height = None):
         image_raw = Image.open(path)
-        image = image_raw.point(lambda p : p *0.6)
         filter = ImageEnhance.Brightness(image_raw)
         image = filter.enhance(0.6)
         iw, ih = int(image.width), int(image.height)
