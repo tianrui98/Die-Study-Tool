@@ -1,16 +1,20 @@
-from typing import Optional
 from src.UI import UI
 import argparse
 from reset import *
 
-__version__ = 20231217
+# __version__ = 20231217
+# from src.root_logger import logger
+# logger.info(f"Latest update: {__version__}")
+
+# error_log_path = "log/error.txt"
+# sys.stderr = open(error_log_path, "w")
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', "--test" , action= "store_true", help='test mode.')
 parser.add_argument('-r', "--reset", action= "store_true", help='clear all data.')
 args = parser.parse_args()
 
 def main():
-    print(f"Latest update: {__version__}")
     UI().start()
 
 def test_main():
@@ -18,7 +22,6 @@ def test_main():
     Semi-automated testing. User still has to click the buttons but the actions will be recorded and compared with progress_data
     Must start fresh.
     """
-    print(f"Latest update: {__version__}")
     UI(testing_mode = True).start()
 
 if __name__ == "__main__":
@@ -30,4 +33,3 @@ if __name__ == "__main__":
         test_main()
     else:
         main()
-    

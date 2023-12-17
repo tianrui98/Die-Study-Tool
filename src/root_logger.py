@@ -1,9 +1,10 @@
-import logging
-
 # import module
+import logging
 from logging.handlers import TimedRotatingFileHandler
 from logging import Formatter
 from datetime import datetime
+import sys
+
 # get named logger
 logger = logging.getLogger(__name__)
 
@@ -22,3 +23,14 @@ logger.setLevel(logging.DEBUG)
 
 # version information
 today = datetime.today().strftime("%Y%m%d")
+
+# Redirect stderr to the logger
+class LoggingStream(object):
+    def write(self, message):
+        if message.strip():
+            logger.error(message.strip())
+
+    def flush(self):
+        pass
+
+sys.stderr = LoggingStream()

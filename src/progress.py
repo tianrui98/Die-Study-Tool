@@ -165,7 +165,7 @@ def start_new_project(original_project_address, project_name):
                 "nomatches":[],
                 "identicals":[],
                 "best_image_name": best_image}
-
+    logger.info(f"Start new project {project_name}")
     return new_project_address , progress_data
 
 def create_new_stage_in_progress_data(progress_data, project_name, stage):
@@ -838,7 +838,7 @@ def create_image_folder(old_project_address, new_project_address):
     """
     if not os.path.exists(new_project_address):
         os.makedirs(new_project_address)
-    for file_extension in ("*.jpg", "*.jpeg", "*.png"):
+    for file_extension in ("*.jpg", "*.jpeg", "*.png", "*.JPG", "*.JPEG", "*.PNG"):
         for file_path in glob.glob(os.path.join(old_project_address, '**', file_extension), recursive=True):
             new_path = os.path.join(new_project_address, os.path.basename(file_path))
             shutil.copy(file_path, new_path)
@@ -866,6 +866,7 @@ def import_progress_data(image_folder_address, imported_project_name, imported_p
     
     new_project_address = os.path.join(os.getcwd(),"projects",project_name)
     create_image_folder(image_folder_address, new_project_address)
+    logger.info(f"Import project {project_name}")
 
 def get_existing_project_names():
     data_file = open(os.path.join(os.getcwd(), "data.json"), "r")
