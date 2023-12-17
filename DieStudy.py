@@ -2,12 +2,9 @@ from src.UI import UI
 import argparse
 from reset import *
 
-# __version__ = 20231217
-# from src.root_logger import logger
-# logger.info(f"Latest update: {__version__}")
-
-# error_log_path = "log/error.txt"
-# sys.stderr = open(error_log_path, "w")
+__version__ = 20231217
+from src.root_logger import logger
+logger.info(f"Latest update: {__version__}")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', "--test" , action= "store_true", help='test mode.')
