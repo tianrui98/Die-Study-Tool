@@ -140,7 +140,7 @@ def start_new_project(original_project_address, project_name):
     new_project_address =os.path.join(os.getcwd() ,"projects", project_name)
     os.makedirs(new_project_address)
 
-    for file_extension in ("*.jpg", "*.jpeg", "*.png"):
+    for file_extension in ("*.jpg", "*.jpeg", "*.png", "*.JPG", "*.JPEG", "*.PNG"):
         for file_path in glob.glob(os.path.join(original_project_address, '**', file_extension), recursive=True):
             new_path = os.path.join(new_project_address, os.path.basename(file_path))
             shutil.copy(file_path, new_path)
