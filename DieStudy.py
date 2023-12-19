@@ -3,12 +3,12 @@ import argparse
 from reset import *
 from src.root_logger import *
 
-__version__ = 20231217
+__version__ = 20231218
 logger.info(f"Latest update: {__version__}")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', "--test" , action= "store_true", help='test mode.')
-parser.add_argument('-r', "--reset", action= "store_true", help='clear all data.')
+parser.add_argument('-r', "--reset", action= "store_true", help='clear all data after exit.')
 args = parser.parse_args()
 
 def main():
