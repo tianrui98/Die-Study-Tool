@@ -69,3 +69,490 @@
 2023-12-18 21:24:43,133 - src.root_logger - INFO - ====EXIT====
 
 
+2023-12-18 21:42:53,271 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 21:42:57,934 - src.root_logger - INFO - Start new project demo
+2023-12-18 21:42:59,512 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 21:43:04,423 - src.root_logger - INFO - Confirm coin list dict_keys(['57;004.jpg', '57;010.jpg', '57;002.jpg'])
+2023-12-18 21:43:08,534 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 21:43:11,476 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 21:43:11,957 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 21:43:11,957 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;010.jpg', '57;002.jpg'], 'best_image_name': '57;004.jpg', 'nomatches': [], 'images': ['57;010.jpg', '57;002.jpg', '57;004.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;002_57;004_57;010', '57;009_57;012']}}}}
+2023-12-18 21:43:12,500 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;002_57;004_57;010', '57;018_57;048', '57;009_57;012'}
+2023-12-18 21:54:18,239 - src.root_logger - INFO - {}
+2023-12-18 21:54:18,241 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 21:54:23,490 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 21:54:26,524 - src.root_logger - INFO - Start new project demo
+2023-12-18 21:54:28,074 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 21:54:31,280 - src.root_logger - INFO - {}
+2023-12-18 21:54:31,280 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 21:54:35,410 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 21:54:37,651 - src.root_logger - INFO - Start new project demo
+2023-12-18 21:54:39,203 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 21:54:45,467 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 21:54:49,506 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 21:54:52,753 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 21:54:53,233 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 21:54:53,233 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 21:54:53,673 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;009_57;012', '57;002_57;004_57;010', '57;018_57;048'}
+2023-12-18 21:55:50,065 - src.root_logger - INFO - {}
+2023-12-18 21:55:50,066 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 21:55:54,684 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 21:55:56,832 - src.root_logger - INFO - Start new project demo
+2023-12-18 21:55:58,384 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 21:56:00,065 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 21:56:04,014 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 21:56:07,378 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 21:56:07,860 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 21:56:07,860 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 21:56:08,510 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;009_57;012', '57;002_57;004_57;010'}
+2023-12-18 21:56:08,511 - src.root_logger - ERROR - Exception in Tkinter callback
+2023-12-18 21:56:08,516 - src.root_logger - ERROR - Traceback (most recent call last):
+2023-12-18 21:56:08,516 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 1892, in __call__
+    return self.func(*args)
+2023-12-18 21:56:08,516 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1328, in <lambda>
+    self.root.bind('n', lambda event: self.group_frame_next_cluster())
+2023-12-18 21:56:08,516 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1163, in group_frame_next_cluster
+    self.group_frame_check_completion_and_move_on()
+2023-12-18 21:56:08,517 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1137, in group_frame_check_completion_and_move_on
+    self.pair_frame_start()
+2023-12-18 21:56:08,517 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 934, in pair_frame_start
+    self.frame.grid_forget()
+2023-12-18 21:56:08,517 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 2503, in grid_forget
+    self.tk.call('grid', 'forget', self._w)
+2023-12-18 21:56:08,517 - src.root_logger - ERROR - _tkinter.TclError: bad window path name ".!frame4"
+2023-12-18 21:56:42,068 - src.root_logger - INFO - {}
+2023-12-18 21:56:42,069 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 21:56:46,336 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 21:56:48,680 - src.root_logger - INFO - Start new project demo
+2023-12-18 21:56:50,260 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 21:56:51,549 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 21:56:54,370 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 21:56:57,278 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 21:56:57,758 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 21:56:57,759 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 21:56:58,218 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;009_57;012', '57;002_57;004_57;010', '57;018_57;048'}
+2023-12-18 21:59:42,943 - src.root_logger - INFO - {}
+2023-12-18 21:59:42,944 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 21:59:47,582 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 21:59:49,830 - src.root_logger - INFO - Start new project demo
+2023-12-18 21:59:51,381 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 21:59:53,174 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 21:59:55,984 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 21:59:58,834 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 21:59:59,314 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 21:59:59,315 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 21:59:59,788 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;009_57;012', '57;002_57;004_57;010', '57;018_57;048'}
+2023-12-18 22:00:00,132 - src.root_logger - ERROR - Exception in Tkinter callback
+2023-12-18 22:00:00,136 - src.root_logger - ERROR - Traceback (most recent call last):
+2023-12-18 22:00:00,136 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 1892, in __call__
+    return self.func(*args)
+2023-12-18 22:00:00,136 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1325, in <lambda>
+    self.root.bind('n', lambda event: self.group_frame_next_cluster())
+2023-12-18 22:00:00,136 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1165, in group_frame_next_cluster
+    self.group_frame_check_completion_and_move_on()
+2023-12-18 22:00:00,136 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1139, in group_frame_check_completion_and_move_on
+    self.pair_frame_start()
+2023-12-18 22:00:00,136 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 937, in pair_frame_start
+    self.create_pair_frame()
+2023-12-18 22:00:00,136 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 556, in create_pair_frame
+    self.prev_btn["status"] = "disabled"
+2023-12-18 22:00:00,136 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 1657, in __setitem__
+    self.configure({key: value})
+2023-12-18 22:00:00,136 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 1646, in configure
+    return self._configure('configure', cnf, kw)
+2023-12-18 22:00:00,136 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 1636, in _configure
+    self.tk.call(_flatten((self._w, cmd)) + self._options(cnf))
+2023-12-18 22:00:00,137 - src.root_logger - ERROR - _tkinter.TclError: unknown option "-status"
+2023-12-18 22:00:11,931 - src.root_logger - INFO - {}
+2023-12-18 22:00:11,931 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:01:06,902 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:01:44,130 - src.root_logger - INFO - {}
+2023-12-18 22:01:44,130 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:01:48,526 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:01:53,460 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:01:55,038 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:01:57,341 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:02:00,690 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:02:03,893 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:02:04,372 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:02:04,373 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;002_57;004_57;010', '57;009_57;012']}}}}
+2023-12-18 22:02:04,912 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;002_57;004_57;010', '57;009_57;012'}
+2023-12-18 22:06:40,473 - src.root_logger - INFO - {}
+2023-12-18 22:06:40,475 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:06:44,980 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:06:47,597 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:06:49,150 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:06:51,307 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:06:54,711 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:06:57,729 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:06:58,209 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:06:58,209 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 22:06:59,055 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;009_57;012', '57;002_57;004_57;010'}
+2023-12-18 22:08:55,683 - src.root_logger - INFO - {}
+2023-12-18 22:08:55,684 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:08:59,750 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:09:01,980 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:09:03,542 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:09:05,562 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:09:08,486 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:09:11,409 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:09:11,896 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:09:11,896 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;002_57;004_57;010', '57;009_57;012']}}}}
+2023-12-18 22:09:12,358 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;002_57;004_57;010', '57;009_57;012', '57;018_57;048'}
+2023-12-18 22:17:26,720 - src.root_logger - INFO - {}
+2023-12-18 22:17:26,721 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:17:31,172 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:17:33,555 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:17:35,149 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:17:36,818 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:17:39,849 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:17:42,773 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:17:43,259 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:17:43,259 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;002_57;004_57;010', '57;009_57;012']}}}}
+2023-12-18 22:17:43,723 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;002_57;004_57;010', '57;009_57;012'}
+2023-12-18 22:17:43,724 - src.root_logger - ERROR - Exception in Tkinter callback
+2023-12-18 22:17:43,728 - src.root_logger - ERROR - Traceback (most recent call last):
+2023-12-18 22:17:43,728 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 1892, in __call__
+    return self.func(*args)
+2023-12-18 22:17:43,728 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1338, in <lambda>
+    self.root.bind('n', lambda event: self.group_frame_next_cluster())
+2023-12-18 22:17:43,728 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1168, in group_frame_next_cluster
+    self.group_frame_check_completion_and_move_on()
+2023-12-18 22:17:43,728 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1140, in group_frame_check_completion_and_move_on
+    self.group_frame_destroy()
+2023-12-18 22:17:43,728 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1320, in group_frame_destroy
+    self.image_frames.destroy()
+2023-12-18 22:17:43,729 - src.root_logger - ERROR - AttributeError: 'list' object has no attribute 'destroy'
+2023-12-18 22:18:20,355 - src.root_logger - INFO - {}
+2023-12-18 22:18:20,356 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:18:25,218 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:18:27,709 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:18:29,269 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:18:31,356 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:18:34,134 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:18:36,740 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:18:37,223 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:18:37,224 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;002_57;004_57;010', '57;009_57;012']}}}}
+2023-12-18 22:18:37,470 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;009_57;012', '57;002_57;004_57;010'}
+2023-12-18 22:21:51,908 - src.root_logger - INFO - {}
+2023-12-18 22:21:51,909 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:21:55,654 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:21:57,924 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:21:59,494 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:22:00,943 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:22:04,401 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:22:07,149 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:22:07,633 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:22:07,633 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 22:22:08,321 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;009_57;012', '57;002_57;004_57;010'}
+2023-12-18 22:25:07,702 - src.root_logger - INFO - {}
+2023-12-18 22:25:07,703 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:25:11,200 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:25:13,569 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:25:15,130 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:25:17,385 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:25:27,946 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:25:30,800 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:25:31,281 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:25:31,281 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;002_57;004_57;010', '57;009_57;012']}}}}
+2023-12-18 22:25:31,679 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;002_57;004_57;010', '57;009_57;012'}
+2023-12-18 22:26:12,247 - src.root_logger - INFO - Unmatch 57;053.jpg from cluster 57;002_57;004_57;010
+2023-12-18 22:26:23,056 - src.root_logger - INFO - Unmatch 57;053.jpg from cluster 57;002_57;004_57;010
+2023-12-18 22:28:39,046 - src.root_logger - INFO - {}
+2023-12-18 22:28:39,047 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:28:42,729 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:28:44,896 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:28:46,451 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:28:48,423 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:28:51,405 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:28:54,209 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:28:54,690 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:28:54,690 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 22:28:55,152 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;009_57;012', '57;002_57;004_57;010'}
+2023-12-18 22:31:05,054 - src.root_logger - INFO - {}
+2023-12-18 22:31:05,055 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:31:08,847 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:31:11,926 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:31:13,487 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:31:15,119 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:31:18,340 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:31:21,211 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:31:21,691 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:31:21,691 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;002_57;004_57;010', '57;009_57;012']}}}}
+2023-12-18 22:31:22,156 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;009_57;012', '57;018_57;048', '57;002_57;004_57;010'}
+2023-12-18 22:38:37,181 - src.root_logger - INFO - {}
+2023-12-18 22:38:37,183 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:38:42,944 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:38:45,502 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:38:47,107 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:38:49,294 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:38:52,382 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:38:55,296 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:38:55,782 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:38:55,782 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;002_57;004_57;010', '57;009_57;012']}}}}
+2023-12-18 22:38:56,237 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;002_57;004_57;010', '57;009_57;012'}
+2023-12-18 22:38:56,238 - src.root_logger - ERROR - Exception in Tkinter callback
+2023-12-18 22:38:56,242 - src.root_logger - ERROR - Traceback (most recent call last):
+2023-12-18 22:38:56,243 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 1892, in __call__
+    return self.func(*args)
+2023-12-18 22:38:56,243 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1345, in <lambda>
+    self.root.bind('n', lambda event: self.group_frame_next_cluster())
+2023-12-18 22:38:56,243 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1169, in group_frame_next_cluster
+    self.group_frame_check_completion_and_move_on()
+2023-12-18 22:38:56,243 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1140, in group_frame_check_completion_and_move_on
+    self.group_frame_destroy()
+2023-12-18 22:38:56,243 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1334, in group_frame_destroy
+    self.root.unbind('n', lambda event: self.group_frame_next_cluster())
+2023-12-18 22:38:56,243 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 1399, in unbind
+    self.deletecommand(funcid)
+2023-12-18 22:38:56,243 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 648, in deletecommand
+    self.tk.deletecommand(name)
+2023-12-18 22:38:56,243 - src.root_logger - ERROR - TypeError: deletecommand() argument must be str, not function
+2023-12-18 22:40:18,312 - src.root_logger - INFO - {}
+2023-12-18 22:40:18,312 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:40:23,365 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:40:25,689 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:40:27,247 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:40:28,754 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:40:31,702 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:40:34,582 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:40:35,062 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:40:35,062 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 22:40:35,475 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;009_57;012', '57;018_57;048', '57;002_57;004_57;010'}
+2023-12-18 22:40:35,476 - src.root_logger - ERROR - Exception in Tkinter callback
+2023-12-18 22:40:35,480 - src.root_logger - ERROR - Traceback (most recent call last):
+2023-12-18 22:40:35,480 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 1892, in __call__
+    return self.func(*args)
+2023-12-18 22:40:35,480 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1345, in <lambda>
+    self.root.bind('n', lambda event: self.group_frame_next_cluster())
+2023-12-18 22:40:35,481 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1169, in group_frame_next_cluster
+    self.group_frame_check_completion_and_move_on()
+2023-12-18 22:40:35,481 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1140, in group_frame_check_completion_and_move_on
+    self.group_frame_destroy()
+2023-12-18 22:40:35,481 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1326, in group_frame_destroy
+    self.root.unbind('n', self.group_frame_next_cluster())
+2023-12-18 22:40:35,481 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1163, in group_frame_next_cluster
+    self.group_frame_reset_identical_list_box()
+2023-12-18 22:40:35,481 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1087, in group_frame_reset_identical_list_box
+    self.added_coin_list_box.delete(0,tk.END)
+2023-12-18 22:40:35,481 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 3179, in delete
+    self.tk.call(self._w, 'delete', first, last)
+2023-12-18 22:40:35,481 - src.root_logger - ERROR - _tkinter.TclError: invalid command name ".!frame4.!frame2.!listbox"
+2023-12-18 22:42:04,622 - src.root_logger - INFO - {}
+2023-12-18 22:42:04,622 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:42:08,444 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:42:10,597 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:42:12,157 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:42:14,352 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:42:17,282 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:42:19,983 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:42:20,463 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:42:20,463 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;002_57;004_57;010', '57;009_57;012']}}}}
+2023-12-18 22:42:20,946 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;002_57;004_57;010', '57;018_57;048', '57;009_57;012'}
+2023-12-18 22:42:32,104 - src.root_logger - INFO - _____STAGE 2. Correcting Sensitivity Rate COMPLETED_____
+2023-12-18 22:42:32,105 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;018_57;048': {'matches': ['57;048.jpg'], 'best_image_name': '57;018.jpg', 'nomatches': [], 'images': ['57;048.jpg', '57;018.jpg'], 'identicals': []}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}}, 'stages': {'1': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;002_57;004_57;010', '57;009_57;012']}}}}
+2023-12-18 22:42:33,492 - src.root_logger - DEBUG - Next stage 3. Single vs Single. yet to check: {'57;053.jpg'}
+2023-12-18 22:42:33,492 - src.root_logger - DEBUG - Skip single ['57;053.jpg']
+2023-12-18 22:42:33,492 - src.root_logger - DEBUG - Skip stage 3. Single vs Single
+2023-12-18 22:42:33,492 - src.root_logger - DEBUG - Next stage 4. Find Identicals. yet to check: {'Singles', '57;018_57;048', '57;009_57;012', '57;002_57;004_57;010'}
+2023-12-18 22:42:35,270 - src.root_logger - ERROR - Exception in Tkinter callback
+2023-12-18 22:42:35,274 - src.root_logger - ERROR - Traceback (most recent call last):
+2023-12-18 22:42:35,274 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 1892, in __call__
+    return self.func(*args)
+2023-12-18 22:42:35,275 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1345, in <lambda>
+    self.root.bind('n', lambda event: self.group_frame_next_cluster())
+2023-12-18 22:42:35,275 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1169, in group_frame_next_cluster
+    self.group_frame_check_completion_and_move_on()
+2023-12-18 22:42:35,275 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1140, in group_frame_check_completion_and_move_on
+    self.group_frame_destroy()
+2023-12-18 22:42:35,275 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1319, in group_frame_destroy
+    self.root.unbind('n', self.group_frame_next_cluster())
+2023-12-18 22:42:35,275 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1169, in group_frame_next_cluster
+    self.group_frame_check_completion_and_move_on()
+2023-12-18 22:42:35,275 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1140, in group_frame_check_completion_and_move_on
+    self.group_frame_destroy()
+2023-12-18 22:42:35,275 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1323, in group_frame_destroy
+    self.next_cluster_btn.destroy()
+2023-12-18 22:42:35,275 - src.root_logger - ERROR - AttributeError: 'UI' object has no attribute 'next_cluster_btn'
+2023-12-18 22:47:28,436 - src.root_logger - INFO - {}
+2023-12-18 22:47:28,436 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:47:32,733 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:47:34,988 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:47:36,616 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:47:38,228 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:47:40,915 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:47:43,403 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:47:43,884 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:47:43,884 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 22:47:44,441 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;009_57;012', '57;002_57;004_57;010'}
+2023-12-18 22:47:44,442 - src.root_logger - ERROR - Exception in Tkinter callback
+2023-12-18 22:47:44,446 - src.root_logger - ERROR - Traceback (most recent call last):
+2023-12-18 22:47:44,446 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 1892, in __call__
+    return self.func(*args)
+2023-12-18 22:47:44,447 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1345, in <lambda>
+    self.root.bind('n', lambda event: self.group_frame_next_cluster())
+2023-12-18 22:47:44,447 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1169, in group_frame_next_cluster
+    self.group_frame_check_completion_and_move_on()
+2023-12-18 22:47:44,447 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1140, in group_frame_check_completion_and_move_on
+    self.group_frame_destroy()
+2023-12-18 22:47:44,447 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 1319, in group_frame_destroy
+    self.root.unbind('n', self.group_frame_next_cluster)
+2023-12-18 22:47:44,447 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 1399, in unbind
+    self.deletecommand(funcid)
+2023-12-18 22:47:44,447 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 648, in deletecommand
+    self.tk.deletecommand(name)
+2023-12-18 22:47:44,447 - src.root_logger - ERROR - TypeError: deletecommand() argument must be str, not method
+2023-12-18 22:52:40,083 - src.root_logger - INFO - {}
+2023-12-18 22:52:40,084 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 22:52:44,135 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 22:53:16,365 - src.root_logger - INFO - Start new project demo
+2023-12-18 22:53:17,945 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 22:53:19,941 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 22:53:22,792 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 22:53:25,701 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 22:53:26,184 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 22:53:26,185 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 22:53:26,719 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;002_57;004_57;010', '57;018_57;048', '57;009_57;012'}
+2023-12-18 22:56:28,296 - src.root_logger - INFO - Unmatch 57;018.jpg from cluster 57;002_57;004_57;010
+2023-12-18 23:00:46,109 - src.root_logger - INFO - {}
+2023-12-18 23:00:46,110 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 23:00:57,358 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 23:00:59,811 - src.root_logger - INFO - Start new project demo
+2023-12-18 23:01:01,376 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 23:01:02,900 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 23:01:05,830 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 23:01:08,559 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 23:01:09,044 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 23:01:09,044 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 23:01:09,663 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;009_57;012', '57;002_57;004_57;010'}
+2023-12-18 23:04:22,798 - src.root_logger - INFO - {}
+2023-12-18 23:04:22,799 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 23:04:34,059 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 23:04:36,523 - src.root_logger - INFO - Start new project demo
+2023-12-18 23:04:38,099 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 23:04:40,394 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 23:04:43,554 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 23:04:46,353 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 23:04:46,833 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 23:04:46,833 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': [], 'images': ['57;004.jpg', '57;010.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 23:04:47,449 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;009_57;012', '57;002_57;004_57;010'}
+2023-12-18 23:05:32,077 - src.root_logger - INFO - Unmatch 57;009.jpg from cluster 57;002_57;004_57;010
+2023-12-18 23:05:33,323 - src.root_logger - INFO - Unmatch 57;018.jpg from cluster 57;002_57;004_57;010
+2023-12-18 23:05:33,921 - src.root_logger - INFO - Unmatch 57;053.jpg from cluster 57;002_57;004_57;010
+2023-12-18 23:06:35,876 - src.root_logger - INFO - {}
+2023-12-18 23:06:35,876 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 23:06:42,638 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 23:06:45,449 - src.root_logger - INFO - Start new project demo
+2023-12-18 23:06:46,996 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 23:06:48,221 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 23:06:50,717 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 23:06:53,025 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 23:06:53,505 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 23:06:53,505 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': ['57;012.jpg', '57;009.jpg'], 'images': ['57;004.jpg', '57;010.jpg', '57;012.jpg', '57;009.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;002_57;004_57;010', '57;009_57;012']}}}}
+2023-12-18 23:06:53,672 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;002_57;004_57;010', '57;009_57;012'}
+2023-12-18 23:06:58,718 - src.root_logger - INFO - Unmatch 57;009.jpg from cluster 57;002_57;004_57;010
+2023-12-18 23:07:00,062 - src.root_logger - INFO - Unmatch 57;053.jpg from cluster 57;002_57;004_57;010
+2023-12-18 23:07:03,790 - src.root_logger - INFO - Unmatch 57;053.jpg from cluster 57;009_57;012
+2023-12-18 23:07:25,757 - src.root_logger - INFO - Unmatch 57;053.jpg from cluster 57;018_57;048
+2023-12-18 23:07:26,339 - src.root_logger - INFO - _____STAGE 2. Correcting Sensitivity Rate COMPLETED_____
+2023-12-18 23:07:26,340 - src.root_logger - INFO - {'demo': {'clusters': {'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;018_57;048': {'matches': ['57;048.jpg'], 'best_image_name': '57;018.jpg', 'nomatches': [], 'images': ['57;048.jpg', '57;018.jpg'], 'identicals': []}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': ['57;048.jpg', '57;018.jpg'], 'images': ['57;004.jpg', '57;010.jpg', '57;048.jpg', '57;018.jpg', '57;002.jpg'], 'identicals': []}, '57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': ['57;048.jpg', '57;018.jpg'], 'images': ['57;012.jpg', '57;048.jpg', '57;018.jpg', '57;009.jpg'], 'identicals': []}}, 'stages': {'1': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;002_57;004_57;010', '57;009_57;012']}}}}
+2023-12-18 23:07:27,848 - src.root_logger - DEBUG - Next stage 3. Single vs Single. yet to check: {'57;053.jpg'}
+2023-12-18 23:07:27,848 - src.root_logger - DEBUG - Skip single ['57;053.jpg']
+2023-12-18 23:07:27,848 - src.root_logger - DEBUG - Skip stage 3. Single vs Single
+2023-12-18 23:07:27,848 - src.root_logger - DEBUG - Next stage 4. Find Identicals. yet to check: {'Singles', '57;002_57;004_57;010', '57;009_57;012', '57;018_57;048'}
+2023-12-18 23:07:34,097 - src.root_logger - INFO - {}
+2023-12-18 23:07:34,097 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 23:07:45,121 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 23:07:50,745 - src.root_logger - INFO - Start new project demo
+2023-12-18 23:07:52,382 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 23:07:54,508 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 23:07:57,218 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 23:07:59,570 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 23:08:00,053 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 23:08:00,053 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': ['57;012.jpg', '57;009.jpg'], 'images': ['57;004.jpg', '57;010.jpg', '57;012.jpg', '57;009.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 23:08:00,496 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;009_57;012', '57;002_57;004_57;010'}
+2023-12-18 23:08:06,787 - src.root_logger - INFO - Unmatch 57;009.jpg from cluster 57;002_57;004_57;010
+2023-12-18 23:08:10,030 - src.root_logger - INFO - Match 57;053.jpg to cluster 57;002_57;004_57;010
+2023-12-18 23:08:12,961 - src.root_logger - DEBUG - [create_new_objects] Skip cluster 57;009_57;012
+2023-12-18 23:08:12,962 - src.root_logger - ERROR - Exception in Tkinter callback
+2023-12-18 23:08:12,973 - src.root_logger - ERROR - Traceback (most recent call last):
+2023-12-18 23:08:12,974 - src.root_logger - ERROR - File "/Users/rui/opt/anaconda3/lib/python3.9/tkinter/__init__.py", line 1892, in __call__
+    return self.func(*args)
+2023-12-18 23:08:12,974 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 930, in <lambda>
+    self.root.bind('<Right>', lambda event: self.pair_frame_load_next_image())
+2023-12-18 23:08:12,974 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 783, in pair_frame_load_next_image
+    self.pair_frame_check_completion_and_move_on()
+2023-12-18 23:08:12,974 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/UI.py", line 915, in pair_frame_check_completion_and_move_on
+    self.cluster, self.stage= progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status)
+2023-12-18 23:08:12,974 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/progress.py", line 827, in create_new_objects
+    if check_stage_completion(stage,progress_data[project_name]["clusters"]):
+2023-12-18 23:08:12,974 - src.root_logger - ERROR - File "/Users/rui/Die-Study-Tool/src/progress.py", line 499, in check_stage_completion
+    logger.debug(f"Skip cluster {stage.clusters_yet_to_check[0]}")
+2023-12-18 23:08:12,974 - src.root_logger - ERROR - TypeError: 'set' object is not subscriptable
+2023-12-18 23:10:24,693 - src.root_logger - INFO - {}
+2023-12-18 23:10:24,694 - src.root_logger - INFO - ====EXIT====
+
+
+2023-12-18 23:11:22,298 - src.root_logger - INFO - Latest update: 20231218
+2023-12-18 23:11:24,766 - src.root_logger - INFO - Start new project demo
+2023-12-18 23:11:26,347 - src.root_logger - INFO - _____create demo project_____
+2023-12-18 23:11:27,665 - src.root_logger - INFO - Confirm coin list dict_keys(['57;002.jpg', '57;004.jpg', '57;010.jpg'])
+2023-12-18 23:11:31,271 - src.root_logger - INFO - Confirm coin list dict_keys(['57;009.jpg', '57;012.jpg'])
+2023-12-18 23:11:36,632 - src.root_logger - INFO - Confirm coin list dict_keys(['57;018.jpg', '57;048.jpg'])
+2023-12-18 23:11:37,288 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 23:11:37,288 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': ['57;012.jpg', '57;009.jpg'], 'images': ['57;004.jpg', '57;010.jpg', '57;012.jpg', '57;009.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 23:11:41,024 - src.root_logger - INFO - _____STAGE 1. Correcting False Discovery Rate COMPLETED_____
+2023-12-18 23:11:41,024 - src.root_logger - INFO - {'demo': {'clusters': {'57;009_57;012': {'matches': ['57;012.jpg'], 'best_image_name': '57;009.jpg', 'nomatches': [], 'images': ['57;012.jpg', '57;009.jpg'], 'identicals': []}, 'Singles': {'images': ['57;053.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': ''}, '57;002_57;004_57;010': {'matches': ['57;004.jpg', '57;010.jpg'], 'best_image_name': '57;002.jpg', 'nomatches': ['57;012.jpg', '57;009.jpg'], 'images': ['57;004.jpg', '57;010.jpg', '57;012.jpg', '57;009.jpg', '57;002.jpg'], 'identicals': []}, '57;018_57;048': {'images': ['57;018.jpg', '57;048.jpg'], 'matches': [], 'nomatches': [], 'identicals': [], 'best_image_name': '57;018.jpg'}}, 'stages': {'0': {'current_cluster': {'name': '57;009_57;012', 'unprocessed_matches': [], 'unprocessed_nomatches': [], 'unprocessed_marked_coin_group_list': []}, 'clusters_yet_to_check': ['57;018_57;048'], 'clusters_done': ['57;009_57;012', '57;002_57;004_57;010']}}}}
+2023-12-18 23:11:41,981 - src.root_logger - DEBUG - Next stage 2. Correcting Sensitivity Rate. yet to check: {'57;018_57;048', '57;009_57;012', '57;002_57;004_57;010'}
+2023-12-18 23:12:38,445 - src.root_logger - INFO - {}
+2023-12-18 23:12:38,446 - src.root_logger - INFO - ====EXIT====
+
+

@@ -496,7 +496,7 @@ def check_stage_completion(stage, clusters_data):
         if (len(stage.clusters_yet_to_check) == 0) :
             return True
         elif (len(stage.clusters_yet_to_check) == 1 and len(clusters_data["Singles"]["images"]) == 0):
-            logger.debug(f"Skip cluster {stage.clusters_yet_to_check[0]}")
+            logger.debug(f"Skip cluster {stage.clusters_yet_to_check}")
             return True
     elif stage.stage_number == 2:
         if (len(stage.clusters_yet_to_check) == 0):

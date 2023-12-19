@@ -553,7 +553,9 @@ class UI():
         right_navigation_bar = self.add_frame(self.button_frame_height, self.button_frame_width //2,2, 2, 1, 1, self.frame, "e")
         #navigation buttons
         self.prev_btn = self.add_button("◀", self.pair_frame_load_prev_image, 4, 4, 0, 0, 1, 2, right_navigation_bar, sticky="e")
+        self.prev_btn["state"] = "disabled"
         self.next_btn = self.add_button("▶", self.pair_frame_load_next_image, 4, 4, 1, 0, 1, 2, right_navigation_bar, sticky="e")
+        self.next_btn["state"] = "normal"
 
         #action buttons
         action_bar = self.add_frame(self.button_frame_height, self.button_frame_width,1, 3, 2, 1, self.frame, "se")
@@ -810,6 +812,7 @@ class UI():
             self.next_btn["state"] = "normal"
         else:
             self.next_btn["state"] = "disabled"
+
         return None
 
     def pair_frame_mark_match (self):
@@ -1132,6 +1135,7 @@ class UI():
 
                 #update display
                 if self.stage.stage_number == 1 or self.stage.stage_number == 2:
+                    self.group_frame_destroy() 
                     self.pair_frame_start()
                 else:
                     self.group_frame_refresh_image_display()
@@ -1145,6 +1149,7 @@ class UI():
         """Save current progress and display next cluster
         If all clusters have been visited -> end of project
         """
+
         if len(self.added_coin_dict) > 1:
             confirm_list = messagebox.askyesno("Next Cluster", "Confirm current list of coins?")
             if confirm_list:
@@ -1159,11 +1164,6 @@ class UI():
                 self.cluster.identicals.append(set(group))
 
         self.group_frame_check_completion_and_move_on()
-        if not self.quit:
-            self.current_page = 0
-            self.group_frame_refresh_image_display()
-            self.initialize_stack()
-            self.root.after(1, lambda: self.root.focus_force())
 
     def group_frame_load_next_page(self) -> None:
         self.current_page = min(self.current_page + 1, math.ceil(len(self.cluster.images)/6 ) - 1)
@@ -1298,8 +1298,26 @@ class UI():
         self.prev_btn = self.add_button("◀", self.group_frame_load_prev_page, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
         self.next_btn= self.add_button("▶", self.group_frame_load_next_page, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
 
-        _ = self.add_button("Next Cluster (N)", self.group_frame_next_cluster, 3, 19, 1, 2, 1, 1, self.frame, "sw" )
+        self.next_cluster_btn = self.add_button("Next Cluster (N)", self.group_frame_next_cluster, 3, 19, 1, 2, 1, 1, self.frame, "sw" )
         self.current_cluster_label  = self.add_text("Current cluster: ",0, 3, 1, 1, self.frame, "w" )
+    
+    def group_frame_destroy (self):
+        """Destroy all the label created in create_group_frame"""
+
+        self.prev_btn.destroy()
+        self.next_btn.destroy()
+        self.next_cluster_btn.destroy()
+        self.scrollbar.destroy()
+        self.added_coin_list_box.destroy()
+        self.right_image_window.destroy()
+
+        del self.prev_btn
+        del self.next_btn
+        del self.next_cluster_btn
+        del self.scrollbar
+        del self.added_coin_list_box
+        del self.right_image_window
+        del self.current_page
 
     def group_frame_start(self, identical_stage = False):
         self.frame.grid_forget()
