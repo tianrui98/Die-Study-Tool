@@ -547,6 +547,8 @@ class UI():
         self.right_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.right_info_bar, sticky="w")
 
         self.right_tick =self.add_image(os.path.join("images","blank.png"), 1, 0, 1, 1, self.right_info_bar, "w", 15, 0, 0)
+        self.green_tick_img = self.create_image_object(os.path.join("images","green_tick.png"),15)
+        self.grey_tick_img = self.create_image_object(os.path.join("images","grey_tick.png"),15)
 
         right_navigation_bar = self.add_frame(self.button_frame_height, self.button_frame_width //2,2, 2, 1, 1, self.frame, "e")
         #navigation buttons
@@ -638,7 +640,7 @@ class UI():
         image = image.resize((math.ceil(h/ih * iw), h), Image. ANTIALIAS)
         img = ImageTk.PhotoImage(image)
         img_label = tk.Label(parent, image=img)
-        img_label.image = img
+        # img_label.image = img
         img_label.grid(column=column,
                        row=row,
                        columnspan=columspan,
@@ -714,9 +716,9 @@ class UI():
             checked ([bool]): whether the image has been checked
         """
         if checked:
-            tick_img = self.create_image_object(os.path.join("images","green_tick.png"),15)
+            tick_img = self.green_tick_img
         else:
-            tick_img = self.create_image_object(os.path.join("images","grey_tick.png"),15)
+            tick_img = self.grey_tick_img
 
         self.right_tick.configure(image = tick_img)
         self.right_tick.image = tick_img
