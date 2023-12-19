@@ -1,9 +1,9 @@
 from src.UI import UI
 import argparse
 from reset import *
+from src.root_logger import *
 
 __version__ = 20231217
-from src.root_logger import logger
 logger.info(f"Latest update: {__version__}")
 
 parser = argparse.ArgumentParser()
