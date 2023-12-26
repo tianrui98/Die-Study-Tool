@@ -301,7 +301,6 @@ class UI():
         if self.stage.stage_number == 0 or self.stage.stage_number == 3:
             self.group_frame_start()
             self.group_frame_refresh_image_display()
-            print("Call refresh in browse file")
         else:
             self.pair_frame_start()
             self.pair_frame_refresh_image_display()
@@ -1073,7 +1072,6 @@ class UI():
         self.right_image_window.image = img
 
     def group_frame_confirm_current_list (self):
-        print("confirm current list")
         """mark the images on the list matches and un-display their widgets.
         reset the identical list and display window.
         """
@@ -1089,7 +1087,6 @@ class UI():
         self.group_frame_reset_identical_list_box()
 
     def group_frame_reset_identical_list_box(self):
-        print("reset identical list box")
         #reset list
         self.added_coin_list_box.delete(0,tk.END)
         self.added_coin_dict = {}
@@ -1187,7 +1184,6 @@ class UI():
 
     #visuals
     def group_frame_refresh_image_display(self) -> None:
-        print("refresh function")
         """show current cluster's coin images. Add the image widgets to the image_widgets dictionary"""
         self.project_title_label.config(text = str("Project Title: " + self.project_name))
         self.stage_label.config(text = str("Current Stage: " + self.stage.name))
@@ -1217,7 +1213,6 @@ class UI():
                     img = self.create_darken_image_object(self._get_image_address(i), int(self.main_frame_height * 0.49))
                 else:
                     img = self.create_image_object(self._get_image_address(i),int(self.main_frame_height * 0.49))
-                    print(f"create normal image for {self._get_image_address(i)}")
 
             self.image_on_display[display_index][1].configure(image = img )
             self.image_on_display[display_index][1].image = img
@@ -1331,7 +1326,6 @@ class UI():
         self.current_page = 0
         self.initialize_stack()
         self.create_group_frame(identical_stage)
-        print("Call refresh in group frame start")
         self.group_frame_refresh_image_display()
         self.root.bind('<Right>', lambda event: self.group_frame_load_next_page())
         self.root.bind('<Left>', lambda event: self.group_frame_load_prev_page())
