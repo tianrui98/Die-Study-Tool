@@ -253,7 +253,6 @@ class UI():
                 #process coin list
                 for coin in coin_list:
                     self.marked_added_coin_dict[coin] = self.create_image_object(self._image_name_to_address(coin))
-            self.group_frame_refresh_image_display()
         else:
             if self.testing_mode:
                 current_cluster = self.progress_data[self.project_name]["stages"][str(self.stage.stage_number)]["current_cluster"]["name"]
@@ -266,7 +265,7 @@ class UI():
                 for coin in self.progress_data[self.project_name]["stages"][str(self.stage.stage_number)]["current_cluster"]["unprocessed_nomatches"]:
                     self.test.unmatch(current_cluster_best_image_name, coin, self.stage.stage_number)        
             self.pair_frame_start()
-            self.pair_frame_refresh_image_display()
+
     def browse_files(self):
         """Let user choose which new project/folder to start working on
         pass the directory name to the class
@@ -302,6 +301,7 @@ class UI():
         if self.stage.stage_number == 0 or self.stage.stage_number == 3:
             self.group_frame_start()
             self.group_frame_refresh_image_display()
+            print("Call refresh in browse file")
         else:
             self.pair_frame_start()
             self.pair_frame_refresh_image_display()
@@ -567,6 +567,14 @@ class UI():
 
         self.no_match_btn = self.add_button("No Match (N)", self.pair_frame_mark_no_match, action_button_height, 12, 1, 0, 1, 1, action_bar, "se")
         self.match_btn = self.add_button("Match (M)", self.pair_frame_mark_match, action_button_height, 12, 2, 0, 1, 1, action_bar, "se")
+
+        #WIP: #skip to a particular image
+    
+        # self.skip_to_image_name_var = tk.StringVar()
+        # self.skip_to_image_name_var.set("")
+        # self.skip_to_image_name_option_box = tk.OptionMenu(action_bar, self.skip_to_image_name_var, None)
+        # # self.skip_to_image_name_option_box.configure(width = 20)
+        # self.skip_to_image_name_option_box.place(relx=relx_base, rely=rely_base *2 + 0.1, anchor = "w")
 
     def start(self):
         self.create_UI()
@@ -1064,8 +1072,8 @@ class UI():
         self.right_image_window.configure(image = img)
         self.right_image_window.image = img
 
-
     def group_frame_confirm_current_list (self):
+        print("confirm current list")
         """mark the images on the list matches and un-display their widgets.
         reset the identical list and display window.
         """
@@ -1081,6 +1089,7 @@ class UI():
         self.group_frame_reset_identical_list_box()
 
     def group_frame_reset_identical_list_box(self):
+        print("reset identical list box")
         #reset list
         self.added_coin_list_box.delete(0,tk.END)
         self.added_coin_dict = {}
@@ -1091,6 +1100,7 @@ class UI():
         self.right_image_window.image = img
         #reset left window
         self.group_frame_refresh_image_display()
+
 
     def group_frame_finish_project(self):
         logger.info("_____PROJECT COMPLETED_____")
@@ -1135,9 +1145,11 @@ class UI():
 
                 #update display
                 if self.stage.stage_number == 1 or self.stage.stage_number == 2:
-                    self.group_frame_destroy() 
+                    #stage change will trigger a different display format 
                     self.pair_frame_start()
                 else:
+                    self.current_page = 0
+                    self.initialize_stack()
                     self.group_frame_refresh_image_display()
                
             else:
@@ -1175,6 +1187,7 @@ class UI():
 
     #visuals
     def group_frame_refresh_image_display(self) -> None:
+        print("refresh function")
         """show current cluster's coin images. Add the image widgets to the image_widgets dictionary"""
         self.project_title_label.config(text = str("Project Title: " + self.project_name))
         self.stage_label.config(text = str("Current Stage: " + self.stage.name))
@@ -1200,9 +1213,11 @@ class UI():
                 self.image_label_widgets[display_index].config(text = image_display_name)
 
                 if image_object.name in self.marked_added_coin_dict:
+                    #TODO: the darken function does not work for CMYK -- it will only darken the non-white part
                     img = self.create_darken_image_object(self._get_image_address(i), int(self.main_frame_height * 0.49))
                 else:
                     img = self.create_image_object(self._get_image_address(i),int(self.main_frame_height * 0.49))
+                    print(f"create normal image for {self._get_image_address(i)}")
 
             self.image_on_display[display_index][1].configure(image = img )
             self.image_on_display[display_index][1].image = img
@@ -1302,7 +1317,7 @@ class UI():
         self.current_cluster_label  = self.add_text("Current cluster: ",0, 3, 1, 1, self.frame, "w" )
     
     def group_frame_destroy (self):
-        """Destroy all the label created in create_group_frame"""
+        """TODO: See if this is really necessary. Destroy all the label created in create_group_frame"""
 
         self.prev_btn.destroy()
         self.next_btn.destroy()
@@ -1311,17 +1326,12 @@ class UI():
         self.added_coin_list_box.destroy()
         self.right_image_window.destroy()
 
-        del self.prev_btn
-        del self.next_btn
-        del self.next_cluster_btn
-        del self.scrollbar
-        del self.added_coin_list_box
-        del self.right_image_window
-        del self.current_page
-
     def group_frame_start(self, identical_stage = False):
         self.frame.grid_forget()
+        self.current_page = 0
+        self.initialize_stack()
         self.create_group_frame(identical_stage)
+        print("Call refresh in group frame start")
         self.group_frame_refresh_image_display()
         self.root.bind('<Right>', lambda event: self.group_frame_load_next_page())
         self.root.bind('<Left>', lambda event: self.group_frame_load_prev_page())

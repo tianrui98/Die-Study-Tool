@@ -7,7 +7,7 @@ __version__ = 20231219
 logger.info(f"Latest update: {__version__}")
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-t', "--test" , action= "store_true", help='test mode.')
+parser.add_argument('-t', "--test" , action= "store_true", help='test mode.semi-automated test.')
 parser.add_argument('-r', "--reset", action= "store_true", help='clear all data after exit.')
 args = parser.parse_args()
 
