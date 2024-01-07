@@ -562,10 +562,13 @@ class UI():
         for i in range(4):
             action_bar.columnconfigure(i, weight=1)
 
-        action_button_height = 4
+        self.action_button_height = self._pixel_to_char(self.button_frame_height)
+        self.no_match_btn = self.add_button("No Match (N)", self.pair_frame_mark_no_match, self.action_button_height, 12, 2, 0, 1, 1, action_bar, "se")
+        self.match_btn = self.add_button("Match (M)", self.pair_frame_mark_match, self.action_button_height, 12, 3, 0, 1, 1, action_bar, "se")
 
-        self.no_match_btn = self.add_button("No Match (N)", self.pair_frame_mark_no_match, action_button_height, 12, 1, 0, 1, 1, action_bar, "se")
-        self.match_btn = self.add_button("Match (M)", self.pair_frame_mark_match, action_button_height, 12, 2, 0, 1, 1, action_bar, "se")
+        #WIP: skip to the first of remaining unchecked images
+        self.skip_to_unchecked_btn = self.add_button("Jump to \nUnchecked (J)", self.pair_frame_jump_to_unchecked, self.action_button_height, 12, 1, 0, 1, 1, action_bar, "se")
+
 
         #WIP: #skip to a particular image
     
@@ -821,6 +824,9 @@ class UI():
             self.next_btn["state"] = "disabled"
 
         return None
+
+    def pair_frame_jump_to_unchecked(self) -> None:
+
 
     def pair_frame_mark_match (self):
         """During cluster validation stage, match left and right image
