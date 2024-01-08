@@ -44,7 +44,7 @@ class UI():
         self.image_height_char = self._pixel_to_char(int(self.initial_height * image_height_ratio))
         self.image_height_pixel = int(self.initial_height * image_height_ratio)
         self.button_frame_width = self.root.winfo_width() * 0.45
-        self.button_frame_height = self.root.winfo_height() * 0.2
+        self.button_frame_height = self.root.winfo_height() * 0.1
         self.display_frame_width = self.root.winfo_width() * 0.9
         self.display_frame_height = self.root.winfo_height() * 0.8
         self.identical_image_height_pixel = int(self.initial_height * 0.9 * 0.5)
@@ -263,8 +263,8 @@ class UI():
                 for coin in self.progress_data[self.project_name]["stages"][str(self.stage.stage_number)]["current_cluster"]["unprocessed_matches"]:
                     self.test.match(current_cluster_best_image_name, coin, self.stage.stage_number)
                 for coin in self.progress_data[self.project_name]["stages"][str(self.stage.stage_number)]["current_cluster"]["unprocessed_nomatches"]:
-                    self.test.unmatch(current_cluster_best_image_name, coin, self.stage.stage_number)        
-            self.pair_frame_start()
+                    self.test.unmatch(current_cluster_best_image_name, coin, self.stage.stage_number)     
+            self.pair_frame_start(jump_to_unchecked = True)
 
     def browse_files(self):
         """Let user choose which new project/folder to start working on
@@ -661,18 +661,8 @@ class UI():
 
     def pair_frame_refresh_image_display(self):
         """display left and right images"""
-
-        best_image_index = self.cluster.get_best_image_index()
-        if best_image_index == 0:
-            self.left_image_index = 0
-            self.right_image_index = 1
-        else:
-            self.left_image_index = best_image_index
-            self.right_image_index = 0
-
-        #skip the index of left image
-        if self.right_image_index == self.left_image_index:
-            self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
+        self.left_image_index = 0
+        self.right_image_index = 1
 
         self.pair_frame_add_images(self.left_image_index, self.right_image_index)
 
@@ -828,8 +818,8 @@ class UI():
 
     def pair_frame_jump_to_unchecked(self) -> None:
         #find the first unchecked image from the start
-        for i in range(len(self.cluster.images)):
-            if (i != self.left_image_index) and (not self._has_been_checked(self._get_image_name(i))):
+        for i in range(1, len(self.cluster.images)):
+            if not self._has_been_checked(self._get_image_name(i)):
                 self.right_image_index = i
                 self.pair_frame_update_right_image()
                 self.pair_frame_update_next_prev_btn()
@@ -957,11 +947,13 @@ class UI():
         self.root.bind('n', lambda event: self.pair_frame_mark_no_match())
         self.root.bind('j', lambda event: self.pair_frame_jump_to_unchecked())
     
-    def pair_frame_start(self): 
+    def pair_frame_start(self, jump_to_unchecked = False): 
         self.frame.grid_forget()
         self.create_pair_frame()
         self.pair_frame_bind_keys()
         self.pair_frame_refresh_image_display()
+        if jump_to_unchecked:
+            self.pair_frame_jump_to_unchecked()
         self.root.after(1, lambda: self.root.focus_force())
 
 #%% Actions for the Group Display Frame
