@@ -569,7 +569,6 @@ class UI():
         #WIP: skip to the first of remaining unchecked images
         self.skip_to_unchecked_btn = self.add_button("Jump to \nUnchecked (J)", self.pair_frame_jump_to_unchecked, self.action_button_height, 12, 1, 0, 1, 1, action_bar, "se")
 
-
         #WIP: #skip to a particular image
     
         # self.skip_to_image_name_var = tk.StringVar()
@@ -755,6 +754,27 @@ class UI():
         else:
             self._deactivate_button(self.no_match_btn)
 
+    def pair_frame_update_right_image(self) -> None:
+        new_image_path = self._get_image_address(self.right_image_index)
+        new_img = self.create_image_object(new_image_path)
+        self.right_image.configure(image = new_img)
+        self.right_image.image = new_img
+        self.pair_frame_update_image_label()
+        self.pair_frame_update_cluster_label()
+        self.pair_frame_update_icon_button_color ()
+    
+    def pair_frame_update_next_prev_btn(self) -> None:
+        #update previous button
+        if self.right_image_index > 1:
+            self.prev_btn["state"] = "normal"
+        else:
+            self.prev_btn["state"] = "disabled"
+
+        #update next button
+        if self.right_image_index < len(self.cluster.images):
+            self.next_btn["state"] = "normal"
+        else:
+            self.next_btn["state"] = "disabled"
 
     def pair_frame_load_next_image (self):
         """Change right image. Erase old image, Add the next in line image. function for "next" button
@@ -762,12 +782,7 @@ class UI():
         """
         self.right_image_index = min(len(self.cluster.images), self.right_image_index + 1)
         if self.right_image_index < len(self.cluster.images):
-            new_image_path = self._get_image_address(self.right_image_index)
-            new_img = self.create_image_object(new_image_path)
-            self.right_image.configure(image = new_img)
-            self.right_image.image = new_img
-            self.pair_frame_update_cluster_label()
-            self.pair_frame_update_icon_button_color ()
+            self.pair_frame_update_right_image()
             self.next_btn["state"] = "normal"
         else:
             new_image_path = os.path.join("images", "end.png")
@@ -780,14 +795,13 @@ class UI():
             self._deactivate_button(self.no_match_btn)
             self.right_cluster_label.config(text = "Cluster: " + new_cluster_label)
             self.next_btn["state"] = "disabled"
+            self.pair_frame_update_image_label()
         
         if self.right_image_index > 1:
             self.prev_btn["state"] = "normal"
         else:
             self.prev_btn["state"] = "disabled"
         
-        #update image labels
-        self.pair_frame_update_image_label()
         #check for completion at the last image
         if self.right_image_index == len(self.cluster.images):
             self.pair_frame_check_completion_and_move_on()
@@ -805,28 +819,25 @@ class UI():
             self.right_image_index = curr_right_image_index
 
         if self.right_image_index >= 0:
-            new_image_path = self._get_image_address(self.right_image_index)
-            new_img = self.create_image_object(new_image_path)
-            self.right_image.configure(image = new_img)
-            self.right_image.image = new_img
-            self.pair_frame_update_image_label()
-            self.pair_frame_update_cluster_label()
-            self.pair_frame_update_icon_button_color ()
+            self.pair_frame_update_right_image()
 
-        if self.right_image_index > 1:
-            self.prev_btn["state"] = "normal"
-        else:
-            self.prev_btn["state"] = "disabled"
-
-        if self.right_image_index < len(self.cluster.images):
-            self.next_btn["state"] = "normal"
-        else:
-            self.next_btn["state"] = "disabled"
+        self.pair_frame_update_next_prev_btn()
 
         return None
 
-    def pair_frame_jump_to_unchecked(self) -> None:
 
+    def pair_frame_jump_to_unchecked(self) -> None:
+        #find the first unchecked image from the start
+        for i in range(len(self.cluster.images)):
+            if (i != self.left_image_index) and (not self._has_been_checked(self._get_image_name(i))):
+                self.right_image_index = i
+                self.pair_frame_update_right_image()
+                self.pair_frame_update_next_prev_btn()
+                return
+        
+        #if all have been checked, ask user if they want to move to the next cluser
+        self.pair_frame_check_completion_and_move_on()
+    
 
     def pair_frame_mark_match (self):
         """During cluster validation stage, match left and right image
@@ -944,6 +955,7 @@ class UI():
         self.root.bind('<Left>', lambda event: self.pair_frame_load_prev_image())
         self.root.bind('m', lambda event: self.pair_frame_mark_match())
         self.root.bind('n', lambda event: self.pair_frame_mark_no_match())
+        self.root.bind('j', lambda event: self.pair_frame_jump_to_unchecked())
     
     def pair_frame_start(self): 
         self.frame.grid_forget()
