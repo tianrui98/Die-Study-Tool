@@ -49,12 +49,16 @@ class Stage:
     """track progress in a stage
     """
     def __init__(self, stage_number, project_data):
-        stages = ["1. Correcting False Discovery Rate", "2. Correcting Sensitivity Rate", "3. Single vs Single", "4. Find Identicals"]
+        stages = ["1. Correcting False Discovery Rate", #Confirm true clusters from the ML-created clusters. The rest unselected images will be thrown into "Singles"
+                  "2. Correcting Sensitivity Rate", #Compare true clusters with each other and with singles (potential False Negatives) to merge true clusters
+                  "3. Single vs Single", #Compare single with single to find remaining clusters or merge identicals 
+                  "4. Find Identicals" #Mark out identical images so we don't double count
+                  ]
         self.stage_number = stage_number
         self.name = stages[self.stage_number]
 
-        if stage_number < 2 :
-            #all images in clusters (not singles)
+        if stage_number == 0 or stage_number == 1 :
+            #all clusters (not singles)
             self.clusters_yet_to_check = {c for c in project_data["clusters"] if c != "Singles"}
 
         elif stage_number == 2:

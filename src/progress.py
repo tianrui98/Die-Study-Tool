@@ -293,8 +293,7 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
                 else:
                     clusters_data[new_cluster_name]["best_image_name"] = best_image_name
             
-            nomatches = original_images_set - set(matched_coin_list)
-
+            nomatches = original_images_set - set(matched_coin_list) #mark all the other images in the original cluster as nomatches
             clusters_data[new_cluster_name]["nomatches"] = list(nomatches)
             clusters_data[new_cluster_name]["images"] = clusters_data[new_cluster_name]["matches"] + clusters_data[new_cluster_name]["nomatches"] + [clusters_data[new_cluster_name]["best_image_name"]]
             clusters_data[new_cluster_name]["identicals"] = []
@@ -486,6 +485,7 @@ def check_cluster_completion(cluster,stage):
     """
     if not cluster:
         return True
+
     all_compared_already = all([(imgObj.name in cluster.compared_before or imgObj.name == cluster.best_image.name ) \
         for imgObj in cluster.images ])
     return all_compared_already
@@ -496,15 +496,16 @@ def check_stage_completion(stage, clusters_data):
         if (len(stage.clusters_yet_to_check) == 0) :
             return True
         elif (len(stage.clusters_yet_to_check) == 1 and len(clusters_data["Singles"]["images"]) == 0):
-            logger.debug(f"Skip cluster {stage.clusters_yet_to_check}")
+            logger.debug(f"[progress: check_stage_completion] Skip cluster {stage.clusters_yet_to_check}")
             return True
     elif stage.stage_number == 2:
         if (len(stage.clusters_yet_to_check) == 0):
             return True
         elif (len(clusters_data["Singles"]["images"]) <= 1):
             remaining_single = clusters_data["Singles"]["images"]
-            logger.debug(f"Skip single {remaining_single}")
+            logger.debug(f"progress: check_stage_completion] Skip single {remaining_single}")
             return True
+        # elif  #TODO when everything has been compared before
     else:
         return len(stage.clusters_yet_to_check) == 0
     
@@ -515,13 +516,18 @@ def check_project_completion(stage, clusters_data):
 
 
 def check_part1_completion(cluster,stage, clusters_data):
+    """
+    part1 means all stages except the identicals vs identicals
+    """
     stage_completed = check_stage_completion(stage, clusters_data)
-    is_second_stage = stage.stage_number == 2
-    case1 = stage_completed and is_second_stage
+    is_stage_two = stage.stage_number == 2
+    case1 = stage_completed and is_stage_two
 
-    #we are at stage 1 and we don't have any Single or cluster to compare with the last cluster
-    case2 = stage.stage_number == 1 and check_cluster_completion(cluster, stage) and len(stage.clusters_yet_to_check) == 1\
-    and len(set(clusters_data["Singles"]["images"]).intersection(clusters_data[list(stage.clusters_yet_to_check)[0]]['nomatches'])) == len(clusters_data["Singles"]["images"])
+    #we are at the last cluster of stage 1 and we don't have any Single or cluster to compare with the last cluster
+    case2 = stage.stage_number == 1 and check_cluster_completion(cluster, stage) \
+        and len(stage.clusters_yet_to_check) == 1\
+        and len(set(clusters_data["Singles"]["images"]).intersection(clusters_data[list(stage.clusters_yet_to_check)[0]]['nomatches'])) \
+            == len(clusters_data["Singles"]["images"])  # all the remaining singles have already been compared with the last cluster and marked nomatches
 
     return case1 or case2
 
@@ -812,17 +818,17 @@ def create_new_objects(cluster, stage, project_name, progress_data, completion_s
     elif completion_status == "stage":
             new_cluster, new_stage = create_next_stage(stage, progress_data[project_name])
             while ((not new_cluster) or check_stage_completion(new_stage, progress_data[project_name]["clusters"])):
-                logger.debug(f"Skip stage {new_stage.name}")
+                logger.debug(f"[progress.py: create_new_objects] Skip stage {new_stage.name}")
                 new_cluster, new_stage = create_next_stage(new_stage,progress_data[project_name])
             return new_cluster, new_stage
     else:
         clusters_data = progress_data[project_name]["clusters"]
         new_cluster = create_next_cluster(stage, clusters_data)
 
-        #If the new cluster is already completed: skip
+        #If the new cluster is already completed: skip TODO:this part should be outside of this function
         if stage.stage_number < 3:
             while check_cluster_completion(new_cluster, stage):
-                logger.debug(f"[create_new_objects] Skip cluster {new_cluster.name}")
+                logger.debug(f"[progress.py: create_new_objects] Skip cluster {new_cluster.name}")
                 stage = mark_cluster_completed(new_cluster, stage,progress_data[project_name]["clusters"])
                 if check_stage_completion(stage,progress_data[project_name]["clusters"]):
                     if check_project_completion(stage, progress_data[project_name]["clusters"]):

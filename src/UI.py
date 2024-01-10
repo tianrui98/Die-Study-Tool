@@ -11,11 +11,13 @@ from tkinter import font
 from src.test import *
 from datetime import datetime
 from datetime import timedelta
+from tkinter import ttk
 
 #%% UI
 class UI():
     def __init__(self, image_height_ratio = 0.7, project_name = "", project_address = "", progress_data = {},  group_display = False, root = None, testing_mode = False):
         super().__init__()
+
         # main interface
         self.root = tk.Tk()
         self.root.title("Die Study Tool")
@@ -44,7 +46,7 @@ class UI():
         self.image_height_char = self._pixel_to_char(int(self.initial_height * image_height_ratio))
         self.image_height_pixel = int(self.initial_height * image_height_ratio)
         self.button_frame_width = self.root.winfo_width() * 0.45
-        self.button_frame_height = self.root.winfo_height() * 0.1
+        self.button_frame_height = self.root.winfo_height() * 0.15
         self.display_frame_width = self.root.winfo_width() * 0.9
         self.display_frame_height = self.root.winfo_height() * 0.8
         self.identical_image_height_pixel = int(self.initial_height * 0.9 * 0.5)
@@ -53,7 +55,6 @@ class UI():
         self.save_recently_benchmark = timedelta(minutes = 1)
 
         self.test = Test()
-
 
 #%% Shortcuts
 
@@ -160,8 +161,8 @@ class UI():
                            textvariable=button_text,
                            height=height,
                            width=width,
-                           command=func,
-                           font = ("Arial", "14"))
+                           command=func) 
+                        #    ,font = ("Arial", "14"))
         button_text.set(content)
         button.grid(column=column,
                     row=row,
@@ -476,6 +477,15 @@ class UI():
     def create_save_progress_window(self, message):
         response = messagebox.askokcancel("Save progress", message + "\nMove on to the next?" )
         return response
+    
+    def create_save_progress_and_proceed_to_identicals_window(self):
+        response = messagebox.askyesnocancel("Save progress", "You have completed stages 1-3" "\nThe next stage, 4: Find Identicals, is unnecessary if there are no identical images in the dataset (eg. hoard data).\nChoose 'Yes' to proceed to Stage 4\nChoose 'No' to finish the project and export.\nChoose 'Cancel' to return.")
+        return response
+        
+
+    def create_skip_identicals_stage_window(self, message):
+        response = messagebox.askokcancel("Skip Find Identicals stage", "\nThe next stage is Find Identicals. " )
+        return response
 
     def create_open_window(self):
         self.open_window = Toplevel(self.root)
@@ -514,34 +524,36 @@ class UI():
 
     def create_UI(self):
         # menu bar
-        right_menu_bar = self.add_frame(self.button_frame_height, self.button_frame_width, 1, 0, 1, 1, self.root, "e")
+        self.right_menu_bar = self.add_frame(self.button_frame_height, self.button_frame_width, 1, 0, 1, 1, self.root, "e")
         
-        self.open_btn = self.add_button("Open", self.create_open_window, 2, 3, 0, 0, 1, 1, right_menu_bar, sticky = "e")
-        self.import_btn = self.add_button("Import", self.create_import_window, 2, 3, 1, 0, 1, 1, right_menu_bar, sticky = "e")
-        self.export_btn = self.add_button("Export", self.export, 2, 3, 2, 0, 1, 1, right_menu_bar, sticky = "e")
-        self.save_btn = self.add_button("Save", self.save, 2, 3, 3, 0, 1, 1, right_menu_bar, sticky = "e")
-        self.exit_btn = self.add_button("Exit", self.exit, 2, 3, 4, 0, 1, 1, right_menu_bar, sticky = "e")
+        self.open_btn = self.add_button("Open", self.create_open_window, None, None, 0, 0, 1, 1, self.right_menu_bar, sticky = "e")
+        self.import_btn = self.add_button("Import", self.create_import_window,None, None, 1, 0, 1, 1, self.right_menu_bar, sticky = "e")
+        self.export_btn = self.add_button("Export", self.export, None, None, 2, 0, 1, 1, self.right_menu_bar, sticky = "e")
+        self.save_btn = self.add_button("Save", self.save, None, None, 3, 0, 1, 1, self.right_menu_bar, sticky = "e")
+        self.exit_btn = self.add_button("Exit", self.exit, None, None, 4, 0, 1, 1, self.right_menu_bar, sticky = "e")
 
-        left_menu_bar = self.add_frame(self.button_frame_height, self.button_frame_width,0, 0, 1, 1, self.root, "we")
-        # left_menu_bar.columnconfigure(1, weight=1)
-        self.project_title_label = self.add_text("Project Title: ", 0, 0, 1, 1, left_menu_bar, sticky= "w")
-        self.stage_label = self.add_text("Current Stage: ", 0, 1, 1, 1, left_menu_bar, sticky= "w")
+        self.left_menu_bar = self.add_frame(self.button_frame_height, self.button_frame_width,0, 0, 1, 1, self.root, "we")
+        # self.left_menu_bar.columnconfigure(1, weight=1)
+        self.project_title_label = self.add_text("Project Title: ", 0, 0, 1, 1, self.left_menu_bar, sticky= "w")
+        self.stage_label = self.add_text("Current Stage: ", 0, 1, 1, 1, self.left_menu_bar, sticky= "w")
 
         self.frame = self.add_frame(self.display_frame_height, self.display_frame_width, 0, 1, 2, 1, self.root)
 
     def create_pair_frame(self):
+        self.action_button_height = self._pixel_to_char(self.button_frame_height)
+
         self.frame.grid_forget()
-        self.frame = self.add_frame(self.display_frame_height, self.display_frame_width, 0, 1, 2, 1, self.root)
+        self.frame = self.add_frame(self.display_frame_height, self.display_frame_width, 0, 1, 2, 1, self.root, "nwe")
         self.frame.rowconfigure(0, weight = 1)
         self.frame.columnconfigure(0, weight = 1)
-        self.left_image = self.add_image(os.path.join("images","blank.png"), 0, 1, 1, 1, self.frame, "w", self.image_height_pixel, 0, 0)
-        self.right_image = self.add_image(os.path.join("images","blank.png"), 1, 1, 2, 1, self.frame, "w", self.image_height_pixel, 0, 0)
+        self.left_image = self.add_image(os.path.join("images","blank.png"), 0, 1, 1, 1, self.frame, "nw", self.image_height_pixel, 0, 0)
+        self.right_image = self.add_image(os.path.join("images","blank.png"), 1, 1, 2, 1, self.frame, "nw", self.image_height_pixel, 0, 0)
 
         self.left_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width,0, 2, 1, 1, self.frame)
         self.left_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.left_info_bar, sticky= "w")
         self.left_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.left_info_bar, sticky= "w")
 
-        self.right_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width // 2,1, 2, 1, 1, self.frame, "w")
+        self.right_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width // 2,1, 2, 1, 1, self.frame, "nw")
         self.right_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.right_info_bar, sticky="w")
         self.right_cluster_label = self.add_text("Cluster : ", 0, 1, 1, 1, self.right_info_bar, sticky="w")
 
@@ -549,11 +561,11 @@ class UI():
         self.green_tick_img = self.create_image_object(os.path.join("images","green_tick.png"),15)
         self.grey_tick_img = self.create_image_object(os.path.join("images","grey_tick.png"),15)
 
-        right_navigation_bar = self.add_frame(self.button_frame_height, self.button_frame_width //2,2, 2, 1, 1, self.frame, "e")
+        right_navigation_bar = self.add_frame(self.button_frame_height, self.button_frame_width //2,2, 2, 1, 1, self.frame, "ne")
         #navigation buttons
-        self.prev_btn = self.add_button("◀", self.pair_frame_load_prev_image, 4, 4, 0, 0, 1, 2, right_navigation_bar, sticky="e")
+        self.prev_btn = self.add_button("◀", self.pair_frame_load_prev_image, self.action_button_height, 4, 0, 0, 1, 2, right_navigation_bar, sticky="ne")
         self.prev_btn["state"] = "disabled"
-        self.next_btn = self.add_button("▶", self.pair_frame_load_next_image, 4, 4, 1, 0, 1, 2, right_navigation_bar, sticky="e")
+        self.next_btn = self.add_button("▶", self.pair_frame_load_next_image, self.action_button_height, 4, 1, 0, 1, 2, right_navigation_bar, sticky="ne")
         self.next_btn["state"] = "normal"
 
         #action buttons
@@ -562,20 +574,11 @@ class UI():
         for i in range(4):
             action_bar.columnconfigure(i, weight=1)
 
-        self.action_button_height = self._pixel_to_char(self.button_frame_height)
         self.no_match_btn = self.add_button("No Match (N)", self.pair_frame_mark_no_match, self.action_button_height, 12, 2, 0, 1, 1, action_bar, "se")
         self.match_btn = self.add_button("Match (M)", self.pair_frame_mark_match, self.action_button_height, 12, 3, 0, 1, 1, action_bar, "se")
 
-        #WIP: skip to the first of remaining unchecked images
+        #skip to the first of remaining unchecked images
         self.skip_to_unchecked_btn = self.add_button("Jump to \nUnchecked (J)", self.pair_frame_jump_to_unchecked, self.action_button_height, 12, 1, 0, 1, 1, action_bar, "se")
-
-        #WIP: #skip to a particular image
-    
-        # self.skip_to_image_name_var = tk.StringVar()
-        # self.skip_to_image_name_var.set("")
-        # self.skip_to_image_name_option_box = tk.OptionMenu(action_bar, self.skip_to_image_name_var, None)
-        # # self.skip_to_image_name_option_box.configure(width = 20)
-        # self.skip_to_image_name_option_box.place(relx=relx_base, rely=rely_base *2 + 0.1, anchor = "w")
 
     def start(self):
         self.create_UI()
@@ -880,6 +883,34 @@ class UI():
         if self.testing_mode:
             self.test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "unmatch")
 
+    def pair_frame_part1_completion_procedure(self):
+        logger.info(f"_____STAGE {self.stage.name} COMPLETED_____")
+        logger.info(f"Part 1 completed")
+        logger.info(str(self.progress_data))
+        response = self.create_save_progress_and_proceed_to_identicals_window()
+        if response:
+            #proceed to Find Identicals
+            self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data)
+            self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, "part1")
+            if self.testing_mode:
+                self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
+                self.test.test_comparison(self.project_name, self.stage.stage_number, self.progress_data[self.project_name]["clusters"])
+                self.test.test_image_number(self.progress_data[self.project_name]["clusters"],self.project_name)
+            self.group_frame_start(identical_stage= True)
+            self.group_frame_refresh_image_display()
+            return None
+        elif response == False:
+            #finish project and export
+            logger.info(f"User chooses to skip stage 4. Find Identicals")
+            if self.testing_mode:
+                self.test.test_image_number(self.progress_data[self.project_name]["clusters"], self.project_address)
+            exported = self.finish_project()
+            if not exported:
+                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
+        else:
+            #return
+            self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
+    
     def pair_frame_check_completion_and_move_on (self):
         """This function is called when user clicks "next" while at the last image
         !!! only mark cluster complete if user clicks ok"""
@@ -893,23 +924,8 @@ class UI():
             return None
 
         if progress.check_part1_completion(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"]):
-            logger.info(f"_____STAGE {self.stage.name} COMPLETED_____")
-            logger.debug(f"Part 1 completed")
-            logger.info(str(self.progress_data))
-            completion_status = "part1"
-            message = "You have completed the current *STAGE*."
-            response = self.create_save_progress_window(message)
-            if response:
-                self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data)
-                self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status)
-                if self.testing_mode:
-                    self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
-                    self.test.test_comparison(self.project_name, self.stage.stage_number, self.progress_data[self.project_name]["clusters"])
-                    self.test.test_image_number(self.progress_data[self.project_name]["clusters"],self.project_name)
-                self.group_frame_start(identical_stage= True)
-                return None
-            else:
-                self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
+            #User can choose to proceed to Finde Identicals stage or not
+            self.pair_frame_part1_completion_procedure()
         else:
             if progress.check_stage_completion(self.stage, self.progress_data[self.project_name]["clusters"]):
                 message = "You have completed the current *STAGE*."
@@ -924,6 +940,7 @@ class UI():
             else:
                 return None
             response = self.create_save_progress_window(message)
+
             if response:
                 self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data)
                 self.cluster, self.stage= progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status)
@@ -931,8 +948,8 @@ class UI():
                     self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
 
                 #update display
-                if self.stage.stage_number == 3:
-                    self.group_frame_start(identical_stage = True)
+                if self.stage.stage_number == 3: #identical vs identical stage is optional
+                    self.pair_frame_part1_completion_procedure()
                 else:
                     self.pair_frame_refresh_image_display()
             else:
@@ -940,12 +957,28 @@ class UI():
                 #todo update test
         self.root.after(1, lambda: self.root.focus_force())
 
+    def resize_frames(self):
+        # Get the current size of the window
+        self.button_frame_width = self.root.winfo_width() * 0.45
+        self.button_frame_height = self.root.winfo_height() * 0.15
+        self.display_frame_width = self.root.winfo_width() * 0.9
+        self.display_frame_height = self.root.winfo_height() * 0.8
+
+        self.frame.config(width=self.display_frame_width, height=self.display_frame_height)
+        self.right_menu_bar.config(width=self.display_frame_width, height=self.display_frame_height)
+        self.left_menu_bar.config(width=self.display_frame_width, height=self.display_frame_height)
+
+        if self.stage.stage_number == 1 or self.stage.stage_number == 2:
+            self.right_info_bar.config(width=self.display_frame_width, height=self.display_frame_height)
+            self.left_info_bar.config(width=self.display_frame_width, height=self.display_frame_height)
+
     def pair_frame_bind_keys(self):
         self.root.bind('<Right>', lambda event: self.pair_frame_load_next_image())
         self.root.bind('<Left>', lambda event: self.pair_frame_load_prev_image())
         self.root.bind('m', lambda event: self.pair_frame_mark_match())
         self.root.bind('n', lambda event: self.pair_frame_mark_no_match())
         self.root.bind('j', lambda event: self.pair_frame_jump_to_unchecked())
+        # self.root.bind("<Configure>", lambda event: self.resize_frames())
     
     def pair_frame_start(self, jump_to_unchecked = False): 
         self.frame.grid_forget()
@@ -1109,7 +1142,7 @@ class UI():
         self.group_frame_refresh_image_display()
 
 
-    def group_frame_finish_project(self):
+    def finish_project(self):
         logger.info("_____PROJECT COMPLETED_____")
         logger.info(str(self.progress_data))
         exported = self.export(project_completed= True)
@@ -1127,7 +1160,7 @@ class UI():
         if progress.check_project_completion(self.stage, self.progress_data[self.project_name]["clusters"]):
             if self.testing_mode:
                 self.test.test_image_number(self.progress_data[self.project_name]["clusters"], self.project_address)
-            exported = self.group_frame_finish_project()
+            exported = self.finish_project()
             if not exported:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
         else:
@@ -1307,23 +1340,23 @@ class UI():
         _ = self.add_text(image_list_label, 0, 1, 1, 1, self.right_main_frame, "w")
 
         #buttons
-        list_button_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 3,2,1,self.right_main_frame, "w")
-        _ = self.add_button("Remove from list (R)", self.group_frame_remove_image_from_list, 2, 17, 0, 3, 1,1, list_button_frame, "w")
-        best_image_btn = self.add_button("Mark best image (B)", self.group_frame_mark_best_image, 2, 17, 1, 3, 1,1, list_button_frame, "e")
+        button_width = self._pixel_to_char(self.right_main_frame_width_pixel //2)
+        list_button_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.7, 0, 3,2,1,self.right_main_frame, "w")
+        _ = self.add_button("Remove from list (R)", self.group_frame_remove_image_from_list, 2, button_width, 0, 3, 1,1, list_button_frame, "w")
+        best_image_btn = self.add_button("Mark best image (B)", self.group_frame_mark_best_image, 2, button_width, 1, 3, 1,1, list_button_frame, "e")
         if identical_stage:
             best_image_btn["state"] = "disabled"
-        _ = self.add_button("Confirm current list (C)", self.group_frame_confirm_current_list, 2,17, 0, 4, 1,1, list_button_frame, "w")
+        _ = self.add_button("Confirm current list (C)", self.group_frame_confirm_current_list, 2,button_width, 0, 4, 1,1, list_button_frame, "w")
 
         prev_next_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 4, 2,1,self.right_main_frame, "w")
         self.prev_btn = self.add_button("◀", self.group_frame_load_prev_page, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
         self.next_btn= self.add_button("▶", self.group_frame_load_next_page, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
 
-        self.next_cluster_btn = self.add_button("Next Cluster (N)", self.group_frame_next_cluster, 3, 19, 1, 2, 1, 1, self.frame, "sw" )
+        self.next_cluster_btn = self.add_button("Next Cluster (N)", self.group_frame_next_cluster, 3, button_width, 1, 2, 1, 1, self.frame, "sw" )
         self.current_cluster_label  = self.add_text("Current cluster: ",0, 3, 1, 1, self.frame, "w" )
     
     def group_frame_destroy (self):
         """TODO: See if this is really necessary. Destroy all the label created in create_group_frame"""
-
         self.prev_btn.destroy()
         self.next_btn.destroy()
         self.next_cluster_btn.destroy()
@@ -1349,6 +1382,9 @@ class UI():
         self.root.bind('4', lambda event: self._add_function_3())
         self.root.bind('5', lambda event: self._add_function_4())
         self.root.bind('6', lambda event: self._add_function_5())
+        # self.root.bind('<Configure>', lambda event: self.resize_frames())
         self.root.after(1, lambda: self.root.focus_force())
+    
+
 
 # %%
