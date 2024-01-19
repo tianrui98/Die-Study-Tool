@@ -12,7 +12,7 @@ from src.test import *
 from datetime import datetime
 from datetime import timedelta
 from tkinter import ttk
-
+import json
 #%% UI
 class UI():
     def __init__(self, image_height_ratio = 0.7, project_name = "", project_address = "", progress_data = {},  group_display = False, root = None, testing_mode = False):
@@ -278,16 +278,19 @@ class UI():
             return 
         #check if the folder is valid
         valid = True
+        error_file = []
         for folder in os.listdir(dirname):
             if not folder.startswith("."):
-                is_folder = os.path.isdir(dirname + "/" + folder)
+                is_folder = os.path.isdir(os.path.join(dirname, folder))
                 no_dot = "." not in folder
                 valid = valid and is_folder and no_dot
+                if not valid:
+                    error_file.append(folder)
 
         valid = valid and "Singles" in os.listdir(dirname)
 
         if not valid:
-            messagebox.askokcancel("Invalid folder", "The folder you have chosen is not valid. \nIt should contain cluster folders and a 'Singles' folder and nothing else." )
+            messagebox.askokcancel("Invalid folder", f"The folder you have chosen is not valid. \nIt should contain cluster folders and a 'Singles' folder and nothing else. It has {error_file}" )
             return None
 
         self.project_name = os.path.basename(dirname)
@@ -462,12 +465,14 @@ class UI():
         image_folder_address = self.imported_image_folder_address_var.get()
         imported_project_name = self.imported_project_name_var.get()
         imported_project_data = eval(self.imported_data_var.get())
+
         if all([image_folder_address, imported_project_name, imported_project_data]):
             progress.import_progress_data(image_folder_address, imported_project_name, imported_project_data)
             self.import_window.quit()
             self.import_window.destroy()
         
         self.project_name = imported_project_name
+        logger.info(f"Import project {imported_project_name}")
         self.open_chosen_project()
 
     def create_export_results_window(self):
@@ -1241,7 +1246,7 @@ class UI():
             self.image_label_widgets[display_index].config(text = "")
 
             if i >= len(self.cluster.images):
-                path = "images/blank.png"
+                path = os.path.join("images", "blank.png")
                 img = self.create_image_object(path, int(self.main_frame_height * 0.49))
                 image_object = None
             else:
@@ -1323,7 +1328,7 @@ class UI():
             row = i // 3
             image_frame = self.add_frame(int(self.main_frame_height * 0.45),int(self.main_frame_height * 0.45), col, row, 1, 1, self.left_main_frame, "nsew")
             self.image_frames.append(image_frame)
-            image_filler = self.add_image("images/blank.png", 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.45))
+            image_filler = self.add_image(os.path.join("images","blank.png"), 0, 0, 2, 1, image_frame, "n", int(self.main_frame_height * 0.45))
             self.image_on_display[i] = (None, image_filler)
             image_label = self.add_text("", 0,1,1,1, image_frame, "se")
             add_function = self._add_function_n(i)
@@ -1331,7 +1336,7 @@ class UI():
             self.image_label_widgets.append(image_label)
 
         #a small image for easy comparison
-        self.right_image_window = self.add_image("images/blank.png", 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
+        self.right_image_window = self.add_image(os.path.join("images","blank.png"), 0,0,1,1,self.right_main_frame, "we", int(self.right_main_frame_width_pixel * 0.7))
         
         if identical_stage:
             image_list_label = "Add images of identical coins: "
