@@ -734,7 +734,7 @@ def create_cluster_folders(project_name, clusters_data, dest_folder):
                 #copy best image to verified
             shutil.copy(os.path.join(project_folder, cluster_info["best_image_name"]),os.path.join(dest_verified_folder, final_cluster_name + '.' + cluster_info["best_image_name"].split(".")[-1]))
 
-def export_results(project_name, progress_data, save_address, keep_progress):
+def export_results(project_name, progress_data, save_address, project_code):
     """Generate excel sheet & move cluster out & wipe out progress data"""
 
     #write none-single clusters
@@ -787,17 +787,19 @@ def export_results(project_name, progress_data, save_address, keep_progress):
 
     data.append([""] * max_length +["sum"] + [str(total_number)])
     res = pd.DataFrame(data, columns=columns)
-    res = res.applymap(lambda x : x.split('.')[0])
+    res = res.applymap(lambda x : x.split('.')[0]) 
+    digits = max(3, len(str(int(res.index.values[-2]))))
+    res.index = [project_code + ';' + str(int(idx) + 1).zfill(digits) for idx in res.index]
+    res = res.rename(index={res.index[-1]: ""})
 
     project_folder = os.path.join(os.getcwd() ,"projects", project_name)
     project_folder_name = os.path.basename(project_folder) + "_" + str(datetime.now().strftime('%Y-%m-%d-%H-%M'))
-
     dest_folder = os.path.join(save_address, project_folder_name)
-
     create_cluster_folders(project_name, progress_data[project_name]["clusters"], dest_folder)
-    res.to_excel( os.path.join(dest_folder, "results_" + project_folder_name + ".xlsx"), index= False)
 
-    return res, dest_folder
+    res.to_excel( os.path.join(dest_folder, "results_" + project_folder_name + ".xlsx"), index= True)
+
+    return dest_folder
 
 def _create_best_image_cluster_dict (clusters_data):
     return {v["best_image_name"]: k for k, v in clusters_data.items() if not k == "Singles"}

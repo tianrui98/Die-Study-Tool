@@ -12,6 +12,7 @@ from src.test import *
 from datetime import datetime
 from datetime import timedelta
 from tkinter import ttk
+from tkinter import simpledialog 
 import json
 #%% UI
 class UI():
@@ -22,6 +23,7 @@ class UI():
         self.root = tk.Tk()
         self.root.title("Die Study Tool")
         self.project_name = project_name
+        self.project_code = "" #user will be asked to give a code when exporting
         self.project_address = project_address
         self.progress_data = progress_data
         self.demo_mode = False
@@ -362,7 +364,7 @@ class UI():
         if not save_address:
             return None
         self.progress_data, _ = progress.update_progress_data(self.project_name, self.stage, self.cluster, self.progress_data)
-        res, destination_address = progress.export_results(self.project_name,self.progress_data, save_address, keep_progress)
+        destination_address = progress.export_results(self.project_name,self.progress_data, save_address, self.project_code)
         if self.testing_mode:
             self.test.test_export(self.progress_data[self.project_name]["clusters"], self.project_name, destination_address)
         if not keep_progress:
@@ -374,10 +376,13 @@ class UI():
             self.root.destroy()
             self.quit = True
 
+ 
+
     def export(self, project_completed = False):
         if project_completed:
             response = self.create_export_results_window()
             if response:
+                self.project_code = self.create_ask_project_code_window()
                 self.export_data()
         else:
             response = messagebox.askokcancel("Export intermediate results", "You have NOT completed the current project.\nExport the intermediate results?" )
@@ -478,6 +483,11 @@ class UI():
     def create_export_results_window(self):
         response = messagebox.askokcancel("Export results", "You have completed the current project.\nExport the results?" )
         return response
+
+    def create_ask_project_code_window(self):
+        response = simpledialog.askstring("Project code", "Please enter a short project code. Example: 'O1' for obverse type 1 or 'R12' for reverse type 12. \n This will be the prefix for the die numbers (eg. O1;001, O1;002).")
+          
+        return response.replace(' ', '')
 
     def create_save_progress_window(self, message):
         response = messagebox.askokcancel("Save progress", message + "\nMove on to the next?" )
