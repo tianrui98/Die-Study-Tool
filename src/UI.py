@@ -74,6 +74,7 @@ class UI():
 
     def _image_name_to_address(self, image_name):
         return os.path.join(self.project_address, image_name)
+    
 
     def _swap_positions(self, l, pos1, pos2):
 
@@ -594,6 +595,8 @@ class UI():
 
         #skip to the first of remaining unchecked images
         self.skip_to_unchecked_btn = self.add_button("Jump to \nUnchecked (J)", self.pair_frame_jump_to_unchecked, self.action_button_height, 12, 1, 0, 1, 1, action_bar, "se")
+        #bump up images to be shown in the left slot next
+        self.bump_up_btn = self.add_button("Bump up (B)", self.pair_frame_bump_up, self.action_button_height, 12, 0, 0, 1, 1, action_bar, "se" )
 
     def start(self):
         self.create_UI()
@@ -679,6 +682,7 @@ class UI():
 
     def pair_frame_refresh_image_display(self):
         """display left and right images"""
+        logger.debug(f"Bump up queue: {self.bump_up_queue}")
         self.left_image_index = 0
         self.right_image_index = 1
 
@@ -761,6 +765,12 @@ class UI():
             self.pair_frame_change_tick_color("right", True)
         else:
             self._deactivate_button(self.no_match_btn)
+        
+        #if the image is in bump_up_queue:
+        if self._get_image_name(self.right_image_index) in self.bump_up_queue:
+            self._activate_button(self.bump_up_btn)
+        else:
+            self._deactivate_button(self.bump_up_btn)
 
     def pair_frame_update_right_image(self) -> None:
         new_image_path = self._get_image_address(self.right_image_index)
@@ -847,6 +857,29 @@ class UI():
         self.pair_frame_check_completion_and_move_on()
     
 
+    def pair_frame_bump_up(self) -> None:
+        """
+        Bump up the image seen on the right to be shown next on the left by adding the right image index to a queue
+        """
+        #add the name of the cluster/image to be checked next to the queue
+
+        if self._get_image_object(self.right_image_index) :
+            if self._get_image_name(self.right_image_index) in self.bump_up_queue:
+                return
+            if self.stage.stage_number == 1:
+                bump_up_next = self._get_image_object(self.right_image_index).cluster
+                if bump_up_next == "Singles":
+                    bump_up_next = self._get_image_object(self.right_image_index).name
+            elif self.stage.stage_number == 2:
+                bump_up_next = self._get_image_object(self.right_image_index).name
+            if bump_up_next not in self.bump_up_queue:
+                self.bump_up_queue.append(bump_up_next)
+            
+            self.pair_frame_mark_no_match()
+            self._activate_button(self.bump_up_btn)
+            
+            logger.info(f"Bump up {bump_up_next}.")
+
     def pair_frame_mark_match (self):
         """During cluster validation stage, match left and right image
         - the right tick turn green (means checked)
@@ -869,6 +902,11 @@ class UI():
             self._mark_compared()
             logger.info("Match {} to cluster {}".format(self._get_image_name(self.right_image_index),self.cluster.name))
 
+            if self._get_image_name(self.right_image_index) in self.bump_up_queue:
+                self.bump_up_queue = [i for i in self.bump_up_queue if i != self._get_image_name(self.right_image_index)]
+                self._deactivate_button(self.bump_up_btn)
+                logger.info(f"Remove {self._get_image_name(self.right_image_index)} from bump up queue.")
+                
         if self.testing_mode:
             self.test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "match")
 
@@ -958,7 +996,17 @@ class UI():
 
             if response:
                 self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data)
-                self.cluster, self.stage= progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status)
+                bump_up_next = None
+                if (len(self.bump_up_queue) > 0):
+                    if completion_status == "stage" and self.stage.stage_number == 1: #pass bump up next to Single vs. Single stage 
+                        bump_up_next = self.bump_up_queue.pop(0)
+                    else:
+                        for i in range(len(self.bump_up_queue)):
+                            if self.bump_up_queue[i] in self.stage.clusters_yet_to_check:
+                                bump_up_next = self.bump_up_queue.pop(i)
+                                break
+     
+                self.cluster, self.stage= progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status, bump_up_next, self.bump_up_queue)
                 if self.testing_mode:
                     self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
 
@@ -969,7 +1017,9 @@ class UI():
                     self.pair_frame_refresh_image_display()
             else:
                 self.stage = progress.unmark_cluster_completed(self.cluster, self.stage, self.progress_data[self.project_name]["clusters"])
-                #todo update test
+                if bump_up_next:
+                    self.bump_up_queue.insert(0, bump_up_next)
+                #TODO: update test
         self.root.after(1, lambda: self.root.focus_force())
 
     def resize_frames(self):
@@ -993,9 +1043,11 @@ class UI():
         self.root.bind('m', lambda event: self.pair_frame_mark_match())
         self.root.bind('n', lambda event: self.pair_frame_mark_no_match())
         self.root.bind('j', lambda event: self.pair_frame_jump_to_unchecked())
+        self.root.bind('b', lambda event: self.pair_frame_bump_up())
         # self.root.bind("<Configure>", lambda event: self.resize_frames())
     
     def pair_frame_start(self, jump_to_unchecked = False): 
+        self.bump_up_queue = []
         self.frame.grid_forget()
         self.create_pair_frame()
         self.pair_frame_bind_keys()

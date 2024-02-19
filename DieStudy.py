@@ -3,7 +3,7 @@ import argparse
 from reset import *
 from src.root_logger import *
 
-__version__ = 20240205
+__version__ = 20240218
 logger.info(f"Latest update: {__version__}")
 
 parser = argparse.ArgumentParser()

@@ -14,16 +14,21 @@ class Cluster:
     name: updated upon saving
     number: updated upon saving
     """
-    def __init__ (self, cluster_name = None, images=[], identicals = [], best_image_name = None, matches = set(), nomatches = set()):
+    def __init__ (self, cluster_name = None, images=[], identicals = [], best_image_name = None, matches = set(), nomatches = set(), bump_up_queue = []):
         self.name = cluster_name
         self.images_dict = {f: ImgObj(f, cluster_name) for f in images}
         #images to compare with, with best image at the first value
-        self.images = sorted(list(self.images_dict.values()), key = lambda x:x.name)
+
+        #self.images is an ordered list of image objects prioritizing images in bump up queue. the image indices in UI correspond to positions in this list.
+        image_name_not_in_bump_up = sorted([i for i in images if i not in bump_up_queue])
+        self.images = [self.images_dict[image_name] for image_name in bump_up_queue if image_name in self.images_dict] + [self.images_dict[image_name] for image_name in image_name_not_in_bump_up]
 
         self.identicals = identicals #list of sets of image names
+
+        #move or set best image as the first image
         if best_image_name and best_image_name in self.images_dict:
             self.best_image = self.images_dict[best_image_name]
-            self.images = [i for i in self.images if i.name != best_image_name]
+            self.images = [i for i in self.images if i.name != best_image_name] #move best image to the first position to be displayed on the left
             self.images.insert(0, self.best_image)
 
         elif best_image_name:
@@ -32,10 +37,10 @@ class Cluster:
             self.best_image = self.images[0]
         else:
             if len(self.images) > 0:
-                self.best_image = self.images[0] #default first image
+                self.best_image = self.images[0] #default best image is the first image in the list
             else:
                 self.best_image = None
-
+        
         self.matches = matches #for adding right image name that belong to the cluster
         self.nomatches = nomatches #for adding right image name that does not belong to the cluster
         self.compared_before = matches.union(nomatches)
@@ -45,6 +50,12 @@ class Cluster:
         for index, obj in enumerate(self.images):
             if obj.name == best_image_name:
                 return index
+
+    def _get_image_index (self, image_name):
+        for i in range(len(self.cluster.images)):
+            im = self.cluster.images[i]
+            if im.name == image_name:
+                return i
 class Stage:
     """track progress in a stage
     """

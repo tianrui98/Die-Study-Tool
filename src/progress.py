@@ -583,7 +583,7 @@ def copy_best_image_to_verified(cluster, project_name):
     return cluster
 
 
-def _create_a_cluster(stage, clusters_data, next_cluster_name, recover_mode =False):
+def _create_a_cluster(stage, clusters_data, next_cluster_name, bump_up_queue = []):
     #compare within cluster
     if stage.stage_number == 0 :
         next_cluster = Cluster(cluster_name = next_cluster_name, 
@@ -614,7 +614,8 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name, recover_mode =Fal
         identicals = [], 
         best_image_name = clusters_data[next_cluster_name]["best_image_name"], 
         matches = set(), 
-        nomatches = set())
+        nomatches = set(),
+        bump_up_queue= bump_up_queue)
 
         #replace the image's cluster name with the cluster it represents
         for image_name, image_object in next_cluster.images_dict.items():
@@ -626,13 +627,14 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name, recover_mode =Fal
 
     elif stage.stage_number == 2:
         #A cluster should include all images in the Singles folder, except those have been matched
-        images = [i for i in clusters_data["Singles"]["images"] if i not in stage.clusters_done]
+        images= [i for i in clusters_data["Singles"]["images"] if i not in stage.clusters_done]
         next_cluster = Cluster(cluster_name = next_cluster_name, 
         images = images, 
         identicals = [], 
         best_image_name = next_cluster_name, 
         matches = set(), 
-        nomatches = set())
+        nomatches = set(),
+        bump_up_queue = bump_up_queue)
         #replace the image's cluster name with the cluster it represents
         for image_name, image_object in next_cluster.images_dict.items():
             image_object.cluster = "Singles"
@@ -651,20 +653,26 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name, recover_mode =Fal
         
     return next_cluster
 
-def create_next_cluster(stage, clusters_data):
+def create_next_cluster(stage, clusters_data, bump_up_next = None, bump_up_queue = []):
     """If the new cluster has only 1 image. the interface will take care of it"""
     if len(stage.clusters_yet_to_check) == 0:
         logger.debug(f"stage {stage.name} clusters yet to check is zero")
         return None
-    next_cluster_name = sorted(list(stage.clusters_yet_to_check),key= lambda s: s.split("_")[0])[0]
-    next_cluster = _create_a_cluster(stage, clusters_data, next_cluster_name)
+    if (not bump_up_next) or (bump_up_next not in stage.clusters_yet_to_check):
+        next_cluster_name = sorted(list(stage.clusters_yet_to_check),key= lambda s: s.split("_")[0])[0]
+    else:
+        next_cluster_name = bump_up_next
+    if stage.stage_number == 1 or stage.stage_number == 2:
+        next_cluster = _create_a_cluster(stage, clusters_data, next_cluster_name, bump_up_queue)
+    else:
+        next_cluster = _create_a_cluster(stage, clusters_data, next_cluster_name)
     return next_cluster
 
 
-def create_next_stage( stage, project_data):
+def create_next_stage( stage, project_data, bump_up_next, bump_up_queue):
     new_stage = Stage(stage.stage_number+1, project_data)
     logger.debug(f"Next stage {new_stage.name}. yet to check: {new_stage.clusters_yet_to_check}")
-    new_cluster = create_next_cluster(new_stage, project_data["clusters"])
+    new_cluster = create_next_cluster(new_stage, project_data["clusters"], bump_up_next, bump_up_queue)
 
     return new_cluster, new_stage
 
@@ -804,7 +812,7 @@ def export_results(project_name, progress_data, save_address, project_code):
 def _create_best_image_cluster_dict (clusters_data):
     return {v["best_image_name"]: k for k, v in clusters_data.items() if not k == "Singles"}
 
-def create_new_objects(cluster, stage, project_name, progress_data, completion_status):
+def create_new_objects(cluster, stage, project_name, progress_data, completion_status, bump_up_next = None, bump_up_queue = []):
     """
     Creates new stage and cluster objects
     completion_status:
@@ -818,14 +826,14 @@ def create_new_objects(cluster, stage, project_name, progress_data, completion_s
     elif completion_status == "part1":
         return create_find_identical_stage(progress_data[project_name])
     elif completion_status == "stage":
-            new_cluster, new_stage = create_next_stage(stage, progress_data[project_name])
+            new_cluster, new_stage = create_next_stage(stage, progress_data[project_name], bump_up_next, bump_up_queue)
             while ((not new_cluster) or check_stage_completion(new_stage, progress_data[project_name]["clusters"])):
                 logger.debug(f"[progress.py: create_new_objects] Skip stage {new_stage.name}")
-                new_cluster, new_stage = create_next_stage(new_stage,progress_data[project_name])
+                new_cluster, new_stage = create_next_stage(new_stage,progress_data[project_name], bump_up_next, bump_up_queue)
             return new_cluster, new_stage
     else:
         clusters_data = progress_data[project_name]["clusters"]
-        new_cluster = create_next_cluster(stage, clusters_data)
+        new_cluster = create_next_cluster(stage, clusters_data, bump_up_next, bump_up_queue)
 
         #If the new cluster is already completed: skip TODO:this part should be outside of this function
         if stage.stage_number < 3:
@@ -836,9 +844,9 @@ def create_new_objects(cluster, stage, project_name, progress_data, completion_s
                     if check_project_completion(stage, progress_data[project_name]["clusters"]):
                         return None, stage
                     else:
-                        return create_new_objects(new_cluster, stage, project_name, progress_data, "stage")
+                        return create_new_objects(new_cluster, stage, project_name, progress_data, "stage", bump_up_next, bump_up_queue)
                 else:
-                    return create_new_objects(new_cluster, stage, project_name, progress_data, "cluster")
+                    return create_new_objects(new_cluster, stage, project_name, progress_data, "cluster", bump_up_next, bump_up_queue)
         return new_cluster, stage
 
 def create_image_folder(old_project_address, new_project_address):
