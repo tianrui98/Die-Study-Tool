@@ -14,6 +14,8 @@ from datetime import timedelta
 from tkinter import ttk
 from tkinter import simpledialog 
 import json
+import time
+
 #%% UI
 class UI():
     def __init__(self, image_height_ratio = 0.7, project_name = "", project_address = "", progress_data = {},  group_display = False, root = None, testing_mode = False):
@@ -825,6 +827,10 @@ class UI():
             self.pair_frame_check_completion_and_move_on()
         return None
 
+    def pair_frame_load_next_image_delayed(self):
+        # time.sleep(0.5)
+        self.pair_frame_load_next_image()
+
     def pair_frame_load_prev_image (self):
         """ change right image
         When user reach the index 1 image, can't move forward anymore
@@ -875,10 +881,11 @@ class UI():
             if bump_up_next not in self.bump_up_queue:
                 self.bump_up_queue.append(bump_up_next)
             
-            self.pair_frame_mark_no_match()
             self._activate_button(self.bump_up_btn)
+            self.pair_frame_mark_no_match()
             
             logger.info(f"Bump up {bump_up_next}.")
+
 
     def pair_frame_mark_match (self):
         """During cluster validation stage, match left and right image
@@ -910,6 +917,8 @@ class UI():
         if self.testing_mode:
             self.test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "match")
 
+        self.pair_frame_load_next_image_delayed()
+
     def pair_frame_mark_no_match (self):
         """During cluster validation stage, unmatch left and right image
         - the right tick turn green (means checked)
@@ -935,6 +944,8 @@ class UI():
             logger.info("Unmatch {} from cluster {}".format(self._get_image_name(self.right_image_index), self.cluster.name))
         if self.testing_mode:
             self.test.record_action(self._get_image_name(self.left_image_index), self._get_image_name(self.right_image_index), "unmatch")
+
+        self.pair_frame_load_next_image_delayed()
 
     def pair_frame_part1_completion_procedure(self):
         logger.info(f"_____STAGE {self.stage.name} COMPLETED_____")
