@@ -117,7 +117,7 @@ class UI():
 
         else:
             h = max_height
-        image = image.resize((math.ceil(h/ih * iw), h), Image. ANTIALIAS)
+        image = image.resize((math.ceil(h/ih * iw), h))
         img = ImageTk.PhotoImage(image)
 
         return img
@@ -132,7 +132,7 @@ class UI():
 
         else:
             h = max_height
-        image = image.resize((math.ceil(h/ih * iw), h), Image. ANTIALIAS)
+        image = image.resize((math.ceil(h/ih * iw), h))
         img = ImageTk.PhotoImage(image)
 
         return img
@@ -140,7 +140,7 @@ class UI():
     def add_icon(self, path, height, width,  column, row, columspan, rowspan, parent, sticky="nsew"):
 
         image = Image.open(path)
-        image = image.resize((width, height), Image. ANTIALIAS)
+        image = image.resize((width, height))
         img = ImageTk.PhotoImage(image)
         img_label = tk.Label(parent, image=img)
         img_label.image = img
@@ -671,7 +671,7 @@ class UI():
 
         else:
             h = max_height
-        image = image.resize((math.ceil(h/ih * iw), h), Image. ANTIALIAS)
+        image = image.resize((math.ceil(h/ih * iw), h))
         img = ImageTk.PhotoImage(image)
         img_label = tk.Label(parent, image=img)
         # img_label.image = img
