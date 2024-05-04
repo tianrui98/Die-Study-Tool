@@ -60,6 +60,8 @@ class UI():
 
         self.test = Test()
 
+        self.root.protocol("WM_DELETE_WINDOW", self.exit)
+
 #%% Shortcuts
 
     def _get_image_object(self, image_index):
@@ -111,13 +113,24 @@ class UI():
 
     def create_image_object(self, path, max_height = None):
         image = Image.open(path)
-        iw, ih = int(image.width), int(image.height)
+
         if not max_height:
             h = int(self.root.winfo_height() * self.image_height_ratio)
 
         else:
             h = max_height
-        image = image.resize((math.ceil(h/ih * iw), h))
+
+        aspect_ratio = image.width / image.height
+
+        # Determine the new dimensions
+        if aspect_ratio > 1:
+            new_width = h
+            new_height = int(h / aspect_ratio)
+        else:
+            new_width = int(h * aspect_ratio)
+            new_height = h
+
+        image = image.resize((new_width, new_height))
         img = ImageTk.PhotoImage(image)
 
         return img
@@ -126,13 +139,26 @@ class UI():
         image_raw = Image.open(path)
         filter = ImageEnhance.Brightness(image_raw)
         image = filter.enhance(0.6)
+
+
         iw, ih = int(image.width), int(image.height)
         if not max_height:
             h = int(self.root.winfo_height() * self.image_height_ratio)
 
         else:
             h = max_height
-        image = image.resize((math.ceil(h/ih * iw), h))
+
+        aspect_ratio = image.width / image.height
+
+        # Determine the new dimensions
+        if aspect_ratio > 1:
+            new_width = h
+            new_height = int(h / aspect_ratio)
+        else:
+            new_width = int(h * aspect_ratio)
+            new_height = h
+
+        image = image.resize((new_width, new_height))
         img = ImageTk.PhotoImage(image)
 
         return img
@@ -1036,7 +1062,7 @@ class UI():
     def resize_frames(self):
         # Get the current size of the window
         self.button_frame_width = self.root.winfo_width() * 0.45
-        self.button_frame_height = self.root.winfo_height() * 0.15
+        self.button_frame_height = min(30, self.root.winfo_height() * 0.15)
         self.display_frame_width = self.root.winfo_width() * 0.9
         self.display_frame_height = self.root.winfo_height() * 0.8
 
@@ -1395,7 +1421,7 @@ class UI():
         self.image_on_display = {} #key: element index (0-5), value: (image object, image widget)
         self.image_label_widgets = []
         self.image_frames = []
-
+        add_button_height = min(30, self._pixel_to_char(int(self.main_frame_height * 0.01)))
         for i in range(6):
             col = i % 3
             row = i // 3
@@ -1405,7 +1431,7 @@ class UI():
             self.image_on_display[i] = (None, image_filler)
             image_label = self.add_text("", 0,1,1,1, image_frame, "se")
             add_function = self._add_function_n(i)
-            _ = self.add_button(f"Add ({i + 1})", add_function , self._pixel_to_char(int(self.main_frame_height * 0.01)), 5, 1,1,1,1, image_frame, "se")
+            _ = self.add_button(f"Add ({i + 1})", add_function , add_button_height, 5, 1,1,1,1, image_frame, "se")
             self.image_label_widgets.append(image_label)
 
         #a small image for easy comparison
@@ -1419,18 +1445,19 @@ class UI():
 
         #buttons
         button_width = self._pixel_to_char(self.right_main_frame_width_pixel //2)
+        button_height = min(self._pixel_to_char(30), 2)
         list_button_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.7, 0, 3,2,1,self.right_main_frame, "w")
-        _ = self.add_button("Remove from list (R)", self.group_frame_remove_image_from_list, 2, button_width, 0, 3, 1,1, list_button_frame, "w")
-        best_image_btn = self.add_button("Mark best image (B)", self.group_frame_mark_best_image, 2, button_width, 1, 3, 1,1, list_button_frame, "e")
+        _ = self.add_button("Remove from list (R)", self.group_frame_remove_image_from_list, button_height, button_width, 0, 3, 1,1, list_button_frame, "w")
+        best_image_btn = self.add_button("Mark best image (B)", self.group_frame_mark_best_image, button_height, button_width, 1, 3, 1,1, list_button_frame, "e")
         if identical_stage:
             best_image_btn["state"] = "disabled"
-        _ = self.add_button("Confirm current list (C)", self.group_frame_confirm_current_list, 2,button_width, 0, 4, 1,1, list_button_frame, "w")
+        _ = self.add_button("Confirm current list (C)", self.group_frame_confirm_current_list, button_height,button_width, 0, 4, 1,1, list_button_frame, "w")
 
         prev_next_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 4, 2,1,self.right_main_frame, "w")
         self.prev_btn = self.add_button("◀", self.group_frame_load_prev_page, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
         self.next_btn= self.add_button("▶", self.group_frame_load_next_page, 4, 4, 1, 0, 1, 1, prev_next_frame , sticky="sw")
 
-        self.next_cluster_btn = self.add_button("Next Cluster (N)", self.group_frame_next_cluster, 3, button_width, 1, 2, 1, 1, self.frame, "sw" )
+        self.next_cluster_btn = self.add_button("Next Cluster (N)", self.group_frame_next_cluster, button_height, button_width, 1, 2, 1, 1, self.frame, "sw" )
         self.current_cluster_label  = self.add_text("Current cluster: ",0, 3, 1, 1, self.frame, "w" )
     
     def group_frame_destroy (self):
@@ -1462,7 +1489,6 @@ class UI():
         self.root.bind('6', lambda event: self._add_function_5())
         # self.root.bind('<Configure>', lambda event: self.resize_frames())
         self.root.after(1, lambda: self.root.focus_force())
-    
 
 
 # %%
