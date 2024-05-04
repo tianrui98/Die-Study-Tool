@@ -222,7 +222,7 @@ def write_progress_data_to_json(progress_data):
     data_file.close()
 
 def save_progress_data_midway(project_name, stage,cluster, progress_data, marked_coin_group_list):
-    """Save progress without touching clusters_data
+    """Save progress and write to json without touching clusters_data
     """
     if str(stage.stage_number) not in progress_data[project_name]["stages"]:
         progress_data = create_new_stage_in_progress_data(progress_data, project_name, stage)
@@ -263,8 +263,8 @@ def save_progress_data_midway(project_name, stage,cluster, progress_data, marked
 
 def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_data):
     """
-    Args:
-        marked_coin_group_list (_type_): _description_
+    Update "clusters". Take unmatched images to "Singles". Create new cluster groups for matched coins.
+    Update current cluster name if necessary.
     """
     
     if marked_coin_group_list == None:
@@ -301,6 +301,7 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
             seen_images_set = seen_images_set.union(set(matched_coin_list))
 
     if old_cluster_name != new_cluster_name:
+        #The old cluster has been broken up. 
         clusters_data.pop(old_cluster_name)
     #send the unmatched images to Singles
     single_images_list = list(original_images_set - seen_images_set)
@@ -308,9 +309,29 @@ def stage0_consolidate_match_groups(cluster,marked_coin_group_list, clusters_dat
         clusters_data["Singles"]["images"].append(image_name)
     return clusters_data
 
-def update_progress_data(project_name, stage, cluster, progress_data, marked_coin_group_list = None):
+def update_current_cluster(project_name, stage, progress_data, current_cluster_name, write_to_json = False):
     """
-    Make changes to the progress data
+    Triggered after new objects are created. Update the current cluster in progress data
+    """
+    if str(stage.stage_number) not in progress_data[project_name]["stages"]:
+        progress_data = create_new_stage_in_progress_data(progress_data, project_name, stage)
+
+    progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = {
+                                                                "name": current_cluster_name,
+                                                                "unprocessed_matches":[],
+                                                                "unprocessed_nomatches":[],
+                                                                "unprocessed_marked_coin_group_list": []
+                                                                }
+    if write_to_json:
+        write_progress_data_to_json(progress_data)
+    
+    return progress_data
+   
+
+def update_progress_data(project_name, stage, cluster, progress_data, marked_coin_group_list = None, write_to_json = False):
+    """
+    This will only be triggered when a cluster is deemed complete by the program.
+    Make changes to the progress data. Modifies "clusters". By default will not write to json.
     {"project_name" : {  "clusters": {cluster_name: {
                                                         "identicals": [],
                                                         "matches": [],
@@ -387,7 +408,6 @@ def update_progress_data(project_name, stage, cluster, progress_data, marked_coi
         if new_cluster_name:
             stage = _change_name_in_clusters_yet_to_check(old_cluster_name, new_cluster_name, stage)
             stage = _change_name_in_clusters_done(old_cluster_name, new_cluster_name,stage)
-            #update current cluster
             progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"] = {
                                                             "name":new_cluster_name,
                                                             "unprocessed_matches":[],
@@ -411,9 +431,9 @@ def update_progress_data(project_name, stage, cluster, progress_data, marked_coi
     for i in range(stage.stage_number):
         if str(i) in progress_data[project_name]["stages"]:
             _ = progress_data[project_name]["stages"].pop(str(i))
-    stages = progress_data[project_name]["stages"]
 
-    write_progress_data_to_json(progress_data)
+    if write_to_json:
+        write_progress_data_to_json(progress_data)
     return progress_data, stage
 
 def clear_current_project(project_name, progress_data):

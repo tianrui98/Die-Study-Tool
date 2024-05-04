@@ -27,7 +27,7 @@ class UI():
         self.project_name = project_name
         self.project_code = "" #user will be asked to give a code when exporting
         self.project_address = project_address
-        self.progress_data = progress_data
+        self.progress_data = progress_data #This is a WORKING version of the JSON data. The JSON will only be updated when the user clicks "save"
         self.demo_mode = False
         self.testing_mode = testing_mode
         self.quit = False
@@ -359,7 +359,6 @@ class UI():
         if len(self.progress_data) > 0:
             logger.info("====SAVE====\n\n")
             self.save_progress_midway()
-            stages = self.progress_data[self.project_name]["stages"]
             self.save_button_pressed_time = datetime.now()
             self.existing_project_names.add(self.project_name)
 
@@ -381,6 +380,10 @@ class UI():
                     logger.info("====SAVE====\n\n")
                 elif self.project_name not in self.existing_project_names:
                     progress.clear_current_project(self.project_name, self.progress_data)
+                    logger.info("====DO NOT SAVE====\n\n")
+                else:
+                    #revert to the previous version.
+                    pass
         logger.info(str(self.progress_data))
         logger.info("====EXIT====\n\n")
         self.root.quit()
@@ -392,7 +395,7 @@ class UI():
         save_address = filedialog.askdirectory() # asks user to choose a directory
         if not save_address:
             return None
-        self.progress_data, _ = progress.update_progress_data(self.project_name, self.stage, self.cluster, self.progress_data)
+        self.progress_data, _ = progress.update_progress_data(self.project_name, self.stage, self.cluster, self.progress_data, write_to_json = True)
         destination_address = progress.export_results(self.project_name,self.progress_data, save_address, self.project_code)
         if self.testing_mode:
             self.test.test_export(self.progress_data[self.project_name]["clusters"], self.project_name, destination_address)
@@ -982,6 +985,7 @@ class UI():
             #proceed to Find Identicals
             self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data)
             self.cluster, self.stage = progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, "part1")
+            self.progress_data = progress.update_current_cluster(self.project_name, self.stage, self.progress_data, self.cluster.name, write_to_json = False)
             if self.testing_mode:
                 self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
                 self.test.test_comparison(self.project_name, self.stage.stage_number, self.progress_data[self.project_name]["clusters"])
@@ -1044,6 +1048,7 @@ class UI():
                                 break
      
                 self.cluster, self.stage= progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status, bump_up_next, self.bump_up_queue)
+                self.progress_data = progress.update_current_cluster(self.project_name, self.stage, self.progress_data, self.cluster.name, write_to_json = False)
                 if self.testing_mode:
                     self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
 
@@ -1284,6 +1289,8 @@ class UI():
             if response:
                 self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data, self.marked_coin_group_list)
                 self.cluster, self.stage= progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status)
+                self.progress_data = progress.update_current_cluster(self.project_name, self.stage, self.progress_data, self.cluster.name, write_to_json = False)
+                
                 if self.testing_mode:
                     self.test.test_cluster_correctedness(self.progress_data[self.project_name]["clusters"])
 
