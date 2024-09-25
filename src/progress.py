@@ -218,7 +218,7 @@ def _merge_singles(cluster, clusters_data, old_cluster_name):
 
 def write_progress_data_to_json(progress_data):
     data_file = open("data.json", "w")
-    json.dump(progress_data, data_file)
+    json.dump(progress_data, data_file, indent = 4)
     data_file.close()
 
 def save_progress_data_midway(project_name, stage,cluster, progress_data, marked_coin_group_list):
@@ -444,7 +444,7 @@ def clear_current_project(project_name, progress_data):
     if project_name in progress_data:
         _ = progress_data.pop(project_name)
     data_file = open("data.json", "w")
-    json.dump(progress_data, data_file)
+    json.dump(progress_data, data_file, indent = 4)
     data_file.close()
     project_folder = os.path.join(os.getcwd() ,"projects", project_name)
     shutil.rmtree(project_folder)
@@ -897,7 +897,7 @@ def import_progress_data(image_folder_address, imported_project_name, imported_p
         project_name += "_"
     existing_progress_data[project_name] = imported_project_data[imported_project_name]
     data_file = open(os.path.join(os.getcwd(), "data.json"), "w")
-    json.dump(existing_progress_data, data_file)
+    json.dump(existing_progress_data, data_file, indent= 4)
     data_file.close()
     
     new_project_address = os.path.join(os.getcwd(),"projects",project_name)

@@ -2,7 +2,7 @@ from src.objects import *
 import src.progress as progress
 from src.root_logger import *
 import tkinter as tk
-from tkinter.constants import CENTER, RAISED, RIDGE, VERTICAL
+from tkinter.constants import CENTER
 from PIL import Image, ImageTk, ImageEnhance
 import math
 from tkinter import Toplevel, filedialog, messagebox
@@ -11,10 +11,8 @@ from tkinter import font
 from src.test import *
 from datetime import datetime
 from datetime import timedelta
-from tkinter import ttk
 from tkinter import simpledialog 
 import json
-import time
 
 #%% UI
 class UI():
@@ -384,7 +382,7 @@ class UI():
                 else:
                     #revert to the previous version.
                     pass
-        logger.info(str(self.progress_data))
+        logger.info(json.dumps(self.progress_data, indent = 4))
         logger.info("====EXIT====\n\n")
         self.root.quit()
         self.root.destroy()
@@ -979,7 +977,7 @@ class UI():
     def pair_frame_part1_completion_procedure(self):
         logger.info(f"_____STAGE {self.stage.name} COMPLETED_____")
         logger.info(f"Part 1 completed")
-        logger.info(str(self.progress_data))
+        logger.info(json.dumps(self.progress_data, indent= 4))
         response = self.create_save_progress_and_proceed_to_identicals_window()
         if response:
             #proceed to Find Identicals
@@ -1025,7 +1023,7 @@ class UI():
                 message = "You have completed the current *STAGE*."
                 completion_status = "stage"
                 logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
-                logger.info(f"{self.progress_data}")
+                logger.info(json.dumps(self.progress_data, indent =4))
                 if self.testing_mode:
                     self.test.test_comparison(self.project_name, self.stage.stage_number, self.progress_data[self.project_name]["clusters"])
                     self.test.clear_comparisons()
@@ -1253,7 +1251,7 @@ class UI():
 
     def finish_project(self):
         logger.info("_____PROJECT COMPLETED_____")
-        logger.info(str(self.progress_data))
+        logger.info(json.dumps(self.progress_data, indent = 4))
         exported = self.export(project_completed= True)
         return exported
 
@@ -1277,7 +1275,7 @@ class UI():
                 message = "You have completed the current *STAGE*."
                 completion_status = "stage"
                 logger.info(f"_____STAGE {self.stage.name} COMPLETED_____")
-                logger.info(f"{self.progress_data}")
+                logger.info(json.dumps(self.progress_data, indent =4))
                 if self.testing_mode:
                     self.test.test_comparison(self.project_name, self.stage.stage_number,self.progress_data[self.project_name]["clusters"])
                     self.test.clear_comparisons()
