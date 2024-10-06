@@ -40,7 +40,7 @@ class Cluster:
                 self.best_image = self.images[0] #default best image is the first image in the list
             else:
                 self.best_image = None
-        
+    
         self.matches = matches #for adding right image name that belong to the cluster
         self.nomatches = nomatches #for adding right image name that does not belong to the cluster
         self.compared_before = matches.union(nomatches)

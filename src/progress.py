@@ -611,7 +611,7 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name, bump_up_queue = [
         identicals = [], 
         best_image_name = "", 
         matches = set(), 
-        nomatches = set())
+        nomatches = set()) 
 
     #compare each cluster's best image with other cluster's best image and everything in "Singles", minus those that have been compared to the next cluster in stage 0
     elif stage.stage_number == 1:
@@ -629,15 +629,26 @@ def _create_a_cluster(stage, clusters_data, next_cluster_name, bump_up_queue = [
             (i not in clusters_data[next_cluster_name]["nomatches"]) and
             (best_image_cluster_dict[i] != next_cluster_name)
              )]
+        
+        #modify the bump_up_queue to be a list of image names. The complexity of this step lies in the mix of Singles and normal clusters.
+        #Images under Singles are named by their own name whereas those under a cluster is named after their cluster name
+        bump_up_queue_image_name = []
+        for item in bump_up_queue:
+            if item in clusters_data:
+                bump_up_queue_image_name.append(clusters_data[item]["best_image_name"])
+            else:
+                bump_up_queue_image_name.append(item)
+    
+        #create the cluster
         next_cluster = Cluster(cluster_name = next_cluster_name, 
         images =  images_in_single + best_images, 
         identicals = [], 
         best_image_name = clusters_data[next_cluster_name]["best_image_name"], 
         matches = set(), 
         nomatches = set(),
-        bump_up_queue= bump_up_queue)
+        bump_up_queue= bump_up_queue_image_name)
 
-        #replace the image's cluster name with the cluster it represents
+        #replace the image's cluster name with the cluster it represents for showing in the interface
         for image_name, image_object in next_cluster.images_dict.items():
             if image_name in best_image_cluster_dict:
                 image_object.cluster = best_image_cluster_dict[image_name]
@@ -678,6 +689,10 @@ def create_next_cluster(stage, clusters_data, bump_up_next = None, bump_up_queue
     if len(stage.clusters_yet_to_check) == 0:
         logger.debug(f"stage {stage.name} clusters yet to check is zero")
         return None
+    
+    if bump_up_next:
+        next_cluster_name = bump_up_next[1]
+
     if (not bump_up_next) or (bump_up_next not in stage.clusters_yet_to_check):
         next_cluster_name = sorted(list(stage.clusters_yet_to_check),key= lambda s: s.split("_")[0])[0]
     else:

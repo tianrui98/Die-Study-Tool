@@ -796,7 +796,8 @@ class UI():
             self._deactivate_button(self.no_match_btn)
         
         #if the image is in bump_up_queue:
-        if self._get_image_name(self.right_image_index) in self.bump_up_queue:
+        if (self._get_image_name(self.right_image_index) in self.bump_up_queue)\
+            or (self._get_image_object(self.right_image_index).cluster in self.bump_up_queue):
             self._activate_button(self.bump_up_btn)
         else:
             self._deactivate_button(self.bump_up_btn)
