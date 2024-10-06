@@ -382,7 +382,7 @@ class UI():
                 else:
                     #revert to the previous version.
                     pass
-        logger.info(json.dumps(self.progress_data, indent = 4))
+        logger.info(json.dumps(self.progress_data))
         logger.info("====EXIT====\n\n")
         self.root.quit()
         self.root.destroy()
@@ -976,7 +976,7 @@ class UI():
     def pair_frame_part1_completion_procedure(self):
         logger.info(f"_____STAGE {self.stage.name} COMPLETED_____")
         logger.info(f"Part 1 completed")
-        logger.info(json.dumps(self.progress_data, indent= 4))
+        logger.info(json.dumps(self.progress_data))
         response = self.create_save_progress_and_proceed_to_identicals_window()
         if response:
             #proceed to Find Identicals
@@ -1022,7 +1022,7 @@ class UI():
                 message = "You have completed the current *STAGE*."
                 completion_status = "stage"
                 logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
-                logger.info(json.dumps(self.progress_data, indent =4))
+                logger.info(json.dumps(self.progress_data))
                 if self.testing_mode:
                     self.test.test_comparison(self.project_name, self.stage.stage_number, self.progress_data[self.project_name]["clusters"])
                     self.test.clear_comparisons()
@@ -1247,7 +1247,7 @@ class UI():
 
     def finish_project(self):
         logger.info("_____PROJECT COMPLETED_____")
-        logger.info(json.dumps(self.progress_data, indent = 4))
+        logger.info(json.dumps(self.progress_data))
         exported = self.export(project_completed= True)
         return exported
 
@@ -1271,7 +1271,7 @@ class UI():
                 message = "You have completed the current *STAGE*."
                 completion_status = "stage"
                 logger.info(f"_____STAGE {self.stage.name} COMPLETED_____")
-                logger.info(json.dumps(self.progress_data, indent =4))
+                logger.info(json.dumps(self.progress_data))
                 if self.testing_mode:
                     self.test.test_comparison(self.project_name, self.stage.stage_number,self.progress_data[self.project_name]["clusters"])
                     self.test.clear_comparisons()

@@ -341,15 +341,16 @@ def update_progress_data(project_name, stage, cluster, progress_data, marked_coi
                                                     }
                                             }
                             "stages": { "0": {
-                                        "current_cluster" {"name":,
-                                                            "unprocessed_matches":[],
-                                                            "unprocessed_nomatches":[],
-                                                            "unprocessed_marked_coin_group_list": []
-                                                            }: ,
-                                        "clusters_yet_to_check": [],
-                                        "clusters_done":[]
-                                        "bump_up_queue":[]
-                                         }}
+                                                "current_cluster" {"name":,
+                                                                            "unprocessed_matches":[],
+                                                                            "unprocessed_nomatches":[],
+                                                                            "unprocessed_marked_coin_group_list": []
+                                                                            }: ,
+                                                        "clusters_yet_to_check": [],
+                                                        "clusters_done":[]
+                                                        "bump_up_queue":[]     
+                                                        } 
+                                         }
     }
 
     *the update on "clusters" will only happen for stage 0, 3 and 4
