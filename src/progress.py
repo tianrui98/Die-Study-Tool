@@ -254,7 +254,7 @@ def save_progress_data_midway(project_name, stage,cluster, progress_data, marked
     #update stage properties
     progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
     progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_done"] = list(stage.clusters_done)
-
+    progress_data[project_name]["stages"][str(stage.stage_number)]["bump_up_queue"] = stage.bump_up_queue
     #write new clusters_data
 
     write_progress_data_to_json(progress_data)
@@ -348,6 +348,7 @@ def update_progress_data(project_name, stage, cluster, progress_data, marked_coi
                                                             }: ,
                                         "clusters_yet_to_check": [],
                                         "clusters_done":[]
+                                        "bump_up_queue":[]
                                          }}
     }
 
@@ -423,7 +424,7 @@ def update_progress_data(project_name, stage, cluster, progress_data, marked_coi
                                                                         }
         progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_yet_to_check"] = list(stage.clusters_yet_to_check)
         progress_data[project_name]["stages"][str(stage.stage_number)]["clusters_done"] = list(stage.clusters_done)
-    
+        progress_data[project_name]["stages"][str(stage.stage_number)]["bump_up_queue"] = stage.bump_up_queue
     #write new clusters_data
     progress_data[project_name]["clusters"] = clusters_data
 
@@ -473,6 +474,7 @@ def load_progress(project_name, create_next_cluster = True, data_address = "data
     stage = Stage(int(stage_number), progress_data[project_name])
     stage.clusters_yet_to_check = set(stage_info["clusters_yet_to_check"])
     stage.clusters_done = set(stage_info["clusters_done"])
+    stage.bump_up_queue = list(stage_info["bump_up_queue"])
     #retrieve latest cluster
     current_cluster_name = stage_info["current_cluster"]["name"]
     if stage_number == "0":
@@ -487,14 +489,14 @@ def load_progress(project_name, create_next_cluster = True, data_address = "data
     else:
         # current cluster hasn't been completed yet. restore unprocessed info
         if current_cluster_name in stage.clusters_yet_to_check:
-            cluster = _create_a_cluster(stage, progress_data[project_name]["clusters"],current_cluster_name)
+            cluster = _create_a_cluster(stage, progress_data[project_name]["clusters"],current_cluster_name, stage.bump_up_queue)
             cluster.matches = cluster.matches.union(set(stage_info["current_cluster"]["unprocessed_matches"]))
             cluster.nomatches = cluster.nomatches.union(set(stage_info["current_cluster"]["unprocessed_nomatches"]))
             cluster.compared_before = (cluster.matches).union(cluster.nomatches)
         # if current cluster has already been checked. give the next cluster in line
         else:
             next_in_line = sorted(list(stage.clusters_yet_to_check), key= lambda s: s.split("_")[0])[0]
-            cluster = _create_a_cluster(stage, progress_data[project_name]["clusters"], next_in_line)
+            cluster = _create_a_cluster(stage, progress_data[project_name]["clusters"], next_in_line,stage.bump_up_queue)
             progress_data[project_name]["stages"][str(stage.stage_number)]["current_cluster"]["name"] = cluster.name
 
     unprocessed_marked_coin_group_list = [(item[0], item[1]) for item in stage_info["current_cluster"]["unprocessed_marked_coin_group_list"]]
@@ -706,6 +708,7 @@ def create_next_cluster(stage, clusters_data, bump_up_next = None, bump_up_queue
 
 def create_next_stage( stage, project_data, bump_up_next, bump_up_queue):
     new_stage = Stage(stage.stage_number+1, project_data)
+    new_stage.bump_up_queue = bump_up_queue
     logger.debug(f"Next stage {new_stage.name}. yet to check: {new_stage.clusters_yet_to_check}")
     new_cluster = create_next_cluster(new_stage, project_data["clusters"], bump_up_next, bump_up_queue)
 
