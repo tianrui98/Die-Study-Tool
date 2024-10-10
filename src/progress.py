@@ -475,7 +475,10 @@ def load_progress(project_name, create_next_cluster = True, data_address = "data
     stage = Stage(int(stage_number), progress_data[project_name])
     stage.clusters_yet_to_check = set(stage_info["clusters_yet_to_check"])
     stage.clusters_done = set(stage_info["clusters_done"])
-    stage.bump_up_queue = list(stage_info["bump_up_queue"])
+    if "bump_up_queue" in stage_info:
+        stage.bump_up_queue = list(stage_info["bump_up_queue"])
+    else:
+        stage.bump_up_queue = []
     #retrieve latest cluster
     current_cluster_name = stage_info["current_cluster"]["name"]
     if stage_number == "0":
