@@ -589,10 +589,13 @@ class UI():
 
         self.frame.grid_forget()
         self.frame = self.add_frame(self.display_frame_height, self.display_frame_width, 0, 1, 2, 1, self.root, "nwe")
-        self.frame.rowconfigure(0, weight = 1)
-        self.frame.columnconfigure(0, weight = 1)
-        self.left_image = self.add_image(os.path.join("images","blank.png"), 0, 1, 1, 1, self.frame, "nw", self.image_height_pixel, 0, 0)
-        self.right_image = self.add_image(os.path.join("images","blank.png"), 1, 1, 2, 1, self.frame, "nw", self.image_height_pixel, 0, 0)
+        self.frame.rowconfigure(0, weight=1)
+        self.frame.columnconfigure(0, weight=1)
+        self.frame.columnconfigure(1, weight=1)  # Give equal weight to both columns
+        
+        # Add a small padding between images (e.g., 10 pixels)
+        self.left_image = self.add_image(os.path.join("images","blank.png"), 0, 1, 1, 1, self.frame, "ne", self.image_height_pixel, padx=(0, 5), pady=0)
+        self.right_image = self.add_image(os.path.join("images","blank.png"), 1, 1, 1, 1, self.frame, "nw", self.image_height_pixel, padx=(5, 0), pady=0)
 
         self.left_info_bar = self.add_frame(self.button_frame_height, self.button_frame_width,0, 2, 1, 1, self.frame)
         self.left_image_name_label = self.add_text("Name : ", 0, 0, 1, 1, self.left_info_bar, sticky= "w")
