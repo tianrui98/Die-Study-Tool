@@ -1509,7 +1509,7 @@ class UI():
         _ = self.add_text(image_list_label, 0, 1, 1, 1, self.right_main_frame, "w")
 
         #buttons
-        button_width = self._pixel_to_char(self.right_main_frame_width_pixel)
+        button_width = self._pixel_to_char(self.right_main_frame_width_pixel * 0.7)
         button_height = min(self._pixel_to_char(30), 2)
         list_button_frame = self.add_frame(5,self.right_main_frame_width_pixel, 0, 3,2,1,self.right_main_frame, "w")
         _ = self.add_button("Remove from list (R)", self.group_frame_remove_image_from_list, button_height, button_width, 0, 3, 1,1, list_button_frame, "w")
