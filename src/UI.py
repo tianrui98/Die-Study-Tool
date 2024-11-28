@@ -621,6 +621,7 @@ class UI():
 
         self.no_match_btn = self.add_button("No Match (N)", self.pair_frame_mark_no_match, self.action_button_height, 12, 2, 0, 1, 1, action_bar, "se")
         self.match_btn = self.add_button("Match (M)", self.pair_frame_mark_match, self.action_button_height, 12, 3, 0, 1, 1, action_bar, "se")
+        self.end_cluster_btn = self.add_button("End Cluster (E)", self.pair_frame_end_cluster, self.action_button_height, 12, 4, 0, 1, 1, action_bar, "se")
 
         #skip to the first of remaining unchecked images
         self.skip_to_unchecked_btn = self.add_button("Jump to \nUnchecked (J)", self.pair_frame_jump_to_unchecked, self.action_button_height, 12, 1, 0, 1, 1, action_bar, "se")
@@ -640,8 +641,10 @@ class UI():
     def _has_been_checked(self, image_name):
         return image_name in self.cluster.matches or image_name in self.cluster.nomatches
 
-    def _mark_compared(self):
-        right_image_name = self._get_image_name(self.right_image_index)
+    def _mark_compared(self, image_index = None):
+        if not image_index:
+            image_index = self.right_image_index
+        right_image_name = self._get_image_name(image_index)
         self.cluster.compared_before.add(right_image_name)
 
     def _change_button_color (self, button_widget, new_fg = "black", new_font = ("Arial", "14")):
@@ -973,6 +976,28 @@ class UI():
 
         self.pair_frame_load_next_image_delayed()
 
+    def pair_frame_end_cluster(self):
+        """Mark all remaining uncompared images as 'no match' and end the cluster"""
+        # Get current right image index
+        current_index = self.right_image_index
+        current_image_name = self._get_image_name(current_index)
+        logger.info(f"End cluster from {self._get_image_name(self.right_image_index)} onwards.")
+        if not self._has_been_checked(current_image_name):
+            self.pair_frame_mark_no_match()
+
+        # Mark all remaining images as no match
+        for i in range(current_index + 1, len(self.cluster.images)):
+            image_name = self._get_image_name(i)
+            if not self._has_been_checked(image_name):
+                self.cluster.nomatches.add(image_name)
+                self._mark_compared(i)
+                if self.testing_mode:
+                    self.test.record_action(self._get_image_name(self.left_image_index), image_name, "unmatch")
+                logger.info(f"Unmatch {image_name} from cluster {self.cluster.name}. Automatically as part of 'end cluster' action.")
+        
+        # Trigger cluster completion check and move to next cluster
+        self.pair_frame_check_completion_and_move_on()
+
     def pair_frame_part1_completion_procedure(self):
         logger.info(f"_____STAGE {self.stage.name} COMPLETED_____")
         logger.info(f"Part 1 completed")
@@ -1024,7 +1049,7 @@ class UI():
                 logger.info("_____STAGE {} COMPLETED_____".format(self.stage.name))
                 logger.info(json.dumps(self.progress_data))
                 if self.testing_mode:
-                    self.test.test_comparison(self.project_name, self.stage.stage_number, self.progress_data[self.project_name]["clusters"])
+                    self.test.test_comparison(self.project_name, self.stage.stage_number,self.progress_data[self.project_name]["clusters"])
                     self.test.clear_comparisons()
             elif completion_status == "cluster":
                 message = "You have completed the current cluster."
@@ -1033,7 +1058,7 @@ class UI():
             response = self.create_save_progress_window(message)
 
             if response:
-                self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data)
+                self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data, self.marked_coin_group_list)
                 bump_up_next = None
                 if (len(self.stage.bump_up_queue) > 0):
                     if completion_status == "stage" and self.stage.stage_number == 1: #pass bump up next to Single vs. Single stage 
@@ -1081,6 +1106,7 @@ class UI():
         self.root.bind('n', lambda event: self.pair_frame_mark_no_match())
         self.root.bind('j', lambda event: self.pair_frame_jump_to_unchecked())
         self.root.bind('b', lambda event: self.pair_frame_bump_up())
+        self.root.bind('e', lambda event: self.pair_frame_end_cluster())
         # self.root.bind("<Configure>", lambda event: self.resize_frames())
     
     def pair_frame_start(self, jump_to_unchecked = False): 
@@ -1243,6 +1269,7 @@ class UI():
         self.right_image_window.image = img
         #reset left window
         self.group_frame_refresh_image_display()
+
 
 
     def finish_project(self):
@@ -1488,6 +1515,7 @@ class UI():
         self.root.bind('4', lambda event: self._add_function_3())
         self.root.bind('5', lambda event: self._add_function_4())
         self.root.bind('6', lambda event: self._add_function_5())
+        self.root.bind('e', lambda event: self.pair_frame_end_cluster())
         # self.root.bind('<Configure>', lambda event: self.resize_frames())
         self.root.after(1, lambda: self.root.focus_force())
 

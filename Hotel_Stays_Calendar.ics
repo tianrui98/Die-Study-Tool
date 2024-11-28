@@ -1,0 +1,44 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:ics.py - http://git.io/lLljaA
+BEGIN:VEVENT
+DESCRIPTION:Room: 乐睿双床客房\, Breakfast included
+DTEND:20241217T040000Z
+LOCATION:远大路25号A座\, Beijing\, China
+DTSTART:20241215T070000Z
+SUMMARY:Stay at 北京海淀雅乐轩酒店 in Beijing
+UID:09a5f626-7fa9-4dea-891c-1a7da91b0d31@09a5.org
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Room: 舒适双床客房\, Breakfast included
+DTEND:20241224T040000Z
+LOCATION:北大街易俗社文化街区西门 (新城区西一路28)\, Xi'an\, China
+DTSTART:20241223T070000Z
+SUMMARY:Stay at 西安城市中心 Moxy 酒店 in Xi'an (Second Stay)
+UID:600fbf38-8a5f-418b-91a8-5127806ce73e@600f.org
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Room: 舒适双床客房\, Breakfast included
+DTEND:20241223T040000Z
+LOCATION:北大街易俗社文化街区西门 (新城区西一路 282 号)\, Xi'an\, China
+DTSTART:20241221T070000Z
+SUMMARY:Stay at 西安城市中心 Moxy 酒店 in Xi'an (First Stay)
+UID:452d1816-e489-4c83-bd5c-109ae7c49efd@452d.org
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Room: 精选双床客房\, Breakfast included
+DTEND:20241225T040000Z
+LOCATION:成都市金牛区北星大道一段4228号2栋\, Chengdu\, China
+DTSTART:20241224T070000Z
+SUMMARY:Stay at 成都 AC 酒店 in Chengdu (First Stay)
+UID:9527e32e-1170-449e-ba01-03bdd9a46cfc@9527.org
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Room: 精选双床客房\, Breakfast included
+DTEND:20241227T040000Z
+LOCATION:成都市金牛区北星大道一段4228号2栋\, Chengdu\, China
+DTSTART:20241225T070000Z
+SUMMARY:Stay at 成都 AC 酒店 in Chengdu (Second Stay)
+UID:40390d17-e727-4970-b1ee-ec3efca674ff@4039.org
+END:VEVENT
+END:VCALENDAR
