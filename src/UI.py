@@ -1142,6 +1142,40 @@ class UI():
 
         self.added_coin_list_box.select_anchor(tk.END) 
 
+    def group_frame_add_all_page(self):
+        """Add all images from the current page to the list.
+        If no best image has been set yet, marks the first added image as best."""
+        start_idx = self.current_page * 6
+        end_idx = min((self.current_page + 1) * 6, len(self.cluster.images))
+        
+        # Check if we have a best image (first item in listbox will be highlighted)
+        has_best_image = self.added_coin_list_box.size() > 0 and \
+                         self.added_coin_list_box.itemcget(0, 'bg') == 'khaki3'
+        
+        first_added = True
+        for i in range(start_idx, end_idx):
+            image_object = self._get_image_object(i)
+            if image_object and image_object.name not in self.added_coin_dict:
+                self.added_coin_dict[image_object.name] = image_object
+                self.added_coin_list_box.insert(tk.END, image_object.name)
+                img = self.create_darken_image_object(self._get_image_address(i), int(self.main_frame_height * 0.49))
+                self.image_on_display[i % 6][1].configure(image=img)
+                self.image_on_display[i % 6][1].image = img
+                
+                # If this is the first image we're adding and no best image exists,
+                # mark it as the best image
+                if first_added and not has_best_image:
+                    # Move it to the top of the list
+                    self.added_coin_list_box.delete(tk.END)
+                    self.added_coin_list_box.insert(0, image_object.name)
+                    # Highlight it
+                    self.added_coin_list_box.itemconfig(0, {'bg':'khaki3'})
+                    # Display it in the small window
+                    img_small = self.create_image_object(self._get_image_address(i), int(self.right_main_frame_width_pixel * 0.7))
+                    self.right_image_window.configure(image=img_small)
+                    self.right_image_window.image = img_small
+                    first_added = False
+
     def _add_function_0(self):
         image_object = self.image_on_display[0][0]
         self.group_frame_add_image_to_list(image_object)
@@ -1480,6 +1514,7 @@ class UI():
         if identical_stage:
             best_image_btn["state"] = "disabled"
         _ = self.add_button("Confirm current list (C)", self.group_frame_confirm_current_list, button_height,button_width, 0, 4, 1,1, list_button_frame, "w")
+        _ = self.add_button("Add all this page (A)", self.group_frame_add_all_page, button_height, button_width, 1, 4, 1, 1, list_button_frame, "e")
 
         prev_next_frame = self.add_frame(5,self.right_main_frame_width_pixel * 0.8, 0, 4, 2,1,self.right_main_frame, "w")
         self.prev_btn = self.add_button("◀", self.group_frame_load_prev_page, 4, 4, 0, 0, 1, 1, prev_next_frame , sticky="sw")
@@ -1518,6 +1553,8 @@ class UI():
         self.root.bind('e', lambda event: self.pair_frame_end_cluster())
         # self.root.bind('<Configure>', lambda event: self.resize_frames())
         self.root.after(1, lambda: self.root.focus_force())
+        self.root.bind('a', lambda event: self.group_frame_add_all_page())
+
 
 
 # %%
