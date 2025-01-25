@@ -17,11 +17,20 @@ class Cluster:
     def __init__ (self, cluster_name = None, images=[], identicals = [], best_image_name = None, matches = set(), nomatches = set(), bump_up_queue = []):
         self.name = cluster_name
         self.images_dict = {f: ImgObj(f, cluster_name) for f in images}
-        #images to compare with, with best image at the first value
-
-        #self.images is an ordered list of image objects prioritizing images in bump up queue. the image indices in UI correspond to positions in this list.
-        image_name_not_in_bump_up = sorted([i for i in images if i not in bump_up_queue])
-        self.images = [self.images_dict[image_name] for image_name in bump_up_queue if image_name in self.images_dict] + [self.images_dict[image_name] for image_name in image_name_not_in_bump_up]
+        
+        # Fix: Preserve bump_up_queue order by handling it before sorting remaining images
+        # First get images from bump_up_queue while preserving their order
+        bumped_images = []
+        for image_name in bump_up_queue:
+            if image_name in self.images_dict:
+                bumped_images.append(self.images_dict[image_name])
+                
+        # Then get remaining images sorted
+        remaining_images = sorted([i for i in images if i not in bump_up_queue])
+        remaining_image_objects = [self.images_dict[image_name] for image_name in remaining_images]
+        
+        # Combine bumped and remaining images
+        self.images = bumped_images + remaining_image_objects
 
         self.identicals = identicals #list of sets of image names
 

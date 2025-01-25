@@ -56,6 +56,7 @@ class UI():
         self.save_button_pressed_time = None
         self.save_recently_benchmark = timedelta(minutes = 1)
 
+        self.initialize_stack()
         self.test = Test()
 
         self.root.protocol("WM_DELETE_WINDOW", self.exit)

@@ -571,7 +571,7 @@ def mark_cluster_completed(cluster, stage, clusters_data):
             if stage.stage_number == 1 and image_name in best_image_cluster_dict:
                 matched_cluster_name = best_image_cluster_dict[image_name]
             else:
-                matched_cluster_name = image_name
+                matched_cluster_name = image_name #for stage 2, the matched cluster is the Single image.
 
             if matched_cluster_name in stage.clusters_yet_to_check:
                 stage.clusters_yet_to_check.remove(matched_cluster_name)

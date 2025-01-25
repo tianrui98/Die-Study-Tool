@@ -3,7 +3,7 @@ import argparse
 from reset import *
 from src.root_logger import *
 
-__version__ = 20241128
+__version__ = 20250125
 logger.info(f"Latest update: {__version__}")
 
 parser = argparse.ArgumentParser()
@@ -14,7 +14,7 @@ args = parser.parse_args()
 def main():
     UI().start()
 
-def test_main():
+def test_main():              
     """
     Semi-automated testing. User still has to click the buttons but the actions will be recorded and compared with progress_data
     Must start fresh.

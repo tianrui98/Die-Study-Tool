@@ -1,0 +1,18 @@
+##Install by typing "pip install -r requirements.txt" in terminal
+##For tkinter install with brew install python-tk@3.9
+
+# Core dependencies
+Pillow>=10.0.0  # For PIL (Python Imaging Library) used in UI.py
+pandas>=2.0.0   # For DataFrame operations in export_results
+
+
+# Logging
+logging
+
+# File handling
+pathlib  # For Path operations
+
+# Data handling
+argparse # Standard library but listed for completeness 
+
+openpyxl
