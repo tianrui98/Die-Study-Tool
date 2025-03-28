@@ -1062,7 +1062,7 @@ class UI():
             response = self.create_save_progress_window(message)
 
             if response:
-                self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data, self.marked_coin_group_list)
+                #Deal with bump up next
                 bump_up_next = None
                 if (len(self.stage.bump_up_queue) > 0):
                     if completion_status == "stage" and self.stage.stage_number == 1: #pass bump up next to Single vs. Single stage 
@@ -1070,9 +1070,13 @@ class UI():
                     else:
                         for i in range(len(self.stage.bump_up_queue)):
                             if self.stage.bump_up_queue[i] in self.stage.clusters_yet_to_check:
+                                print(f"Bump up queue: {self.stage.bump_up_queue}")
                                 bump_up_next = self.stage.bump_up_queue.pop(i)
+                                print(f"Bump up next: {bump_up_next}")
+                                print(f"cluster yet to check: {self.stage.clusters_yet_to_check}")
                                 break
      
+                self.progress_data, self.stage = progress.update_progress_data(self.project_name, self.stage,self.cluster,self.progress_data, self.marked_coin_group_list)
                 self.cluster, self.stage= progress.create_new_objects(self.cluster, self.stage, self.project_name, self.progress_data, completion_status, bump_up_next, self.stage.bump_up_queue)
                 self.progress_data = progress.update_current_cluster(self.project_name, self.stage, self.progress_data, self.cluster.name, write_to_json = False)
                 if self.testing_mode:

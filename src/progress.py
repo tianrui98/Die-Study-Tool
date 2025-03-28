@@ -696,9 +696,6 @@ def create_next_cluster(stage, clusters_data, bump_up_next = None, bump_up_queue
         logger.debug(f"stage {stage.name} clusters yet to check is zero")
         return None
     
-    if bump_up_next:
-        next_cluster_name = bump_up_next[1]
-
     if (not bump_up_next) or (bump_up_next not in stage.clusters_yet_to_check):
         next_cluster_name = sorted(list(stage.clusters_yet_to_check),key= lambda s: s.split("_")[0])[0]
     else:
