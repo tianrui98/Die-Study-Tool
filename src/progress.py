@@ -477,6 +477,7 @@ def load_progress(project_name, create_next_cluster = True, data_address = "data
     stage.clusters_done = set(stage_info["clusters_done"])
     if "bump_up_queue" in stage_info:
         stage.bump_up_queue = list(stage_info["bump_up_queue"])
+        print(f"bump up queue: {stage.bump_up_queue}")
     else:
         stage.bump_up_queue = []
     #retrieve latest cluster

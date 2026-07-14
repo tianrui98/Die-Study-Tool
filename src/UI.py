@@ -272,6 +272,7 @@ class UI():
     def open_chosen_project(self):
         self.project_address = os.path.join(os.getcwd(), "projects", self.project_name)
         self.progress_data, self.stage, self.cluster, unprocessed_marked_coin_group_list = progress.load_progress(self.project_name)
+        print(f"[UI] bump up queue: {self.stage.bump_up_queue}")
         if self.testing_mode:
             self.test = Test(self.progress_data[self.project_name]["clusters"]["Singles"]["images"])
             self.test.load_project_into_test(self.progress_data[self.project_name]["clusters"])
